@@ -1,0 +1,77 @@
+/* Barra superior */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #222;
+  padding: 10px 20px;
+}
+
+.topbar .logo {
+  margin: 0;
+  font-size: 20px;
+  color: #00a2ff;
+}
+
+.user-info {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+/* Layout principal */
+.layout {
+  display: flex;
+  height: calc(100vh - 50px);
+}
+
+.sidebar {
+  width: 200px;
+  background: #1e1e1e;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar button {
+  background: #333;
+  border: none;
+  padding: 10px;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.sidebar button:hover {
+  background: #444;
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
+  background: #111;
+  color: white;
+}
+
+/* Páginas internas */
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
+
+/* Lista de amigos */
+#friendsList {
+  list-style: none;
+  padding: 0;
+}
+
+#friendsList li {
+  background: #222;
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 5px;
+}
