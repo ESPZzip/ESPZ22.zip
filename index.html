@@ -2,147 +2,30 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>ESPZ</title>
-  <style>
-    body { background:#111; color:white; font-family:Arial; margin:0; }
-    header { background:#0d0d0d; padding:10px; display:flex; justify-content:space-between; align-items:center; }
-    nav a { color:white; margin:0 10px; text-decoration:none; }
-    #content { padding:20px; }
-    .hidden { display:none; }
-    .friend { display:inline-block; margin:5px; text-align:center; }
-    .friend img { width:50px; border-radius:50%; }
-    #register, #login { background:#222; padding:20px; max-width:300px; margin:50px auto; border-radius:10px; }
-    button { padding:8px 12px; border:none; border-radius:5px; cursor:pointer; }
-    input { padding:6px; margin:5px 0; width:100%; border:none; border-radius:5px; }
-  </style>
+  <title>ESPZ - Login</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header>
-    <div id="logo">ESPZ</div>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="index.html#catalog">Catalog</a>
-      <a href="index.html#create">Create</a>
-      <a href="index.html#profile">Profile</a>
-    </nav>
-    <div id="userInfo"></div>
-  </header>
+  <div class="login-container">
+    <h1>ESPZ</h1>
 
-  <div id="content">
-    <!-- Registro/Login -->
-    <div id="register">
+    <!-- Registro -->
+    <div id="registerBox">
       <h2>Crear cuenta</h2>
-      <input type="text" id="regName" placeholder="Usuario">
+      <input type="text" id="regName" placeholder="Nombre de usuario">
       <input type="password" id="regPass" placeholder="Contraseña">
       <button onclick="register()">Registrarse</button>
     </div>
-    
-    <div id="login" class="hidden">
+
+    <!-- Inicio de sesión -->
+    <div id="loginBox">
       <h2>Iniciar sesión</h2>
-      <input type="text" id="logName" placeholder="Usuario">
+      <input type="text" id="logName" placeholder="Nombre de usuario">
       <input type="password" id="logPass" placeholder="Contraseña">
       <button onclick="login()">Entrar</button>
     </div>
-
-    <!-- Página principal -->
-    <div id="home" class="hidden">
-      <h1 id="welcome"></h1>
-      <h2>Connections</h2>
-      <div id="friends"></div>
-      <input type="text" id="friendName" placeholder="Agregar amigo por nombre">
-      <button onclick="addFriend()">Agregar</button>
-    </div>
-
-    <!-- Perfil -->
-    <div id="profile" class="hidden">
-      <h2 id="profileName"></h2>
-      <p>ID: <span id="profileId"></span></p>
-      <h3>Amigos</h3>
-      <div id="profileFriends"></div>
-    </div>
   </div>
 
-  <script>
-    let users = JSON.parse(localStorage.getItem("users")) || {};
-    let currentUser = JSON.parse(localStorage.getItem("currentUser")) || null;
-
-    // Función registro
-    function register(){
-      let name = document.getElementById("regName").value;
-      let pass = document.getElementById("regPass").value;
-      if(users[name]) return alert("Ese usuario ya existe");
-      let id = "u" + Math.floor(Math.random()*100000);
-      users[name] = {password:pass, id:id, friends:[]};
-      localStorage.setItem("users", JSON.stringify(users));
-      localStorage.setItem("currentUser", JSON.stringify({name, id}));
-      alert("REFRESCA LA PAGINA");
-    }
-
-    // Función login
-    function login(){
-      let name = document.getElementById("logName").value;
-      let pass = document.getElementById("logPass").value;
-      if(users[name] && users[name].password===pass){
-        localStorage.setItem("currentUser", JSON.stringify({name, id:users[name].id}));
-        location.reload();
-      } else alert("Datos incorrectos");
-    }
-
-    // Mostrar home o perfil
-    function loadPage(){
-      let urlParams = new URLSearchParams(window.location.search);
-      let id = urlParams.get("id");
-
-      if(!currentUser){
-        document.getElementById("register").classList.remove("hidden");
-        document.getElementById("login").classList.remove("hidden");
-        return;
-      }
-
-      document.getElementById("userInfo").innerText = currentUser.name + " ("+currentUser.id+")";
-
-      if(id){ // Perfil de otro usuario
-        for(let u in users){
-          if(users[u].id === id){
-            document.getElementById("profile").classList.remove("hidden");
-            document.getElementById("profileName").innerText = u;
-            document.getElementById("profileId").innerText = id;
-            let div = document.getElementById("profileFriends");
-            div.innerHTML="";
-            users[u].friends.forEach(f=>{
-              div.innerHTML+=`<div class='friend'><img src='https://tr.rbxcdn.com/30DAY-AvatarHeadshot.png' alt=''>${f}</div>`;
-            });
-          }
-        }
-      } else { // Home del usuario
-        document.getElementById("home").classList.remove("hidden");
-        document.getElementById("welcome").innerText = "Bienvenido "+currentUser.name;
-        renderFriends();
-      }
-    }
-
-    // Renderizar amigos
-    function renderFriends(){
-      let div = document.getElementById("friends");
-      div.innerHTML="";
-      users[currentUser.name].friends.forEach(f=>{
-        div.innerHTML+=`<div class='friend'><img src='https://tr.rbxcdn.com/30DAY-AvatarHeadshot.png'>${f}</div>`;
-      });
-    }
-
-    // Agregar amigo
-    function addFriend(){
-      let f = document.getElementById("friendName").value;
-      if(users[f]){
-        if(!users[currentUser.name].friends.includes(f)){
-          users[currentUser.name].friends.push(f);
-          localStorage.setItem("users", JSON.stringify(users));
-          renderFriends();
-        }
-      } else alert("Ese usuario no existe");
-    }
-
-    loadPage();
-  </script>
+  <script src="js/app.js"></script>
 </body>
 </html>
