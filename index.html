@@ -1,250 +1,489 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>ESPZ TEST</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ESPZ</title>
   <style>
-    body { margin: 0; font-family: Arial, sans-serif; background: #111; color: white; }
-    .app { display: flex; height: 100vh; }
-    .sidebar { width: 220px; background: #1a1a1a; padding: 20px; }
-    .sidebar h2 { margin-bottom: 20px; }
-    .sidebar ul { list-style: none; padding: 0; }
-    .sidebar ul li { margin: 12px 0; cursor: pointer; padding: 5px; border-radius: 4px; }
-    .sidebar ul li:hover { background: #333; }
-    .content { flex: 1; background: #111; padding: 20px; overflow-y: auto; }
-    .navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .hidden { display: none; }
-
-    /* Connections */
-    .connections { display: flex; gap: 15px; overflow-x: auto; padding: 10px 0; }
-    .circle { width: 60px; height: 60px; border-radius: 50%; background: #333; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; }
-    .circle:hover { background: #444; }
-
-    /* Games */
-    .games { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
-    .game-card { background: #222; border-radius: 8px; padding: 10px; text-align: center; }
-    .game-card img { width: 100%; border-radius: 5px; }
-
-    /* Friends */
-    .search-bar { margin-bottom: 15px; }
-    .search-bar input { padding: 6px; border: none; border-radius: 4px; }
-    .search-bar button { padding: 6px 10px; margin-left: 5px; border: none; border-radius: 4px; background: #28a745; color: white; cursor: pointer; }
-    .search-bar button:hover { background: #218838; }
-    .result { margin: 10px 0; padding: 8px; background: #222; border-radius: 4px; }
-    .result button { margin-left: 10px; padding: 5px; border: none; border-radius: 4px; background: #007bff; color: white; cursor: pointer; }
-    .result button:hover { background: #0056b3; }
+    :root{--bg:#0f1320;--card:#171c2f;--muted:#222943;--text:#e7e9f3;--accent:#00e0ff;--accent2:#8b5cf6;--success:#22c55e;--danger:#ef4444;--warning:#f59e0b}
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:linear-gradient(180deg,#0e1222,#0b0f1a);} a{color:inherit}
+    .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(10,14,28,.8);backdrop-filter: blur(10px);border-bottom:1px solid #1f2542}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.4px}
+    .brand .cube{width:22px;height:22px;transform:rotate(15deg);background:linear-gradient(145deg,var(--accent),var(--accent2));border-radius:4px;box-shadow:0 6px 18px rgba(0,224,255,.25)}
+    .pill{border:1px solid #2b335e;background:#12172a;color:var(--text);padding:6px 10px;border-radius:999px;font-size:14px}
+    .layout{display:grid;grid-template-columns:220px 1fr;gap:16px;padding:16px;max-width:1200px;margin:0 auto}
+    .sidebar{position:sticky;top:64px;height:calc(100dvh - 64px);padding:12px;border:1px solid #1f2542;background:rgba(18,23,42,.7);backdrop-filter: blur(10px);border-radius:16px}
+    .menu{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+    .menu button{width:100%;text-align:left;padding:12px;border-radius:12px;border:1px solid #263055;background:#151a30;color:var(--text);cursor:pointer;font-weight:600}
+    .menu button.active{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,224,255,.2) inset}
+    .content{min-height:60vh;border:1px solid #1f2542;background:rgba(18,23,42,.7);backdrop-filter: blur(10px);border-radius:16px;padding:16px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+    .card{border:1px solid #263055;background:#12172a;border-radius:16px;overflow:hidden}
+    .card .img{width:100%;aspect-ratio:1.6/1;background:#0c1020;display:flex;align-items:center;justify-content:center}
+    .card h4{margin:10px 12px 4px 12px}
+    .card .meta{display:flex;align-items:center;justify-content:space-between;padding:0 12px 12px}
+    .btn{appearance:none;border:1px solid #2b335e;background:#171d35;color:var(--text);padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:700}
+    .btn:hover{filter:brightness(1.05)}
+    .btn.primary{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,224,255,.15) inset}
+    .btn.success{border-color:var(--success)}
+    .btn.danger{border-color:var(--danger)}
+    .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field input,.field select{background:#0f1430;border:1px solid #263055;border-radius:10px;color:var(--text);padding:10px}
+    .hidden{display:none}
+    .flex{display:flex;gap:10px;align-items:center}
+    .space{height:12px}
+    .tag{font-size:12px;opacity:.8}
+    .robux{display:inline-flex;align-items:center;gap:6px}
+    .r-icon{width:16px;height:16px;border:2px solid var(--text);border-radius:3px;display:inline-block;transform:rotate(45deg)}
+    /* Modal */
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100}
+    .modal .box{max-width:480px;width:100%;background:#12172a;border:1px solid #2b335e;border-radius:16px;padding:16px}
+    .modal .box h3{margin-top:0}
+    .row{display:flex;gap:8px;align-items:center}
+    .row.stretch>*{flex:1}
+    @media (max-width:900px){.layout{grid-template-columns:1fr}.sidebar{position:static;height:auto}}
   </style>
 </head>
 <body>
-  <!-- LOGIN -->
-  <div class="login-bg" id="loginPage">
-    <div class="form-container">
-      <h1 id="formTitle">Registrarse</h1>
-      <div id="registerForm">
-        <input type="text" id="regUser" placeholder="Usuario">
-        <input type="password" id="regPass" placeholder="Contraseña">
-        <button onclick="register()">Registrarse</button>
-        <div class="switch">¿Ya tienes cuenta? <a onclick="toggleForm()">Inicia sesión</a></div>
-      </div>
-      <div id="loginForm" style="display:none;">
-        <input type="text" id="logUser" placeholder="Usuario">
-        <input type="password" id="logPass" placeholder="Contraseña">
-        <button onclick="login()">Entrar</button>
-        <div class="switch">¿No tienes cuenta? <a onclick="toggleForm()">Regístrate</a></div>
+  <header class="topbar">
+    <div class="brand">
+      <div class="cube"></div>
+      <div>
+        <div id="playerName">Invitado</div>
+        <div class="tag">Demo no oficial</div>
       </div>
     </div>
-  </div>
+    <div class="flex">
+      <span class="pill robux" title="Saldo de Robux"><i class="r-icon"></i><span id="robuxBalance">100</span></span>
+      <button id="btnLogin" class="btn primary">Iniciar sesión / Registrarse</button>
+      <button id="btnLogout" class="btn danger hidden">Cerrar sesión</button>
+    </div>
+  </header>
 
-  <!-- HOME -->
-  <div class="app" id="homePage" style="display:none;">
-    <div class="sidebar">
-      <h2>ESPZ</h2>
-      <ul>
-        <li onclick="showSection('homeSection')">Home</li>
-        <li onclick="showProfile(currentUser)">Profile</li>
-        <li onclick="showSection('messagesSection')">Messages</li>
-        <li onclick="showSection('friendsSection')">Friends</li>
-        <li onclick="showSection('avatarSection')">Avatar</li>
-        <li onclick="showSection('inventorySection')">Inventory</li>
-        <li onclick="showSection('settingsSection')">Settings</li>
-        <li onclick="logout()">Cerrar sesión</li>
+  <main class="layout">
+    <aside class="sidebar">
+      <ul class="menu">
+        <li><button data-view="marketplace" class="active">Marketplace</button></li>
+        <li><button data-view="inventory">Inventory</button></li>
+        <li><button data-view="trades">Trades</button></li>
+        <li><button data-view="profile">Profile</button></li>
+        <li><button data-view="friends">Friends</button></li>
       </ul>
+    </aside>
+
+    <section class="content">
+      <!-- Marketplace -->
+      <div id="view-marketplace" class="view">
+        <div class="toolbar">
+          <h2 style="margin:0">Marketplace</h2>
+        </div>
+        <div class="space"></div>
+        <div id="marketGrid" class="grid"></div>
+      </div>
+
+      <!-- Inventory -->
+      <div id="view-inventory" class="view hidden">
+        <div class="toolbar"><h2 style="margin:0">Inventory</h2></div>
+        <div class="space"></div>
+        <div id="inventoryGrid" class="grid"></div>
+        <p id="emptyInventory" class="tag">Aún no tienes objetos. ¡Compra algo en el Marketplace!</p>
+      </div>
+
+      <!-- Trades -->
+      <div id="view-trades" class="view hidden">
+        <div class="toolbar"><h2 style="margin:0">Trades</h2></div>
+        <p class="tag">Sistema de intercambios de demostración. (Pendiente)</p>
+      </div>
+
+      <!-- Profile -->
+      <div id="view-profile" class="view hidden">
+        <div class="toolbar"><h2 style="margin:0">Profile</h2></div>
+        <div class="space"></div>
+        <div id="profileBox" class="card" style="padding:16px">
+          <div class="row stretch">
+            <div class="field">
+              <label>Usuario</label>
+              <input id="profileUsername" type="text" disabled />
+            </div>
+            <div class="field">
+              <label>Robux</label>
+              <input id="profileRobux" type="number" disabled />
+            </div>
+          </div>
+          <div class="space"></div>
+          <div class="row">
+            <button id="grantRobux" class="btn success" title="Demo: otorga Robux de prueba">+100 Robux (demo)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Friends -->
+      <div id="view-friends" class="view hidden">
+        <div class="toolbar"><h2 style="margin:0">Friends</h2></div>
+        <div class="space"></div>
+        <div class="row stretch">
+          <div class="field" style="flex:2">
+            <label>Buscar usuario registrado</label>
+            <input id="friendSearch" type="text" placeholder="Escribe un nombre de usuario..." />
+          </div>
+          <div class="field" style="flex:1">
+            <label>&nbsp;</label>
+            <button id="btnSearchFriend" class="btn">Buscar</button>
+          </div>
+        </div>
+        <div class="space"></div>
+        <div id="friendResults" class="grid"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Auth Modal -->
+  <div id="authModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="box">
+      <h3>Bienvenido</h3>
+      <div class="row" style="gap:12px">
+        <button id="tabLogin" class="btn primary">Iniciar sesión</button>
+        <button id="tabRegister" class="btn">Registrarse</button>
+      </div>
+      <div class="space"></div>
+      <form id="formLogin" class="authForm">
+        <div class="field">
+          <label>Usuario</label>
+          <input id="loginUser" required />
+        </div>
+        <div class="field">
+          <label>Contraseña</label>
+          <input id="loginPass" type="password" required />
+        </div>
+        <div class="space"></div>
+        <div class="row">
+          <button class="btn primary" type="submit">Entrar</button>
+          <button type="button" class="btn" id="closeAuth">Cerrar</button>
+        </div>
+      </form>
+
+      <form id="formRegister" class="authForm hidden">
+        <div class="field">
+          <label>Usuario</label>
+          <input id="regUser" required placeholder="Debe ser único" />
+        </div>
+        <div class="field">
+          <label>Contraseña</label>
+          <input id="regPass" type="password" required />
+        </div>
+        <div class="space"></div>
+        <div class="row">
+          <button class="btn success" type="submit">Crear cuenta</button>
+          <button type="button" class="btn" id="closeAuth2">Cerrar</button>
+        </div>
+      </form>
     </div>
-    <div class="content">
-      <div class="navbar">
-        <h2 id="sectionTitle">Home</h2>
-        <div>Bienvenido, <span id="playerName"></span></div>
-      </div>
+  </div>
 
-      <!-- HOME -->
-      <div id="homeSection">
-        <h3>Connections</h3>
-        <div class="connections" id="friendList">
-          <div class="circle">+</div>
-        </div>
-
-        <h3>Juegos recomendados</h3>
-        <div class="games">
-          <div class="game-card"><img src="https://tr.rbxcdn.com/8b54f1a44bf75b1b27a4c0a8c04e6a77/420/420/Image/Png"><p>Adopt Me!</p></div>
-          <div class="game-card"><img src="https://tr.rbxcdn.com/40144b61f8d19f3e40104bfeab8c083d/420/420/Image/Png"><p>Brookhaven 🏡RP</p></div>
-          <div class="game-card"><img src="https://tr.rbxcdn.com/c63ad65c9fa2b1c06dcf07ecbe0281e7/420/420/Image/Png"><p>Blox Fruits</p></div>
-        </div>
-      </div>
-
-      <!-- PROFILE -->
-      <div id="profileSection" class="hidden">
-        <h3 id="profileTitle">Perfil</h3>
-        <p><strong>Usuario:</strong> <span id="profileUser"></span></p>
-        <p><strong>Amigos:</strong> <span id="profileFriends"></span></p>
-      </div>
-
-      <!-- MESSAGES -->
-      <div id="messagesSection" class="hidden">
-        <h3>Mensajes</h3>
-        <p>No tienes mensajes nuevos.</p>
-      </div>
-
-      <!-- FRIENDS -->
-      <div id="friendsSection" class="hidden">
-        <h3>Amigos</h3>
-        <div class="search-bar">
-          <input type="text" id="searchUser" placeholder="Buscar usuario...">
-          <button onclick="searchUser()">Buscar</button>
-        </div>
-        <div id="searchResults"></div>
-      </div>
-
-      <!-- AVATAR -->
-      <div id="avatarSection" class="hidden">
-        <h3>Editor de Avatar</h3>
-        <p>Pronto podrás personalizar tu avatar aquí.</p>
-      </div>
-
-      <!-- INVENTORY -->
-      <div id="inventorySection" class="hidden">
-        <h3>Inventario</h3>
-        <p>Aquí se mostrarán tus objetos.</p>
-      </div>
-
-      <!-- SETTINGS -->
-      <div id="settingsSection" class="hidden">
-        <h3>Configuración</h3>
-        <p>Ajustes de tu cuenta.</p>
+  <!-- Confirm Modal -->
+  <div id="confirmModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="box">
+      <h3 id="confirmTitle">Confirmar compra</h3>
+      <p id="confirmText">¿Deseas comprar este artículo?</p>
+      <div class="row">
+        <button id="confirmYes" class="btn success">Comprar</button>
+        <button id="confirmNo" class="btn">Cancelar</button>
       </div>
     </div>
   </div>
+
+  <!-- Toast -->
+  <div id="toast" class="hidden" style="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#0f1430;border:1px solid #2b335e;border-radius:12px;padding:10px 14px;z-index:200"></div>
 
   <script>
-    let currentUser = null;
-    let users = JSON.parse(localStorage.getItem("users")) || {};
-    let loggedUser = localStorage.getItem("loggedUser");
+    // --- Datos iniciales (demo) ---
+    const defaultItems = [
+      {id:'1', name:'Classic Fedora', price: 150, img: 'https://via.placeholder.com/640x400?text=Classic+Fedora'},
+      {id:'2', name:'Dominus Astra', price: 1000, img: 'https://via.placeholder.com/640x400?text=Dominus+Astra'},
+      {id:'3', name:'Valkyrie Helm', price: 750, img: 'https://via.placeholder.com/640x400?text=Valkyrie+Helm'},
+      {id:'4', name:'Red Sparkle Time', price: 1200, img: 'https://via.placeholder.com/640x400?text=Red+Sparkle+Time'},
+      {id:'5', name:'RF Top Hat', price: 450, img: 'https://via.placeholder.com/640x400?text=Top+Hat'},
+      {id:'6', name:'Golden Wings', price: 900, img: 'https://via.placeholder.com/640x400?text=Golden+Wings'}
+    ];
 
-    if (loggedUser) { currentUser = loggedUser; showHome(); }
+    // Helpers de almacenamiento local
+    const LS_USERS = 'demo_users';
+    const LS_SESSION = 'demo_session';
 
-    function toggleForm() {
-      const reg = document.getElementById("registerForm");
-      const log = document.getElementById("loginForm");
-      const title = document.getElementById("formTitle");
-      if (reg.style.display === "none") {
-        reg.style.display = "block"; log.style.display = "none"; title.innerText = "Registrarse";
-      } else {
-        reg.style.display = "none"; log.style.display = "block"; title.innerText = "Iniciar sesión";
+    const getUsers = () => JSON.parse(localStorage.getItem(LS_USERS) || '[]');
+    const setUsers = (arr) => localStorage.setItem(LS_USERS, JSON.stringify(arr));
+    const getSession = () => JSON.parse(localStorage.getItem(LS_SESSION) || 'null');
+    const setSession = (obj) => localStorage.setItem(LS_SESSION, JSON.stringify(obj));
+
+    // UI refs
+    const views = {
+      marketplace: document.getElementById('view-marketplace'),
+      inventory: document.getElementById('view-inventory'),
+      trades: document.getElementById('view-trades'),
+      profile: document.getElementById('view-profile'),
+      friends: document.getElementById('view-friends'),
+    };
+    const menuButtons = document.querySelectorAll('.menu button');
+    const marketGrid = document.getElementById('marketGrid');
+    const inventoryGrid = document.getElementById('inventoryGrid');
+    const emptyInventory = document.getElementById('emptyInventory');
+
+    const playerName = document.getElementById('playerName');
+    const robuxBalance = document.getElementById('robuxBalance');
+
+    const btnLogin = document.getElementById('btnLogin');
+    const btnLogout = document.getElementById('btnLogout');
+    const authModal = document.getElementById('authModal');
+    const tabLogin = document.getElementById('tabLogin');
+    const tabRegister = document.getElementById('tabRegister');
+    const formLogin = document.getElementById('formLogin');
+    const formRegister = document.getElementById('formRegister');
+    const closeAuth = document.getElementById('closeAuth');
+    const closeAuth2 = document.getElementById('closeAuth2');
+
+    const loginUser = document.getElementById('loginUser');
+    const loginPass = document.getElementById('loginPass');
+    const regUser = document.getElementById('regUser');
+    const regPass = document.getElementById('regPass');
+
+    const profileUsername = document.getElementById('profileUsername');
+    const profileRobux = document.getElementById('profileRobux');
+    const grantRobuxBtn = document.getElementById('grantRobux');
+
+    const friendSearch = document.getElementById('friendSearch');
+    const btnSearchFriend = document.getElementById('btnSearchFriend');
+    const friendResults = document.getElementById('friendResults');
+
+    const confirmModal = document.getElementById('confirmModal');
+    const confirmTitle = document.getElementById('confirmTitle');
+    const confirmText = document.getElementById('confirmText');
+    const confirmYes = document.getElementById('confirmYes');
+    const confirmNo = document.getElementById('confirmNo');
+
+    const toast = document.getElementById('toast');
+
+    let pendingAction = null; // {type:'buy', item}
+
+    // --- Navegación entre vistas ---
+    function showView(name){
+      Object.keys(views).forEach(k => views[k].classList.add('hidden'));
+      views[name].classList.remove('hidden');
+      menuButtons.forEach(b=>b.classList.toggle('active', b.dataset.view===name));
+    }
+    document.querySelector('.menu').addEventListener('click', (e)=>{
+      if(e.target.tagName==='BUTTON'){
+        const v = e.target.dataset.view; showView(v);
+        if(v==='inventory') renderInventory();
+        if(v==='profile') renderProfile();
       }
-    }
+    });
 
-    function register() {
-      const user = document.getElementById("regUser").value.trim();
-      const pass = document.getElementById("regPass").value;
-      if (!user || !pass) { alert("Completa todos los campos"); return; }
-      if (users[user]) { alert("Ese usuario ya existe"); return; }
-      users[user] = { password: pass, friends: [] };
-      localStorage.setItem("users", JSON.stringify(users));
-      localStorage.setItem("loggedUser", user);
-      alert("✅ Te has registrado con éxito. Refresca la página!");
-    }
-
-    function login() {
-      const user = document.getElementById("logUser").value.trim();
-      const pass = document.getElementById("logPass").value;
-      if (users[user] && users[user].password === pass) {
-        currentUser = user;
-        localStorage.setItem("loggedUser", user);
-        showHome();
-      } else { alert("Usuario o contraseña incorrectos"); }
-    }
-
-    function logout() {
-      localStorage.removeItem("loggedUser");
-      location.reload();
-    }
-
-    function showHome() {
-      document.getElementById("loginPage").style.display = "none";
-      document.getElementById("homePage").style.display = "flex";
-      document.getElementById("playerName").innerText = currentUser;
-      updateFriends();
-    }
-
-    function showSection(sectionId) {
-      const sections = document.querySelectorAll(".content > div:not(.navbar)");
-      sections.forEach(sec => sec.classList.add("hidden"));
-      document.getElementById(sectionId).classList.remove("hidden");
-      document.getElementById("sectionTitle").innerText =
-        document.getElementById(sectionId).querySelector("h3").innerText;
-    }
-
-    // ---------------- PROFILE ----------------
-    function showProfile(username) {
-      const user = users[username];
-      if (!user) return;
-      document.getElementById("profileUser").innerText = username;
-      document.getElementById("profileFriends").innerText = user.friends.length;
-      showSection("profileSection");
-      document.getElementById("profileTitle").innerText = `Perfil de ${username}`;
-      document.getElementById("sectionTitle").innerText = "Profile";
-    }
-
-    // ---------------- FRIENDS ----------------
-    function searchUser() {
-      const query = document.getElementById("searchUser").value.trim();
-      const resultsDiv = document.getElementById("searchResults");
-      resultsDiv.innerHTML = "";
-
-      if (!query) return;
-
-      if (users[query] && query !== currentUser) {
-        const div = document.createElement("div");
-        div.className = "result";
-        div.innerHTML = `${query} <button onclick="addFriend('${query}')">Agregar</button>`;
-        resultsDiv.appendChild(div);
-      } else {
-        resultsDiv.innerHTML = "<p>No se encontró ningún usuario.</p>";
-      }
-    }
-
-    function addFriend(friendName) {
-      if (!users[currentUser].friends.includes(friendName)) {
-        users[currentUser].friends.push(friendName);
-        localStorage.setItem("users", JSON.stringify(users));
-        alert(`${friendName} agregado a tus amigos!`);
-        updateFriends();
-      } else {
-        alert("Ese usuario ya es tu amigo.");
-      }
-    }
-
-    function updateFriends() {
-      const list = document.getElementById("friendList");
-      list.innerHTML = '<div class="circle">+</div>';
-      users[currentUser].friends.forEach(f => {
-        const div = document.createElement("div");
-        div.className = "circle";
-        div.innerText = f[0].toUpperCase();
-        div.title = f;
-        div.onclick = () => showProfile(f);
-        list.appendChild(div);
+    // --- Render Marketplace ---
+    function renderMarketplace(){
+      marketGrid.innerHTML = '';
+      defaultItems.forEach(item=>{
+        const owned = getCurrentUser()?.inventory?.some(x=>x.id===item.id);
+        const card = document.createElement('div');
+        card.className='card';
+        card.innerHTML = `
+          <div class="img"><img src="${item.img}" alt="${item.name}" style="max-width:100%;max-height:100%"></div>
+          <h4>${item.name}</h4>
+          <div class="meta">
+            <span class="robux"><i class="r-icon"></i> ${item.price}</span>
+            <button class="btn primary" ${owned? 'disabled title="Ya en tu inventario"':''} data-buy="${item.id}">${owned?'Comprado':'Comprar'}</button>
+          </div>`;
+        marketGrid.appendChild(card);
       });
     }
+
+    // --- Render Inventory ---
+    function renderInventory(){
+      const user = getCurrentUser();
+      inventoryGrid.innerHTML = '';
+      const items = user?.inventory || [];
+      emptyInventory.style.display = items.length? 'none':'block';
+      items.forEach(item=>{
+        const card = document.createElement('div');
+        card.className='card';
+        card.innerHTML = `
+          <div class="img"><img src="${item.img}" alt="${item.name}" style="max-width:100%;max-height:100%"></div>
+          <h4>${item.name}</h4>
+          <div class="meta"><span class="robux"><i class="r-icon"></i> ${item.price}</span><span class="tag">En propiedad</span></div>`;
+        inventoryGrid.appendChild(card);
+      });
+    }
+
+    // --- Profile ---
+    function renderProfile(){
+      const user = getCurrentUser();
+      profileUsername.value = user?.username || '';
+      profileRobux.value = user?.robux ?? 0;
+    }
+
+    // --- Compras ---
+    marketGrid.addEventListener('click',(e)=>{
+      const btn = e.target.closest('button[data-buy]');
+      if(!btn) return;
+      const id = btn.getAttribute('data-buy');
+      const item = defaultItems.find(i=>i.id===id);
+      const user = getCurrentUser();
+      if(!user){ showToast('Debes iniciar sesión.'); openAuth(); return; }
+      // Si ya lo tiene
+      if(user.inventory.some(x=>x.id===id)){
+        showToast('Ya tienes este artículo.'); return;
+      }
+      // Confirmación
+      confirmTitle.textContent = 'Confirmar compra';
+      confirmText.innerHTML = `¿Comprar <b>${item.name}</b> por <span class="robux"><i class="r-icon"></i> ${item.price}</span>?`;
+      pendingAction = {type:'buy', item};
+      confirmModal.classList.remove('hidden');
+    });
+
+    confirmYes.addEventListener('click',()=>{
+      if(!pendingAction) return;
+      if(pendingAction.type==='buy'){
+        const user = getCurrentUser();
+        const price = pendingAction.item.price;
+        if(user.robux < price){
+          confirmModal.classList.add('hidden');
+          showToast('Robux insuficientes.');
+          return;
+        }
+        user.robux -= price;
+        user.inventory.push(pendingAction.item);
+        updateUser(user);
+        applySession(user);
+        showToast('Compra realizada.');
+        renderMarketplace();
+        renderInventory();
+      }
+      pendingAction=null; confirmModal.classList.add('hidden');
+    });
+    confirmNo.addEventListener('click',()=>{ pendingAction=null; confirmModal.classList.add('hidden'); });
+
+    // --- Friends (buscar registrados) ---
+    btnSearchFriend.addEventListener('click', renderFriendSearch);
+    friendSearch.addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ e.preventDefault(); renderFriendSearch(); }});
+
+    function renderFriendSearch(){
+      const q = friendSearch.value.trim().toLowerCase();
+      const all = getUsers();
+      const me = getCurrentUser();
+      friendResults.innerHTML='';
+      const results = all.filter(u=> q? u.username.toLowerCase().includes(q): true)
+                        .filter(u=> me? u.username!==me.username : true);
+      if(results.length===0){
+        const p = document.createElement('p'); p.className='tag'; p.textContent='No se encontraron usuarios.'; friendResults.appendChild(p); return;
+      }
+      results.forEach(u=>{
+        const card = document.createElement('div'); card.className='card';
+        const isFriend = me?.friends?.includes(u.username);
+        card.innerHTML = `
+          <div class="img"><div style="color:#9aa3c7">@${u.username}</div></div>
+          <h4>${u.username}</h4>
+          <div class="meta">
+            <span class="tag">Robux: ${u.robux}</span>
+            <button class="btn ${isFriend? '':'primary'}" data-addfriend="${u.username}" ${!me? 'disabled title="Inicia sesión"' : ''}>${isFriend? 'Amigos' : 'Agregar'}</button>
+          </div>`;
+        friendResults.appendChild(card);
+      });
+    }
+
+    friendResults.addEventListener('click',(e)=>{
+      const btn = e.target.closest('button[data-addfriend]');
+      if(!btn) return;
+      const target = btn.getAttribute('data-addfriend');
+      const me = getCurrentUser();
+      if(!me){ showToast('Debes iniciar sesión.'); return; }
+      if(me.friends.includes(target)){ showToast('Ya es tu amigo.'); return; }
+      me.friends.push(target);
+      updateUser(me); applySession(me); showToast('Amigo agregado.'); renderFriendSearch();
+    });
+
+    // --- Autenticación ---
+    function openAuth(){ authModal.classList.remove('hidden'); setTimeout(()=>{ loginUser.focus(); },0); }
+    function closeAuthModal(){ authModal.classList.add('hidden'); }
+
+    btnLogin.addEventListener('click', openAuth);
+    closeAuth.addEventListener('click', closeAuthModal);
+    closeAuth2.addEventListener('click', closeAuthModal);
+
+    tabLogin.addEventListener('click',()=>{ formLogin.classList.remove('hidden'); formRegister.classList.add('hidden'); tabLogin.classList.add('primary'); tabRegister.classList.remove('primary'); });
+    tabRegister.addEventListener('click',()=>{ formLogin.classList.add('hidden'); formRegister.classList.remove('hidden'); tabRegister.classList.add('primary'); tabLogin.classList.remove('primary'); });
+
+    formRegister.addEventListener('submit',(e)=>{
+      e.preventDefault();
+      const username = regUser.value.trim();
+      const password = regPass.value;
+      if(!username || !password) return;
+      const users = getUsers();
+      if(users.some(u=>u.username.toLowerCase()===username.toLowerCase())){
+        showToast('Ese usuario ya está en uso.'); return;
+      }
+      const newUser = {username, password, robux: 1000, inventory: [], friends: []};
+      users.push(newUser); setUsers(users); setSession({username});
+      applySession(newUser); closeAuthModal(); showToast('Cuenta creada.');
+      regUser.value=''; regPass.value='';
+    });
+
+    formLogin.addEventListener('submit',(e)=>{
+      e.preventDefault();
+      const username = loginUser.value.trim();
+      const password = loginPass.value;
+      const user = getUsers().find(u=>u.username===username && u.password===password);
+      if(!user){ showToast('Credenciales inválidas.'); return; }
+      setSession({username}); applySession(user); closeAuthModal(); showToast('Sesión iniciada.');
+      loginUser.value=''; loginPass.value='';
+    });
+
+    btnLogout.addEventListener('click',()=>{ localStorage.removeItem(LS_SESSION); applySession(null); showToast('Sesión cerrada.'); });
+
+    function applySession(user){
+      if(user){
+        playerName.textContent = user.username;
+        robuxBalance.textContent = user.robux;
+        btnLogin.classList.add('hidden');
+        btnLogout.classList.remove('hidden');
+      }else{
+        playerName.textContent = 'Invitado';
+        robuxBalance.textContent = '0';
+        btnLogin.classList.remove('hidden');
+        btnLogout.classList.add('hidden');
+      }
+      renderMarketplace();
+    }
+
+    function getCurrentUser(){
+      const session = getSession(); if(!session) return null;
+      const user = getUsers().find(u=>u.username===session.username);
+      return user || null;
+    }
+
+    function updateUser(updated){
+      const users = getUsers();
+      const idx = users.findIndex(u=>u.username===updated.username);
+      if(idx>=0){ users[idx]=updated; setUsers(users); }
+    }
+
+    // Demo: otorgar robux
+    grantRobuxBtn.addEventListener('click',()=>{
+      const user = getCurrentUser(); if(!user){ showToast('Inicia sesión.'); return; }
+      user.robux += 100; updateUser(user); applySession(user); renderProfile(); showToast('+100 Robux (demo)');
+    });
+
+    // Toast helper
+    function showToast(msg){
+      toast.textContent = msg; toast.classList.remove('hidden');
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(()=> toast.classList.add('hidden'), 2200);
+    }
+
+    // Inicializar
+    (function init(){
+      renderMarketplace();
+      const s = getSession(); if(s){ applySession(getCurrentUser()); }
+    })();
   </script>
 </body>
 </html>
