@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>ESPZ</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini ESPZ Demo</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
+      padding: 0;
       background: #111;
       color: #fff;
     }
@@ -14,259 +16,239 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #222;
       padding: 10px 20px;
+      background: #222;
     }
-    #username {
-      font-weight: bold;
+    header h2 {
+      margin: 0;
     }
-    #robux {
-      font-weight: bold;
+    #app {
+      display: none;
+      height: 100vh;
     }
-    .container {
-      display: flex;
-    }
-    nav {
+    .sidebar {
       width: 200px;
-      background: #1b1b1b;
-      padding: 10px;
+      background: #1a1a1a;
+      height: 100%;
+      float: left;
+      padding-top: 20px;
     }
-    nav button {
+    .sidebar button {
       display: block;
       width: 100%;
       padding: 10px;
-      margin: 5px 0;
-      background: #333;
-      color: #fff;
       border: none;
+      background: none;
+      color: #fff;
+      text-align: left;
       cursor: pointer;
     }
-    nav button:hover {
-      background: #444;
+    .sidebar button:hover {
+      background: #333;
     }
-    main {
-      flex: 1;
+    .content {
+      margin-left: 200px;
       padding: 20px;
     }
     .item {
       background: #222;
+      border-radius: 10px;
       padding: 10px;
       margin: 10px;
       display: inline-block;
-      width: 150px;
+      width: 180px;
       text-align: center;
-      border-radius: 5px;
     }
     .item img {
-      max-width: 100%;
-    }
-    .hidden {
-      display: none;
-    }
-    #authModal, #buyModal {
-      position: fixed;
-      top: 0;
-      left: 0;
       width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.8);
+      height: 120px;
+      object-fit: cover;
+      border-radius: 5px;
+    }
+    .hidden { display: none; }
+    #auth {
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      height: 100vh;
     }
-    #authModalContent, #buyModalContent {
-      background: #1b1b1b;
-      padding: 20px;
-      border-radius: 8px;
-      width: 300px;
-      text-align: center;
+    #auth input {
+      margin: 5px;
+      padding: 10px;
+      width: 200px;
     }
-    input {
-      width: 90%;
-      margin: 5px 0;
-      padding: 8px;
-    }
-    button {
+    #auth button {
+      margin: 5px;
+      padding: 10px 20px;
       cursor: pointer;
+    }
+    #purchaseModal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #222;
+      padding: 20px;
+      border-radius: 10px;
+      display: none;
+      z-index: 1000;
+    }
+    #purchaseModal button {
+      margin: 5px;
+      padding: 8px 16px;
     }
   </style>
 </head>
 <body>
-  <header>
-    <div id="username">Invitado</div>
-    <div>
-      <span id="robux">💎 0</span>
-      <button id="authBtn">Iniciar sesión / Registrarse</button>
-    </div>
-  </header>
-  <div class="container">
-    <nav>
+  <div id="auth">
+    <h2>Registrarse / Iniciar sesión</h2>
+    <input type="text" id="username" placeholder="Usuario">
+    <input type="password" id="password" placeholder="Contraseña">
+    <button onclick="register()">Registrarse</button>
+    <button onclick="login()">Iniciar sesión</button>
+    <p id="authMsg"></p>
+  </div>
+
+  <div id="app">
+    <header>
+      <h2 id="playerName">Invitado</h2>
+      <div>
+        <span id="robux">💎 100</span>
+      </div>
+    </header>
+    <div class="sidebar">
       <button onclick="showSection('marketplace')">Marketplace</button>
       <button onclick="showSection('inventory')">Inventory</button>
       <button onclick="showSection('trades')">Trades</button>
       <button onclick="showSection('profile')">Profile</button>
       <button onclick="showSection('friends')">Friends</button>
-    </nav>
-    <main>
-      <section id="marketplace" class="section">
+    </div>
+    <div class="content">
+      <div id="marketplace" class="section">
         <h2>Marketplace</h2>
-        <div id="items"></div>
-      </section>
-      <section id="inventory" class="section hidden">
+        <div class="item">
+          <img src="https://tr.rbxcdn.com/4c9dfc9f22bdf37f02bda2c7e6e295e9/420/420/Hat/Png" alt="Classic Fedora">
+          <h3>Classic Fedora</h3>
+          <p>150 💎</p>
+          <button onclick="buyItem('Classic Fedora',150)">Comprar</button>
+        </div>
+        <div class="item">
+          <img src="https://tr.rbxcdn.com/8ebf0e2e8e9c0b8c2ac12e8a3a6fefec/420/420/Hat/Png" alt="Valkyrie Helm">
+          <h3>Valkyrie Helm</h3>
+          <p>750 💎</p>
+          <button onclick="buyItem('Valkyrie Helm',750)">Comprar</button>
+        </div>
+      </div>
+      <div id="inventory" class="section hidden">
         <h2>Inventory</h2>
         <ul id="inventoryList"></ul>
-      </section>
-      <section id="trades" class="section hidden">
+      </div>
+      <div id="trades" class="section hidden">
         <h2>Trades</h2>
-        <p>Aún en desarrollo.</p>
-      </section>
-      <section id="profile" class="section hidden">
+        <p>Aquí aparecerán tus trades futuros...</p>
+      </div>
+      <div id="profile" class="section hidden">
         <h2>Profile</h2>
-        <p id="profileInfo"></p>
-        <button onclick="addRobux(100)">+100 Robux (demo)</button>
-      </section>
-      <section id="friends" class="section hidden">
+        <p>Nombre de usuario: <span id="profileName"></span></p>
+      </div>
+      <div id="friends" class="section hidden">
         <h2>Friends</h2>
-        <input type="text" id="friendSearch" placeholder="Buscar usuario..." />
+        <input type="text" id="friendSearch" placeholder="Buscar usuario...">
         <button onclick="searchFriend()">Buscar</button>
-        <ul id="friendsList"></ul>
-      </section>
-    </main>
-  </div>
-
-  <!-- Modal de autenticación -->
-  <div id="authModal">
-    <div id="authModalContent">
-      <h3>Registro / Iniciar Sesión</h3>
-      <input type="text" id="authUser" placeholder="Usuario" />
-      <input type="password" id="authPass" placeholder="Contraseña" />
-      <button onclick="register()">Registrarse</button>
-      <button onclick="login()">Iniciar Sesión</button>
+        <p id="friendResult"></p>
+      </div>
     </div>
   </div>
 
-  <!-- Modal de compra -->
-  <div id="buyModal" class="hidden">
-    <div id="buyModalContent">
-      <h3>Confirmar compra</h3>
-      <p id="buyText"></p>
-      <button onclick="confirmBuy()">Comprar</button>
-      <button onclick="closeBuyModal()">Cancelar</button>
-    </div>
+  <div id="purchaseModal">
+    <p id="purchaseMsg"></p>
+    <button onclick="confirmPurchase()">Comprar</button>
+    <button onclick="closeModal()">Cancelar</button>
   </div>
 
   <script>
     let currentUser = null;
-    let users = JSON.parse(localStorage.getItem('users')) || {};
-    let robux = 0;
+    let users = JSON.parse(localStorage.getItem('users')||'{}');
     let inventory = [];
-    let buyingItem = null;
+    let robux = 100;
+    let pendingPurchase = null;
 
-    const items = [
-      { name: 'Classic Fedora', price: 150, img: 'https://tr.rbxcdn.com/8d7b48c37a2f65f0a3bda8659f70903a/420/420/Hat/Webp' },
-      { name: 'Valkyrie Helm', price: 750, img: 'https://tr.rbxcdn.com/87f739b6e70ecf62c802d5f3bcd4d1f9/420/420/Hat/Webp' },
-      { name: 'Red Sparkle Time', price: 1200, img: 'https://tr.rbxcdn.com/f62c97b9a65db0a2b78ccaa6d6c1b03a/420/420/Hat/Webp' },
-      { name: 'Top Hat', price: 500, img: 'https://tr.rbxcdn.com/56e0545d6e92db9275480a219c2f4780/420/420/Hat/Webp' }
-    ];
-
-    function renderItems() {
-      const container = document.getElementById('items');
-      container.innerHTML = '';
-      items.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'item';
-        div.innerHTML = `
-          <img src="${item.img}" alt="${item.name}" />
-          <h4>${item.name}</h4>
-          <p>💎 ${item.price}</p>
-          <button onclick='openBuyModal(${JSON.stringify(JSON.stringify(item))})'>Comprar</button>
-        `;
-        container.appendChild(div);
-      });
+    function register(){
+      let u=document.getElementById('username').value;
+      let p=document.getElementById('password').value;
+      if(users[u]){document.getElementById('authMsg').innerText='Ese usuario ya existe';return;}
+      if(u==''||p==''){document.getElementById('authMsg').innerText='Completa todos los campos';return;}
+      users[u]={password:p,robux:100,inventory:[]};
+      localStorage.setItem('users',JSON.stringify(users));
+      currentUser=u;robux=100;inventory=[];
+      enterApp();
     }
-
-    function openBuyModal(itemStr) {
-      buyingItem = JSON.parse(itemStr);
-      document.getElementById('buyText').innerText = `¿Deseas comprar ${buyingItem.name} por ${buyingItem.price} Robux?`;
-      document.getElementById('buyModal').classList.remove('hidden');
+    function login(){
+      let u=document.getElementById('username').value;
+      let p=document.getElementById('password').value;
+      if(!users[u]||users[u].password!==p){document.getElementById('authMsg').innerText='Usuario o contraseña incorrectos';return;}
+      currentUser=u;
+      robux=users[u].robux;
+      inventory=users[u].inventory;
+      enterApp();
     }
-
-    function closeBuyModal() {
-      document.getElementById('buyModal').classList.add('hidden');
+    function enterApp(){
+      document.getElementById('auth').style.display='none';
+      document.getElementById('app').style.display='block';
+      document.getElementById('playerName').innerText=currentUser;
+      document.getElementById('profileName').innerText=currentUser;
+      updateRobux();
+      renderInventory();
     }
-
-    function confirmBuy() {
-      if (robux >= buyingItem.price) {
-        robux -= buyingItem.price;
-        inventory.push(buyingItem);
-        updateUI();
-        alert('Compra realizada con éxito!');
-      } else {
-        alert('Robux insuficientes');
-      }
-      closeBuyModal();
-    }
-
-    function register() {
-      const user = document.getElementById('authUser').value;
-      const pass = document.getElementById('authPass').value;
-      if (users[user]) {
-        alert('Usuario ya existe');
-        return;
-      }
-      users[user] = { pass, robux: 100, inventory: [], friends: [] };
-      localStorage.setItem('users', JSON.stringify(users));
-      currentUser = user;
-      robux = 100;
-      inventory = [];
-      document.getElementById('authModal').style.display = 'none';
-      updateUI();
-    }
-
-    function login() {
-      const user = document.getElementById('authUser').value;
-      const pass = document.getElementById('authPass').value;
-      if (!users[user] || users[user].pass !== pass) {
-        alert('Credenciales inválidas');
-        return;
-      }
-      currentUser = user;
-      robux = users[user].robux;
-      inventory = users[user].inventory;
-      document.getElementById('authModal').style.display = 'none';
-      updateUI();
-    }
-
-    function updateUI() {
-      document.getElementById('username').innerText = currentUser;
-      document.getElementById('robux').innerText = `💎 ${robux}`;
-      document.getElementById('inventoryList').innerHTML = inventory.map(i => `<li>${i.name}</li>`).join('');
-      document.getElementById('profileInfo').innerText = `Usuario: ${currentUser}`;
-      users[currentUser].robux = robux;
-      users[currentUser].inventory = inventory;
-      localStorage.setItem('users', JSON.stringify(users));
-    }
-
-    function addRobux(amount) {
-      robux += amount;
-      updateUI();
-    }
-
-    function showSection(id) {
-      document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+    function showSection(id){
+      document.querySelectorAll('.section').forEach(s=>s.classList.add('hidden'));
       document.getElementById(id).classList.remove('hidden');
     }
-
-    function searchFriend() {
-      const query = document.getElementById('friendSearch').value;
-      if (users[query] && query !== currentUser) {
-        alert(`${query} encontrado!`);
-      } else {
-        alert('Usuario no encontrado');
+    function buyItem(name,price){
+      pendingPurchase={name,price};
+      document.getElementById('purchaseMsg').innerText=`¿Comprar ${name} por ${price} Robux?`;
+      document.getElementById('purchaseModal').style.display='block';
+    }
+    function confirmPurchase(){
+      if(robux>=pendingPurchase.price){
+        robux-=pendingPurchase.price;
+        inventory.push(pendingPurchase.name);
+        users[currentUser].robux=robux;
+        users[currentUser].inventory=inventory;
+        localStorage.setItem('users',JSON.stringify(users));
+        renderInventory();
+        updateRobux();
+        alert('Compra realizada con éxito');
+      }else{
+        alert('Robux insuficientes');
+      }
+      closeModal();
+    }
+    function closeModal(){
+      document.getElementById('purchaseModal').style.display='none';
+      pendingPurchase=null;
+    }
+    function updateRobux(){
+      document.getElementById('robux').innerText=`💎 ${robux}`;
+    }
+    function renderInventory(){
+      let list=document.getElementById('inventoryList');
+      list.innerHTML='';
+      inventory.forEach(item=>{
+        let li=document.createElement('li');
+        li.innerText=item;
+        list.appendChild(li);
+      });
+    }
+    function searchFriend(){
+      let q=document.getElementById('friendSearch').value;
+      if(users[q]){
+        document.getElementById('friendResult').innerText=`${q} está registrado.`;
+      }else{
+        document.getElementById('friendResult').innerText='Usuario no encontrado';
       }
     }
-
-    renderItems();
   </script>
 </body>
 </html>
