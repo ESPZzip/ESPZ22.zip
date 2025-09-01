@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESPZ REVIVAL</title>
+  <title>Roblox Revival</title>
   <style>
     body { margin: 0; font-family: Arial, sans-serif; background: #111; color: #fff; }
     .hidden { display: none; }
@@ -46,8 +46,11 @@
 
     /* Home */
     #homeSec h1 { margin-bottom: 10px; }
-    .connections { display: flex; gap: 10px; margin: 15px 0; }
-    .connections img { width: 50px; height: 50px; border-radius: 50%; }
+    .connections { display: flex; gap: 10px; margin: 15px 0; align-items: center; }
+    .connections .user {
+      display: flex; flex-direction: column; align-items: center; font-size: 12px;
+    }
+    .connections img { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #00d47e; }
   </style>
 </head>
 <body>
@@ -85,10 +88,8 @@
       <section id="homeSec">
         <h1>Home</h1>
         <h3 id="connectionsTitle"></h3>
-        <div class="connections">
-          <img src="https://tr.rbxcdn.com/30DAY-HEADSHOT" alt="Friend">
-          <img src="https://tr.rbxcdn.com/30DAY-HEADSHOT" alt="Friend">
-          <img src="https://tr.rbxcdn.com/30DAY-HEADSHOT" alt="Friend">
+        <div class="connections" id="connectionsList">
+          <!-- Aquí aparecerá el usuario y sus amigos -->
         </div>
       </section>
       <section id="profileSec" class="hidden">👤 Aquí va el perfil</section>
@@ -119,6 +120,30 @@
       document.getElementById("app").classList.remove("hidden");
       document.getElementById("userDisplay").textContent = user;
       document.getElementById("connectionsTitle").textContent = `${user}'s Connections (16)`;
+
+      // Mostrar usuario con avatar en Connections
+      let conns = document.getElementById("connectionsList");
+      conns.innerHTML = `
+        <div class="user">
+          <img src="https://tr.rbxcdn.com/0e5cc4633a5a97c6f0d948e57843da9b/150/150/AvatarHeadshot/Webp" alt="Avatar">
+          <span>${user}</span>
+        </div>
+      `;
+
+      // Agregar amigos falsos
+      let friends = [
+        {name:"Agus", img:"https://tr.rbxcdn.com/6a8858b3f1d0a037fd8e3f3a74b11ad4/150/150/AvatarHeadshot/Webp"},
+        {name:"Luciano", img:"https://tr.rbxcdn.com/246e42d01afcc9a9d7ccdfd25521db0d/150/150/AvatarHeadshot/Webp"},
+        {name:"TNT_JDG", img:"https://tr.rbxcdn.com/465a33c8a7a448a3282710e8b5b7419e/150/150/AvatarHeadshot/Webp"}
+      ];
+      friends.forEach(f=>{
+        conns.innerHTML += `
+          <div class="user">
+            <img src="${f.img}" alt="${f.name}">
+            <span>${f.name}</span>
+          </div>
+        `;
+      });
     }
 
     function logout() {
