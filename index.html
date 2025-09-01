@@ -5,8 +5,7 @@
   <title>ESP:Z</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; background: #eee; }
-    .login-container { padding: 20px; }
-    input { display: block; margin: 10px 0; padding: 5px; }
+    input { margin: 5px 0; padding: 6px; width: 100%; }
     button { margin: 5px 0; padding: 6px 12px; border: none; background: #006644; color: white; border-radius: 6px; cursor: pointer; }
     button:hover { background: #009966; }
     button:disabled { background: #999; cursor: not-allowed; }
@@ -28,14 +27,24 @@
       text-align: center;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
-    .item-card img {
-      width: 100px; height: 100px; object-fit: contain;
+    .item-card img { width: 100px; height: 100px; object-fit: contain; }
+
+    .admin-item, .admin-user {
+      background: #fff;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
     }
+    .admin-item input, .admin-user input { width: auto; display: inline-block; margin: 3px; }
+    .admin-actions { margin-top: 5px; }
+
+    #admin { display:none; }
   </style>
 </head>
 <body>
   <!-- LOGIN -->
-  <div class="login-container" id="loginPage">
+  <div id="loginPage" style="padding:20px;">
     <h2>ESP:Z</h2>
     <input id="username" placeholder="Usuario">
     <input id="password" type="password" placeholder="Contraseña">
@@ -43,7 +52,7 @@
     <button onclick="login()">Iniciar Sesión</button>
   </div>
 
-  <!-- APP PRINCIPAL -->
+  <!-- APP -->
   <div class="app" id="app">
     <div class="header">
       <div id="playerName"></div>
@@ -78,6 +87,28 @@
         <h2>Amigos</h2>
         <p>Lista de amigos y buscador aquí.</p>
       </div>
+      <div id="admin" class="section">
+        <h2>⚙️ Panel Admin</h2>
+        <p>Añadir Robux a tu cuenta:</p>
+        <input type="number" id="robuxAmount" placeholder="Cantidad de Robux">
+        <button onclick="addRobux()">Agregar Robux</button>
+
+        <hr>
+        <h3>Crear nuevo ítem</h3>
+        <input id="newItemName" placeholder="Nombre del ítem">
+        <input type="number" id="newItemPrice" placeholder="Precio en Robux">
+        <input type="number" id="newItemStock" placeholder="Stock">
+        <input id="newItemImg" placeholder="URL de la imagen">
+        <button onclick="createItem()">Agregar al Marketplace</button>
+
+        <hr>
+        <h3>Administrar ítems existentes</h3>
+        <div id="adminItems"></div>
+
+        <hr>
+        <h3>Administrar jugadores</h3>
+        <div id="adminUsers"></div>
+      </div>
     </div>
   </div>
 
@@ -86,81 +117,59 @@
       let stored = JSON.parse(localStorage.getItem("items"));
       if (stored) return stored;
       const defaultItems = [
-        { id: 1, name: "Dominus Aureus", price: 500, stock: 2, img: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-420-420.png" },
-        { id: 2, name: "Red Sparkle Time Fedora", price: 350, stock: 3, img: "https://tr.rbxcdn.com/30DAY-AvatarBust-420-420.png" },
-        { id: 3, name: "Valkyrie Helm", price: 200, stock: 5, img: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-420-420.png" },
-        { id: 4, name: "Clockwork's Shades", price: 150, stock: 1, img: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-420-420.png" }
+        { id: 1, name: "Dominus Aureus", price: 500, stock: 2, img: "https://via.placeholder.com/100" },
+        { id: 2, name: "Red Sparkle Time Fedora", price: 350, stock: 3, img: "https://via.placeholder.com/100" }
       ];
       localStorage.setItem("items", JSON.stringify(defaultItems));
       return defaultItems;
     }
-    function saveItems(items) {
-      localStorage.setItem("items", JSON.stringify(items));
-    }
+    function saveItems(items) { localStorage.setItem("items", JSON.stringify(items)); }
 
-    function getUsers() {
-      return JSON.parse(localStorage.getItem("users") || "{}");
-    }
-    function saveUsers(users) {
-      localStorage.setItem("users", JSON.stringify(users));
-    }
+    function getUsers() { return JSON.parse(localStorage.getItem("users") || "{}"); }
+    function saveUsers(users) { localStorage.setItem("users", JSON.stringify(users)); }
 
     function register() {
       const username = document.getElementById("username").value.trim();
       const password = document.getElementById("password").value.trim();
-      if (!username || !password) {
-        alert("Completa todos los campos");
-        return;
-      }
+      if (!username || !password) { alert("Completa todos los campos"); return; }
       let users = getUsers();
-      if (users[username]) {
-        alert("Ese usuario ya existe");
-        return;
-      }
+      if (users[username]) { alert("Ese usuario ya existe"); return; }
       users[username] = { password, robux: 300, inventory: [], friends: [], requests: [] };
       saveUsers(users);
       localStorage.setItem("currentUser", username);
       loadApp();
     }
-
     function login() {
       const username = document.getElementById("username").value.trim();
       const password = document.getElementById("password").value.trim();
       let users = getUsers();
-      if (!users[username] || users[username].password !== password) {
-        alert("Usuario o contraseña incorrectos");
-        return;
-      }
+      if (!users[username] || users[username].password !== password) { alert("Usuario o contraseña incorrectos"); return; }
       localStorage.setItem("currentUser", username);
       loadApp();
     }
-
     function logout() {
       localStorage.removeItem("currentUser");
       document.getElementById("app").style.display = "none";
       document.getElementById("loginPage").style.display = "block";
     }
-
     function loadApp() {
       const username = localStorage.getItem("currentUser");
       if (!username) return;
       let users = getUsers();
       const user = users[username];
-
       document.getElementById("loginPage").style.display = "none";
       document.getElementById("app").style.display = "block";
       document.getElementById("playerName").textContent = "Jugador: " + username;
       document.getElementById("playerRobux").textContent = user.robux;
-
-      renderMarketplace();
-      renderInventory();
+      // Panel admin oculto siempre al inicio
+      document.getElementById("admin").style.display = "none";
     }
-
     function showSection(sectionId) {
       document.querySelectorAll(".section").forEach(s => s.style.display = "none");
       document.getElementById(sectionId).style.display = "block";
     }
 
+    // --- Marketplace ---
     function renderMarketplace() {
       const container = document.getElementById("itemsContainer");
       container.innerHTML = "";
@@ -175,8 +184,7 @@
           <p>📦 Stock: ${it.stock}</p>
           <button onclick="buyItem(${it.id})" ${it.stock <= 0 ? "disabled" : ""}>
             ${it.stock > 0 ? "Comprar" : "Agotado"}
-          </button>
-        `;
+          </button>`;
         container.appendChild(div);
       });
     }
@@ -188,20 +196,13 @@
       const users = getUsers();
       const items = getItems();
       const inv = users[username].inventory;
-      if (inv.length === 0) {
-        container.innerHTML = "<p>No tienes ítems.</p>";
-        return;
-      }
+      if (inv.length === 0) { container.innerHTML = "<p>No tienes ítems.</p>"; return; }
       inv.forEach(it => {
         const item = items.find(i => i.id === it);
         if (item) {
           const div = document.createElement("div");
           div.className = "item-card";
-          div.innerHTML = `
-            <img src="${item.img}" onerror="this.src='https://via.placeholder.com/100'">
-            <h4>${item.name}</h4>
-            <p>📦 Stock actual: ${item.stock}</p>
-          `;
+          div.innerHTML = `<img src="${item.img}"><h4>${item.name}</h4>`;
           container.appendChild(div);
         }
       });
@@ -214,36 +215,129 @@
       let items = getItems();
       const itemIndex = items.findIndex(i => i.id === itemId);
       const item = items[itemIndex];
-
-      if (user.robux < item.price) {
-        alert("Robux insuficientes");
-        return;
-      }
-      if (user.inventory.includes(itemId)) {
-        alert("Ya tienes este ítem");
-        return;
-      }
-      if (item.stock <= 0) {
-        alert("Este ítem está agotado");
-        return;
-      }
-
+      if (user.robux < item.price) { alert("Robux insuficientes"); return; }
+      if (user.inventory.includes(itemId)) { alert("Ya tienes este ítem"); return; }
+      if (item.stock <= 0) { alert("Este ítem está agotado"); return; }
       user.robux -= item.price;
       user.inventory.push(itemId);
       items[itemIndex].stock -= 1;
-
-      saveUsers(users);
-      saveItems(items);
+      saveUsers(users); saveItems(items);
       loadApp();
       alert("Has comprado " + item.name + "!");
     }
 
-    // Si ya estaba logueado, cargar directo
-    window.onload = () => {
-      if (localStorage.getItem("currentUser")) {
-        loadApp();
+    // --- Admin ---
+    function addRobux() {
+      const username = localStorage.getItem("currentUser");
+      if (username !== "ROBLOX") return;
+      let users = getUsers();
+      const amount = parseInt(document.getElementById("robuxAmount").value);
+      if (isNaN(amount) || amount <= 0) { alert("Ingresa una cantidad válida"); return; }
+      users[username].robux += amount;
+      saveUsers(users); loadApp();
+      alert("Se han añadido " + amount + " Robux a tu cuenta!");
+    }
+
+    function createItem() {
+      const username = localStorage.getItem("currentUser");
+      if (username !== "ROBLOX") return;
+      const name = document.getElementById("newItemName").value.trim();
+      const price = parseInt(document.getElementById("newItemPrice").value);
+      const stock = parseInt(document.getElementById("newItemStock").value);
+      const img = document.getElementById("newItemImg").value.trim() || "https://via.placeholder.com/100";
+      if (!name || isNaN(price) || isNaN(stock) || price <= 0 || stock <= 0) { alert("Completa bien los campos"); return; }
+      let items = getItems();
+      const newId = items.length ? Math.max(...items.map(i => i.id)) + 1 : 1;
+      items.push({ id: newId, name, price, stock, img });
+      saveItems(items); renderMarketplace(); renderAdminItems();
+      alert("Ítem agregado correctamente!");
+    }
+
+    function renderAdminItems() {
+      const username = localStorage.getItem("currentUser");
+      if (username !== "ROBLOX") return;
+      const container = document.getElementById("adminItems");
+      container.innerHTML = "";
+      const items = getItems();
+      items.forEach(it => {
+        const div = document.createElement("div");
+        div.className = "admin-item";
+        div.innerHTML = `
+          <input value="${it.name}" id="name_${it.id}">
+          <input type="number" value="${it.price}" id="price_${it.id}" style="width:80px;">
+          <input type="number" value="${it.stock}" id="stock_${it.id}" style="width:60px;">
+          <input value="${it.img}" id="img_${it.id}" style="width:150px;">
+          <div class="admin-actions">
+            <button onclick="updateItem(${it.id})">Guardar</button>
+            <button onclick="deleteItem(${it.id})" style="background:#cc0000;">Eliminar</button>
+          </div>`;
+        container.appendChild(div);
+      });
+    }
+
+    function updateItem(id) {
+      const username = localStorage.getItem("currentUser");
+      if (username !== "ROBLOX") return;
+      let items = getItems();
+      const idx = items.findIndex(i => i.id === id);
+      if (idx === -1) return;
+      items[idx].name = document.getElementById("name_" + id).value.trim();
+      items[idx].price = parseInt(document.getElementById("price_" + id).value);
+      items[idx].stock = parseInt(document.getElementById("stock_" + id).value);
+      items[idx].img = document.getElementById("img_" + id).value.trim();
+      saveItems(items); renderMarketplace(); renderAdminItems();
+      alert("Ítem actualizado!");
+    }
+
+    function deleteItem(id) {
+      const username = localStorage.getItem("currentUser");
+      if (username !== "ROBLOX") return;
+      if (!confirm("¿Eliminar este ítem?")) return;
+      let items = getItems().filter(i => i.id !== id);
+      saveItems(items); renderMarketplace(); renderAdminItems();
+      alert("Ítem eliminado.");
+    }
+
+    function renderAdminUsers() {
+      const username = localStorage.getItem("currentUser");
+      if (username !== "ROBLOX") return;
+      const container = document.getElementById("adminUsers");
+      container.innerHTML = "";
+      const users = getUsers();
+      for (let u in users) {
+        const div = document.createElement("div");
+        div.className = "admin-user";
+        div.innerHTML = `
+          <b>${u}</b> - 💰 Robux: 
+          <input type="number" id="robux_${u}" value="${users[u].robux}" style="width:80px;">
+          <button onclick="updateUserRobux('${u}')">Guardar</button>`;
+        container.appendChild(div);
       }
-    };
+    }
+
+    function updateUserRobux(user) {
+      const username = localStorage.getItem("currentUser");
+      if (username !== "ROBLOX") return;
+      let users = getUsers();
+      const newAmount = parseInt(document.getElementById("robux_" + user).value);
+      if (isNaN(newAmount) || newAmount < 0) { alert("Cantidad inválida"); return; }
+      users[user].robux = newAmount;
+      saveUsers(users); loadApp();
+      alert("Robux de " + user + " actualizado!");
+    }
+
+    // Detectar F9 para abrir el panel admin
+    document.addEventListener("keydown", function(e) {
+      const username = localStorage.getItem("currentUser");
+      if (e.key === "F9" && username === "ROBLOX") {
+        e.preventDefault();
+        showSection("admin");
+        renderAdminItems();
+        renderAdminUsers();
+      }
+    });
+
+    window.onload = () => { if (localStorage.getItem("currentUser")) { loadApp(); renderMarketplace(); } };
   </script>
 </body>
 </html>
