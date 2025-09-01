@@ -40,6 +40,18 @@
       text-align: center;
       background: white;
       border-radius: 8px;
+      position: relative;
+    }
+    .exclusive {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      background: gold;
+      color: black;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 2px 5px;
+      border-radius: 4px;
     }
     .login-container {
       padding: 20px;
@@ -59,7 +71,6 @@
       border-radius: 6px;
       cursor: pointer;
     }
-    /* Estilo panel admin */
     #adminPanel {
       display: none;
       position: fixed;
@@ -242,6 +253,7 @@
         const div = document.createElement("div");
         div.className = "item-card";
         div.innerHTML = `
+          ${item.exclusive ? '<div class="exclusive">Exclusivo</div>' : ''}
           <img src="${item.img}" width="80" onerror="this.src='https://via.placeholder.com/80'">
           <h4>${item.name}</h4>
         `;
@@ -254,9 +266,9 @@
   function initItems() {
     if (getItems().length === 0) {
       saveItems([
-        { id: "hat1", name: "Classic Fedora", price: 50, stock: 5, img: "https://tr.rbxcdn.com/2b4fbd5a198f5c6ea4a1d38d2e8cf61b/150/150/Hat/Png" },
-        { id: "sword1", name: "Epic Sword", price: 70, stock: 3, img: "https://tr.rbxcdn.com/1a3b983d5d06c63a7a9b7e4e99d6d8d1/150/150/Gear/Png" },
-        { id: "shirt1", name: "Cool Shirt", price: 20, stock: 10, img: "https://tr.rbxcdn.com/5af74ab58a73f36f79e2fdb8a7346f4a/150/150/Shirt/Png" }
+        { id: "hat1", name: "Classic Fedora", price: 50, stock: 5, img: "https://tr.rbxcdn.com/2b4fbd5a198f5c6ea4a1d38d2e8cf61b/150/150/Hat/Png", exclusive: false },
+        { id: "sword1", name: "Epic Sword", price: 70, stock: 3, img: "https://tr.rbxcdn.com/1a3b983d5d06c63a7a9b7e4e99d6d8d1/150/150/Gear/Png", exclusive: false },
+        { id: "shirt1", name: "Cool Shirt", price: 20, stock: 10, img: "https://tr.rbxcdn.com/5af74ab58a73f36f79e2fdb8a7346f4a/150/150/Shirt/Png", exclusive: false }
       ]);
     }
   }
@@ -270,6 +282,7 @@
       const div = document.createElement("div");
       div.className = "item-card";
       div.innerHTML = `
+        ${it.exclusive ? '<div class="exclusive">Exclusivo</div>' : ''}
         <img src="${it.img}" width="80" onerror="this.src='https://via.placeholder.com/80'">
         <h4>${it.name}</h4>
         <p>Precio: ${it.price} R$</p>
@@ -353,12 +366,13 @@
     const newItem = {
       id: "custom_" + Date.now(),
       name, img: img || "https://via.placeholder.com/80",
-      price, stock
+      price, stock,
+      exclusive: true
     };
     items.push(newItem);
     saveItems(items);
     renderMarketplace();
-    alert("Nuevo ítem agregado al Marketplace.");
+    alert("Nuevo ítem exclusivo agregado al Marketplace.");
   }
 
   // Abrir panel admin con F9 solo para ROBLOX
