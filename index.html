@@ -2,328 +2,202 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>ESP:Z UPDATE</title>
+  <title>Mini Roblox - Marketplace Global</title>
   <style>
-    body { margin: 0; font-family: Arial, sans-serif; }
-    header {
-      display: flex; justify-content: space-between;
-      background: #232527; color: white; padding: 10px;
-    }
-    #menu { display: flex; gap: 15px; background: #eee; padding: 10px; }
-    #menu button { padding: 5px 10px; }
-    #content { padding: 20px; }
-    .card {
-      border: 1px solid #ccc; border-radius: 8px;
-      padding: 10px; margin: 10px 0; background: #f9f9f9;
-    }
-    .market-item {
-      display: inline-block; width: 150px; margin: 10px;
-      border: 1px solid #ccc; padding: 10px; border-radius: 8px;
-      text-align: center;
-    }
-    .market-item img { width: 100%; height: 100px; object-fit: contain; }
-    #tradeModal, #overlay, #adminPanel {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    }
-    #overlay { background: rgba(0,0,0,0.5); z-index: 500; }
-    #tradeModal, #adminPanel {
-      background: white; width: 350px; padding: 20px; border-radius: 8px;
-      top: 50%; left: 50%; transform: translate(-50%, -50%);
-      position: absolute; z-index: 1000;
-    }
-    #usersList .user-item {
-      display: flex; justify-content: space-between; align-items: center;
-      border: 1px solid #ccc; border-radius: 5px; padding: 5px; margin: 5px 0;
-    }
+    body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f0f2f5; }
+    header { background:#24292e; color:#fff; padding:10px; display:flex; justify-content:space-between; }
+    #userInfo { font-weight:bold; }
+    nav { background:#444; padding:10px; display:flex; gap:10px; }
+    nav button { padding:8px 12px; border:none; cursor:pointer; border-radius:5px; }
+    .tab { display:none; padding:20px; }
+    .item { background:#fff; padding:10px; margin:10px; border-radius:8px; display:inline-block; width:150px; text-align:center; box-shadow:0 2px 5px rgba(0,0,0,0.2);}
+    .item img { max-width:100%; border-radius:5px; }
+    #login, #register { background:#fff; padding:20px; max-width:300px; margin:50px auto; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.2);}
+    input, button { margin:5px 0; padding:8px; width:100%; }
   </style>
 </head>
 <body>
-  <header>
-    <div id="playerName">Invitado</div>
-    <div>Robux: <span id="playerRobux">0</span></div>
-  </header>
 
-  <div id="menu">
-    <button onclick="showSection('profile')">Profile</button>
-    <button onclick="showSection('friends')">Friends</button>
-    <button onclick="showSection('marketplace')">Marketplace</button>
-    <button onclick="showSection('inventory')">Inventory</button>
-    <button onclick="showSection('trades')">Trades</button>
+<header>
+  <div id="userInfo">No conectado</div>
+  <div id="robuxInfo">R$: 0</div>
+</header>
+
+<div id="auth">
+  <div id="register">
+    <h2>Registrarse</h2>
+    <input type="text" id="regUser" placeholder="Usuario">
+    <input type="password" id="regPass" placeholder="Contraseña">
+    <button onclick="register()">Registrarse</button>
+  </div>
+  <div id="login">
+    <h2>Iniciar Sesión</h2>
+    <input type="text" id="logUser" placeholder="Usuario">
+    <input type="password" id="logPass" placeholder="Contraseña">
+    <button onclick="login()">Iniciar Sesión</button>
+  </div>
+</div>
+
+<div id="app" style="display:none;">
+  <nav>
+    <button onclick="showTab('market')">Marketplace</button>
+    <button onclick="showTab('inventory')">Inventario</button>
+  </nav>
+
+  <div id="market" class="tab">
+    <h2>Marketplace Global</h2>
+    <div id="marketItems"></div>
   </div>
 
-  <div id="content">
-    <div id="auth">
-      <h2>Inicia Sesión o Regístrate</h2>
-      <input id="username" placeholder="Usuario"><br>
-      <input id="password" type="password" placeholder="Contraseña"><br>
-      <button onclick="register()">Registrar</button>
-      <button onclick="login()">Iniciar Sesión</button>
-    </div>
-
-    <div id="profile" style="display:none;">
-      <h2>Perfil</h2>
-      <div class="card">
-        <p><strong>Usuario:</strong> <span id="profileName"></span></p>
-        <p><strong>Robux:</strong> <span id="profileRobux"></span></p>
-      </div>
-    </div>
-
-    <div id="friends" style="display:none;">
-      <h2>Amigos</h2>
-      <div id="usersList"></div>
-    </div>
-
-    <div id="marketplace" style="display:none;">
-      <h2>Marketplace</h2>
-      <div id="marketItems"></div>
-    </div>
-
-    <div id="inventory" style="display:none;">
-      <h2>Inventario</h2>
-      <div id="inventoryItems"></div>
-    </div>
-
-    <div id="trades" style="display:none;">
-      <h2>Trades Pendientes</h2>
-      <div id="tradeList"></div>
-    </div>
+  <div id="inventory" class="tab">
+    <h2>Mi Inventario</h2>
+    <div id="myItems"></div>
   </div>
+</div>
 
-  <!-- Modal Trade -->
-  <div id="overlay"></div>
-  <div id="tradeModal">
-    <h3>Trade con <span id="tradeTarget"></span></h3>
-    <label>Robux:</label>
-    <input type="number" id="tradeRobux"><br>
-    <label>Selecciona ítems:</label>
-    <div id="tradeItems"></div>
-    <button onclick="confirmTradeOffer()">Enviar Trade</button>
-    <button onclick="closeTradeModal()">Cancelar</button>
-  </div>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js"></script>
 
-  <!-- Admin Panel -->
-  <div id="adminPanel">
-    <h2>Admin Panel</h2>
-    <h3>Agregar Item</h3>
-    <input id="adminItemName" placeholder="Nombre"><br>
-    <input id="adminItemImg" placeholder="URL de Imagen"><br>
-    <input id="adminItemPrice" type="number" placeholder="Precio"><br>
-    <input id="adminItemStock" type="number" placeholder="Stock"><br>
-    <button onclick="adminAddItem()">Agregar</button>
-    <h3>Eliminar Item</h3>
-    <select id="adminRemoveItem"></select>
-    <button onclick="adminRemoveSelected()">Eliminar</button><br><br>
-    <button onclick="closeAdmin()">Cerrar</button>
-  </div>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-<script>
-  // ---------------- BASE ----------------
-  function getUsers(){ return JSON.parse(localStorage.getItem("users")||"{}"); }
-  function saveUsers(u){ localStorage.setItem("users",JSON.stringify(u)); }
-  function getMarket(){ return JSON.parse(localStorage.getItem("market")||"[]"); }
-  function saveMarket(m){ localStorage.setItem("market",JSON.stringify(m)); }
+  // 🚨 PON AQUÍ TU CONFIG DE FIREBASE 🚨
+  const firebaseConfig = {
+    apiKey: "TU_API_KEY",
+    authDomain: "TU_PROYECTO.firebaseapp.com",
+    projectId: "TU_PROYECTO",
+    storageBucket: "TU_PROYECTO.appspot.com",
+    messagingSenderId: "ID",
+    appId: "APP_ID"
+  };
 
-  // ---------------- AUTH ----------------
-  function register(){
-    let u=document.getElementById("username").value.trim();
-    let p=document.getElementById("password").value;
-    if(!u||!p){alert("Completa todo");return;}
-    let users=getUsers();
-    if(users[u]){alert("Ya existe");return;}
-    users[u]={password:p,robux:100,inventory:[],friends:[],trades:[]};
-    saveUsers(users);
-    alert("Registrado");
-  }
-  function login(){
-    let u=document.getElementById("username").value.trim();
-    let p=document.getElementById("password").value;
-    let users=getUsers();
-    if(!users[u]||users[u].password!==p){alert("Credenciales incorrectas");return;}
-    localStorage.setItem("currentUser",u);
-    loadGame();
-  }
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-  // ---------------- GAME ----------------
-  function loadGame(){
-    let u=localStorage.getItem("currentUser");
-    if(!u)return;
-    let users=getUsers();
-    document.getElementById("auth").style.display="none";
-    document.getElementById("playerName").textContent=u;
-    document.getElementById("playerRobux").textContent=users[u].robux;
-    renderProfile(); renderMarketplace(); renderInventory(); renderFriends(); renderTrades();
-  }
+  let currentUser = null;
 
-  // ---------------- SECCIONES ----------------
-  function showSection(id){
-    ["profile","friends","marketplace","inventory","trades"].forEach(s=>document.getElementById(s).style.display="none");
-    document.getElementById(id).style.display="block";
-    if(id==="inventory")renderInventory();
-    if(id==="friends")renderFriends();
-    if(id==="marketplace")renderMarketplace();
-    if(id==="trades")renderTrades();
-  }
+  // ---------- Registro ----------
+  async function register() {
+    let user = document.getElementById("regUser").value;
+    let pass = document.getElementById("regPass").value;
 
-  // ---------------- PROFILE ----------------
-  function renderProfile(){
-    let u=localStorage.getItem("currentUser");
-    let users=getUsers();
-    document.getElementById("profileName").textContent=u;
-    document.getElementById("profileRobux").textContent=users[u].robux;
-  }
-
-  // ---------------- MARKETPLACE ----------------
-  function renderMarketplace(){
-    let m=getMarket();
-    let div=document.getElementById("marketItems"); div.innerHTML="";
-    m.forEach((item,i)=>{
-      if(item.stock>0){
-        let el=document.createElement("div");
-        el.className="market-item";
-        el.innerHTML=`<img src="${item.img}"><p>${item.name}</p><p>${item.price} R$</p>
-          <p>Stock: ${item.stock}</p>
-          <button onclick="buyItem(${i})">Comprar</button>`;
-        div.appendChild(el);
-      }
-    });
-    // actualizar admin remover lista
-    let sel=document.getElementById("adminRemoveItem");
-    sel.innerHTML=""; 
-    m.forEach((item,i)=>{ sel.innerHTML+=`<option value="${i}">${item.name}</option>`; });
-  }
-  function buyItem(i){
-    let m=getMarket(); let u=localStorage.getItem("currentUser");
-    let users=getUsers(); let item=m[i];
-    if(users[u].robux<item.price){alert("Robux insuficientes");return;}
-    if(item.stock<=0){alert("Sin stock");return;}
-    users[u].robux-=item.price;
-    users[u].inventory.push(item.name);
-    item.stock--; saveUsers(users); saveMarket(m);
-    document.getElementById("playerRobux").textContent=users[u].robux;
-    renderMarketplace(); renderInventory();
-    alert("Comprado!");
-  }
-
-  // ---------------- INVENTORY ----------------
-  function renderInventory(){
-    let u=localStorage.getItem("currentUser"); let users=getUsers();
-    let div=document.getElementById("inventoryItems"); div.innerHTML="";
-    users[u].inventory.forEach(it=>{
-      let el=document.createElement("div"); el.className="card"; el.textContent=it;
-      div.appendChild(el);
-    });
-  }
-
-  // ---------------- FRIENDS ----------------
-  function renderFriends(){
-    let users=getUsers(); let cu=localStorage.getItem("currentUser");
-    let div=document.getElementById("usersList"); div.innerHTML="";
-    Object.keys(users).forEach(user=>{
-      if(user!==cu){
-        let el=document.createElement("div"); el.className="user-item";
-        el.innerHTML=`<span>${user}</span> <button onclick="openTrade('${user}')">Trade</button>`;
-        div.appendChild(el);
-      }
-    });
-  }
-
-  // ---------------- TRADES ----------------
-  function openTrade(toUser){
-    document.getElementById("overlay").style.display="block";
-    document.getElementById("tradeModal").style.display="block";
-    document.getElementById("tradeTarget").textContent=toUser;
-    document.getElementById("tradeRobux").value="";
-    renderTradeItems();
-  }
-  function closeTradeModal(){
-    document.getElementById("overlay").style.display="none";
-    document.getElementById("tradeModal").style.display="none";
-  }
-  function renderTradeItems(){
-    let u=localStorage.getItem("currentUser"); let users=getUsers();
-    let div=document.getElementById("tradeItems"); div.innerHTML="";
-    users[u].inventory.forEach(it=>{
-      div.innerHTML+=`<label><input type="checkbox" value="${it}">${it}</label><br>`;
-    });
-  }
-  function confirmTradeOffer(){
-    let cu=localStorage.getItem("currentUser"); let users=getUsers();
-    let toUser=document.getElementById("tradeTarget").textContent;
-    let robux=parseInt(document.getElementById("tradeRobux").value)||0;
-    if(users[cu].robux<robux){alert("Robux insuficientes");return;}
-    let items=[...document.querySelectorAll("#tradeItems input:checked")].map(x=>x.value);
-    users[toUser].trades.push({from:cu,robux:robux,items:items});
-    saveUsers(users); closeTradeModal();
-    alert("Trade enviado");
-  }
-  function renderTrades(){
-    let cu=localStorage.getItem("currentUser"); let users=getUsers();
-    let div=document.getElementById("tradeList"); div.innerHTML="";
-    users[cu].trades.forEach((t,i)=>{
-      let el=document.createElement("div"); el.className="card";
-      el.innerHTML=`<p>De: ${t.from}</p><p>Robux: ${t.robux}</p>
-      <p>Items: ${t.items.join(", ")||"Ninguno"}</p>
-      <button onclick="acceptTrade(${i})">Aceptar</button>
-      <button onclick="rejectTrade(${i})">Rechazar</button>`;
-      div.appendChild(el);
-    });
-  }
-  function acceptTrade(i){
-    let cu=localStorage.getItem("currentUser"); let users=getUsers();
-    let t=users[cu].trades[i]; let from=t.from;
-    if(users[from].robux<t.robux){alert("El usuario no tiene suficiente robux");return;}
-    users[from].robux-=t.robux; users[cu].robux+=t.robux;
-    t.items.forEach(it=>{
-      let idx=users[from].inventory.indexOf(it);
-      if(idx>-1){users[from].inventory.splice(idx,1); users[cu].inventory.push(it);}
-    });
-    users[cu].trades.splice(i,1);
-    saveUsers(users);
-    renderProfile(); renderInventory(); renderTrades();
-    alert("Trade aceptado!");
-  }
-  function rejectTrade(i){
-    let cu=localStorage.getItem("currentUser"); let users=getUsers();
-    users[cu].trades.splice(i,1); saveUsers(users); renderTrades(); alert("Trade rechazado");
-  }
-
-  // ---------------- ADMIN PANEL ----------------
-  document.addEventListener("keydown",e=>{
-    if(e.key==="F9"){
-      let cu=localStorage.getItem("currentUser");
-      if(cu==="ROBLOX"){
-        document.getElementById("overlay").style.display="block";
-        document.getElementById("adminPanel").style.display="block";
-        renderMarketplace();
-      } else { alert("No eres admin"); }
+    let userRef = doc(db, "users", user);
+    let docSnap = await getDoc(userRef);
+    if (docSnap.exists()) {
+      alert("Usuario ya existe");
+      return;
     }
-  });
-  function closeAdmin(){
-    document.getElementById("overlay").style.display="none";
-    document.getElementById("adminPanel").style.display="none";
-  }
-  function adminAddItem(){
-    let name=document.getElementById("adminItemName").value;
-    let img=document.getElementById("adminItemImg").value;
-    let price=parseInt(document.getElementById("adminItemPrice").value)||0;
-    let stock=parseInt(document.getElementById("adminItemStock").value)||0;
-    if(!name||!img||price<=0||stock<=0){alert("Datos inválidos");return;}
-    let m=getMarket(); m.push({name:name,img:img,price:price,stock:stock});
-    saveMarket(m); renderMarketplace(); alert("Item agregado!");
-  }
-  function adminRemoveSelected(){
-    let i=parseInt(document.getElementById("adminRemoveItem").value);
-    let m=getMarket();
-    if(m[i]){ m[i].stock=0; saveMarket(m); renderMarketplace(); alert("Item retirado!"); }
+
+    await setDoc(userRef, {
+      password: pass,
+      robux: 100,
+      inventory: []
+    });
+
+    alert("Registrado, ahora inicia sesión");
   }
 
-  // ---------------- INIT ----------------
-  if(!localStorage.getItem("market")){
-    saveMarket([
-      {name:"Dominus Prefius",img:"https://tr.rbxcdn.com/180DAY-75378372edcd1f03ab46459b4e15038a/420/420/Hat/Webp/noFilter",price:45,stock:3}
-    ]);
+  // ---------- Login ----------
+  async function login() {
+    let user = document.getElementById("logUser").value;
+    let pass = document.getElementById("logPass").value;
+
+    let userRef = doc(db, "users", user);
+    let docSnap = await getDoc(userRef);
+    if (!docSnap.exists()) {
+      alert("No existe usuario");
+      return;
+    }
+    if (docSnap.data().password !== pass) {
+      alert("Contraseña incorrecta");
+      return;
+    }
+
+    currentUser = user;
+    document.getElementById("auth").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    document.getElementById("userInfo").innerText = "Usuario: " + currentUser;
+    updateRobux();
+    showTab("market");
+    loadInventory();
   }
-  window.onload=loadGame;
+
+  // ---------- Marketplace Global ----------
+  const marketDiv = document.getElementById("marketItems");
+  onSnapshot(collection(db, "marketplace"), snapshot => {
+    marketDiv.innerHTML = "";
+    snapshot.forEach(docSnap => {
+      let item = docSnap.data();
+      marketDiv.innerHTML += `
+        <div class="item">
+          <img src="${item.img}">
+          <h3>${item.name}</h3>
+          <p>Precio: ${item.price} R$</p>
+          <p>Stock: ${item.stock}</p>
+          <button onclick="buyItem('${docSnap.id}', ${item.price})">Comprar</button>
+        </div>
+      `;
+    });
+  });
+
+  // ---------- Comprar Item ----------
+  async function buyItem(itemId, price) {
+    if (!currentUser) { alert("Inicia sesión"); return; }
+
+    let userRef = doc(db, "users", currentUser);
+    let userSnap = await getDoc(userRef);
+    let userData = userSnap.data();
+
+    if (userData.robux < price) {
+      alert("Robux insuficientes");
+      return;
+    }
+
+    let itemRef = doc(db, "marketplace", itemId);
+    let itemSnap = await getDoc(itemRef);
+    let item = itemSnap.data();
+
+    if (item.stock <= 0) {
+      alert("Sin stock");
+      return;
+    }
+
+    // Actualizar stock e inventario
+    await updateDoc(itemRef, { stock: item.stock - 1 });
+    await updateDoc(userRef, {
+      robux: userData.robux - price,
+      inventory: [...userData.inventory, item.name]
+    });
+
+    updateRobux();
+    loadInventory();
+    alert("¡Comprado y añadido a tu inventario!");
+  }
+
+  // ---------- Mostrar Robux ----------
+  async function updateRobux() {
+    if (!currentUser) return;
+    let userRef = doc(db, "users", currentUser);
+    let snap = await getDoc(userRef);
+    document.getElementById("robuxInfo").innerText = "R$: " + snap.data().robux;
+  }
+
+  // ---------- Inventario ----------
+  async function loadInventory() {
+    let userRef = doc(db, "users", currentUser);
+    let snap = await getDoc(userRef);
+    let items = snap.data().inventory || [];
+    let invDiv = document.getElementById("myItems");
+    invDiv.innerHTML = items.map(i => `<div class="item"><h4>${i}</h4></div>`).join("");
+  }
+
+  // ---------- Tabs ----------
+  function showTab(tab) {
+    document.querySelectorAll(".tab").forEach(t => t.style.display = "none");
+    document.getElementById(tab).style.display = "block";
+  }
 </script>
 </body>
 </html>
