@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>ESPZ</title>
+  <title>Roblox Revival</title>
   <style>
     body {
       margin: 0;
@@ -53,12 +53,28 @@
       background: #222; border-radius: 8px; padding: 10px; text-align: center;
     }
     .game-card img { width: 100%; border-radius: 5px; }
+
+    /* Friends */
+    .search-bar { margin-bottom: 15px; }
+    .search-bar input {
+      padding: 6px; border: none; border-radius: 4px;
+    }
+    .search-bar button {
+      padding: 6px 10px; margin-left: 5px; border: none; border-radius: 4px;
+      background: #28a745; color: white; cursor: pointer;
+    }
+    .search-bar button:hover { background: #218838; }
+    .result { margin: 10px 0; padding: 8px; background: #222; border-radius: 4px; }
+    .result button {
+      margin-left: 10px; padding: 5px; border: none; border-radius: 4px;
+      background: #007bff; color: white; cursor: pointer;
+    }
+    .result button:hover { background: #0056b3; }
   </style>
 </head>
 <body>
   <!-- LOGIN -->
   <div class="login-bg" id="loginPage">
-    <div class="overlay"></div>
     <div class="form-container">
       <h1 id="formTitle">Registrarse</h1>
       <div id="registerForm">
@@ -79,7 +95,7 @@
   <!-- HOME -->
   <div class="app" id="homePage" style="display:none;">
     <div class="sidebar">
-      <h2>ESPZ</h2>
+      <h2>ROBLOX</h2>
       <ul>
         <li onclick="showSection('homeSection')">Home</li>
         <li onclick="showSection('profileSection')">Profile</li>
@@ -121,27 +137,41 @@
         </div>
       </div>
 
-      <!-- OTRAS SECCIONES -->
+      <!-- PROFILE -->
       <div id="profileSection" class="hidden">
         <h3>Mi Perfil</h3>
         <p>Aquí aparecerán los datos del jugador.</p>
       </div>
+
+      <!-- MESSAGES -->
       <div id="messagesSection" class="hidden">
         <h3>Mensajes</h3>
         <p>No tienes mensajes nuevos.</p>
       </div>
+
+      <!-- FRIENDS -->
       <div id="friendsSection" class="hidden">
         <h3>Amigos</h3>
-        <p>Aquí podrás buscar y agregar amigos.</p>
+        <div class="search-bar">
+          <input type="text" id="searchUser" placeholder="Buscar usuario...">
+          <button onclick="searchUser()">Buscar</button>
+        </div>
+        <div id="searchResults"></div>
       </div>
+
+      <!-- AVATAR -->
       <div id="avatarSection" class="hidden">
         <h3>Editor de Avatar</h3>
         <p>Pronto podrás personalizar tu avatar aquí.</p>
       </div>
+
+      <!-- INVENTORY -->
       <div id="inventorySection" class="hidden">
         <h3>Inventario</h3>
         <p>Aquí se mostrarán tus objetos.</p>
       </div>
+
+      <!-- SETTINGS -->
       <div id="settingsSection" class="hidden">
         <h3>Configuración</h3>
         <p>Ajustes de tu cuenta.</p>
@@ -202,6 +232,7 @@
       document.getElementById("loginPage").style.display = "none";
       document.getElementById("homePage").style.display = "flex";
       document.getElementById("playerName").innerText = currentUser;
+      updateFriends();
     }
 
     function showSection(sectionId) {
@@ -210,6 +241,47 @@
       document.getElementById(sectionId).classList.remove("hidden");
       document.getElementById("sectionTitle").innerText =
         document.getElementById(sectionId).querySelector("h3").innerText;
+    }
+
+    // ---------------- FRIENDS ----------------
+    function searchUser() {
+      const query = document.getElementById("searchUser").value.trim();
+      const resultsDiv = document.getElementById("searchResults");
+      resultsDiv.innerHTML = "";
+
+      if (!query) return;
+
+      if (users[query] && query !== currentUser) {
+        const div = document.createElement("div");
+        div.className = "result";
+        div.innerHTML = `${query} <button onclick="addFriend('${query}')">Agregar</button>`;
+        resultsDiv.appendChild(div);
+      } else {
+        resultsDiv.innerHTML = "<p>No se encontró ningún usuario.</p>";
+      }
+    }
+
+    function addFriend(friendName) {
+      if (!users[currentUser].friends.includes(friendName)) {
+        users[currentUser].friends.push(friendName);
+        localStorage.setItem("users", JSON.stringify(users));
+        alert(`${friendName} agregado a tus amigos!`);
+        updateFriends();
+      } else {
+        alert("Ese usuario ya es tu amigo.");
+      }
+    }
+
+    function updateFriends() {
+      const list = document.getElementById("friendList");
+      list.innerHTML = '<div class="circle">+</div>';
+      users[currentUser].friends.forEach(f => {
+        const div = document.createElement("div");
+        div.className = "circle";
+        div.innerText = f[0].toUpperCase();
+        div.title = f;
+        list.appendChild(div);
+      });
     }
   </script>
 </body>
