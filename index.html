@@ -2,202 +2,135 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>ESPZ</title>
+  <title>Registro - Roblox Revival</title>
   <style>
-    body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f2f2f2; }
-    header { background:#202020; color:white; padding:10px; display:flex; justify-content:space-between; align-items:center; }
-    nav a { margin:0 10px; color:white; text-decoration:none; }
-    .container { padding:20px; }
-    .hidden { display:none; }
-    #catalog .item { border:1px solid #ccc; padding:10px; margin:10px; display:inline-block; width:150px; background:white; }
-    #friendsList div, #searchResults div { background:white; padding:5px; margin:5px 0; border:1px solid #ddd; }
-    button { cursor:pointer; }
-    .top-right { font-weight:bold; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url("https://tr.rbxcdn.com/6be7dbd6cf4d3945e0a73f8a8c92a59b/768/432/Image/Png") repeat;
+      background-size: cover;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .overlay {
+      background: rgba(0, 0, 0, 0.7);
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+    }
+
+    .form-container {
+      position: relative;
+      z-index: 2;
+      background: #1c1c1c;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.8);
+      color: white;
+      width: 350px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    input[type="text"], input[type="password"], select {
+      background: #2a2a2a;
+      color: white;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #00a2ff;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background: #008ada;
+    }
+
+    .switch {
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .switch a {
+      color: #00a2ff;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>ESPZ</h1>
-    <nav>
-      <a href="#" onclick="showSection('home')">Inicio</a>
-      <a href="#" onclick="showSection('catalog')">Catálogo</a>
-      <a href="#" onclick="showSection('friends')">Amigos</a>
-    </nav>
-    <div class="top-right">
-      <span id="robuxDisplay">Robux: 0</span>
-      <button onclick="logout()">Salir</button>
+  <div class="overlay"></div>
+  <div class="form-container" id="authForm">
+    <h1 id="formTitle">¡Regístrate y diviértete!</h1>
+
+    <div id="registerForm">
+      <select>
+        <option>Día</option>
+        <option>1</option>
+        <option>2</option>
+        <!-- etc... -->
+      </select>
+      <select>
+        <option>Mes</option>
+        <option>Enero</option>
+        <option>Febrero</option>
+      </select>
+      <select>
+        <option>Año</option>
+        <option>2000</option>
+        <option>2001</option>
+      </select>
+
+      <input type="text" placeholder="Usuario">
+      <input type="password" placeholder="Contraseña">
+      <button>Registrarse</button>
+      <div class="switch">¿Ya tienes cuenta? <a onclick="toggleForm()">Inicia sesión</a></div>
     </div>
-  </header>
 
-  <div class="container">
-    <!-- LOGIN/REGISTRO -->
-    <section id="authSection">
-      <h2>Registro</h2>
-      <input type="text" id="regUser" placeholder="Usuario"><br>
-      <input type="password" id="regPass" placeholder="Contraseña"><br>
-      <button onclick="register()">Registrar</button>
-
-      <h2>Iniciar sesión</h2>
-      <input type="text" id="loginUser" placeholder="Usuario"><br>
-      <input type="password" id="loginPass" placeholder="Contraseña"><br>
-      <button onclick="login()">Entrar</button>
-    </section>
-
-    <!-- INICIO -->
-    <section id="home" class="hidden">
-      <h2>Bienvenido, <span id="usernameDisplay"></span>!</h2>
-      <p>Tu perfil aparecerá aquí.</p>
-    </section>
-
-    <!-- CATALOGO -->
-    <section id="catalog" class="hidden">
-      <h2>Catálogo</h2>
-      <div class="item">
-        <img src="https://tr.rbxcdn.com/9f67a939f7a09fa38e5c0b1f20d7e9e4/150/150/AvatarHeadshot/Png" width="100"><br>
-        Sombrero Cool<br>
-        50 Robux<br>
-        <button onclick="buyItem('Sombrero Cool',50)">Comprar</button>
-      </div>
-      <div class="item">
-        <img src="https://tr.rbxcdn.com/73a9190ec52e7d3f31c52a4da41d652f/150/150/AvatarHeadshot/Png" width="100"><br>
-        Espada Legendaria<br>
-        100 Robux<br>
-        <button onclick="buyItem('Espada Legendaria',100)">Comprar</button>
-      </div>
-    </section>
-
-    <!-- AMIGOS -->
-    <section id="friends" class="hidden">
-      <h2>Amigos</h2>
-      <div id="friendsList"></div>
-
-      <h3>Buscar personas</h3>
-      <input type="text" id="searchInput" placeholder="Nombre...">
-      <button onclick="searchUsers(document.getElementById('searchInput').value)">Buscar</button>
-      <div id="searchResults"></div>
-    </section>
+    <div id="loginForm" style="display:none;">
+      <input type="text" placeholder="Usuario">
+      <input type="password" placeholder="Contraseña">
+      <button>Entrar</button>
+      <div class="switch">¿No tienes cuenta? <a onclick="toggleForm()">Regístrate</a></div>
+    </div>
   </div>
 
-<script>
-  // ==================== FUNCIONES DE USUARIOS ====================
-  function getUsers() {
-    return JSON.parse(localStorage.getItem("users")) || [];
-  }
-  function saveUsers(users) {
-    localStorage.setItem("users", JSON.stringify(users));
-  }
-
-  function register() {
-    const username = document.getElementById("regUser").value;
-    const password = document.getElementById("regPass").value;
-    if (!username || !password) return alert("Completa todos los campos.");
-    let users = getUsers();
-    if (users.find(u => u.username === username)) return alert("Usuario ya existe.");
-    const newUser = { id: Date.now().toString(), username, password, robux: 200, friends: [] };
-    users.push(newUser);
-    saveUsers(users);
-    alert("Cuenta creada! Ahora inicia sesión.");
-  }
-
-  function login() {
-    const username = document.getElementById("loginUser").value;
-    const password = document.getElementById("loginPass").value;
-    let users = getUsers();
-    const user = users.find(u => u.username === username && u.password === password);
-    if (!user) return alert("Datos incorrectos.");
-    localStorage.setItem("session", JSON.stringify(user));
-    loadSession();
-  }
-
-  function logout() {
-    localStorage.removeItem("session");
-    location.reload();
-  }
-
-  // ==================== SECCIONES ====================
-  function showSection(id) {
-    document.querySelectorAll("section").forEach(s => s.classList.add("hidden"));
-    document.getElementById(id).classList.remove("hidden");
-  }
-
-  // ==================== CARGA DE SESION ====================
-  function loadSession() {
-    const session = JSON.parse(localStorage.getItem("session"));
-    if (!session) {
-      showSection("authSection");
-      return;
+  <script>
+    function toggleForm() {
+      const reg = document.getElementById("registerForm");
+      const log = document.getElementById("loginForm");
+      const title = document.getElementById("formTitle");
+      if (reg.style.display === "none") {
+        reg.style.display = "block";
+        log.style.display = "none";
+        title.innerText = "¡Regístrate y diviértete!";
+      } else {
+        reg.style.display = "none";
+        log.style.display = "block";
+        title.innerText = "Iniciar sesión";
+      }
     }
-    document.getElementById("usernameDisplay").innerText = session.username;
-    document.getElementById("robuxDisplay").innerText = "Robux: " + session.robux;
-    showSection("home");
-    updateFriends();
-  }
-
-  // ==================== CATALOGO ====================
-  function buyItem(itemName, cost) {
-    let session = JSON.parse(localStorage.getItem("session"));
-    let users = getUsers();
-    if (session.robux < cost) return alert("No tienes suficiente Robux.");
-    session.robux -= cost;
-    localStorage.setItem("session", JSON.stringify(session));
-    users = users.map(u => u.id === session.id ? session : u);
-    saveUsers(users);
-    document.getElementById("robuxDisplay").innerText = "Robux: " + session.robux;
-    alert("Compraste: " + itemName);
-  }
-
-  // ==================== AMIGOS ====================
-  function updateFriends() {
-    const session = JSON.parse(localStorage.getItem("session"));
-    const friendsList = document.getElementById("friendsList");
-    friendsList.innerHTML = "";
-    if (!session.friends.length) {
-      friendsList.innerHTML = "<p>No tienes amigos.</p>";
-      return;
-    }
-    session.friends.forEach(f => {
-      const div = document.createElement("div");
-      div.innerText = f.username;
-      friendsList.appendChild(div);
-    });
-  }
-
-  function searchUsers(query) {
-    const users = getUsers();
-    const session = JSON.parse(localStorage.getItem("session"));
-    const resultsContainer = document.getElementById("searchResults");
-    resultsContainer.innerHTML = "";
-    if (!query) return resultsContainer.innerHTML = "<p>Escribe un nombre.</p>";
-
-    const results = users.filter(u => u.username.toLowerCase().includes(query.toLowerCase()) && u.id !== session.id);
-
-    if (!results.length) return resultsContainer.innerHTML = "<p>No se encontraron usuarios.</p>";
-
-    results.forEach(user => {
-      const div = document.createElement("div");
-      div.innerHTML = `${user.username} <button onclick="addFriend('${user.id}')">Agregar</button>`;
-      resultsContainer.appendChild(div);
-    });
-  }
-
-  function addFriend(friendId) {
-    let session = JSON.parse(localStorage.getItem("session"));
-    let users = getUsers();
-    const friend = users.find(u => u.id === friendId);
-    if (!friend) return alert("Usuario no encontrado.");
-
-    if (session.friends.find(f => f.id === friend.id)) return alert("Ya es tu amigo.");
-
-    session.friends.push({ id: friend.id, username: friend.username });
-    localStorage.setItem("session", JSON.stringify(session));
-    users = users.map(u => u.id === session.id ? session : u);
-    saveUsers(users);
-    alert("Amigo agregado!");
-    updateFriends();
-  }
-
-  // ==================== INICIO ====================
-  loadSession();
-</script>
+  </script>
 </body>
 </html>
