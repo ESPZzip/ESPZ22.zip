@@ -1,200 +1,554 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESP:Z</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ESP:Z UPDATE!</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #111; color: #fff; }
-    header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #222; }
-    header h2 { margin: 0; }
-    #app { display: none; height: 100vh; }
-    .sidebar { width: 200px; background: #1a1a1a; height: 100%; float: left; padding-top: 20px; }
-    .sidebar button { display: block; width: 100%; padding: 10px; border: none; background: none; color: #fff; text-align: left; cursor: pointer; }
-    .sidebar button:hover { background: #333; }
-    .content { margin-left: 200px; padding: 20px; }
-    .item { background: #222; border-radius: 10px; padding: 10px; margin: 10px; display: inline-block; width: 180px; text-align: center; }
-    .item img { width: 100%; height: 120px; object-fit: cover; border-radius: 5px; }
-    .hidden { display: none; }
-    #auth { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
-    #auth input { margin: 5px; padding: 10px; width: 200px; }
-    #auth button { margin: 5px; padding: 10px 20px; cursor: pointer; }
-    #purchaseModal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #222; padding: 20px; border-radius: 10px; display: none; z-index: 1000; }
-    #purchaseModal button { margin: 5px; padding: 8px 16px; }
+    :root{
+      --bg:#f2f3f5;--card:#ffffff;--muted:#e5e7eb;--text:#111827;--primary:#2563eb;--primary-700:#1d4ed8;--danger:#dc2626;--success:#16a34a;--shadow:0 10px 20px rgba(0,0,0,.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    header{background:#111827;color:#fff;display:flex;justify-content:space-between;align-items:center;padding:12px 18px;position:sticky;top:0;z-index:5}
+    header .left{font-weight:700}
+    header .right{display:flex;gap:10px;align-items:center}
+    .pill{background:#374151;color:#fff;padding:6px 12px;border-radius:999px;box-shadow:var(--shadow)}
+    .btn{border:none;border-radius:10px;padding:9px 14px;background:#e5e7eb;color:#111827;cursor:pointer;transition:.15s;box-shadow:var(--shadow)}
+    .btn:hover{transform:translateY(-1px)}
+    .btn.primary{background:var(--primary);color:#fff}
+    .btn.primary:hover{background:var(--primary-700)}
+    .btn.success{background:var(--success);color:#fff}
+    .btn.danger{background:var(--danger);color:#fff}
+
+    main{display:flex;min-height:calc(100vh - 56px)}
+    aside{width:240px;background:#111827;color:#fff;padding:16px;position:sticky;top:56px;height:calc(100vh - 56px)}
+    .menu button{width:100%;text-align:left;background:#1f2937;color:#fff;border:none;border-radius:12px;padding:12px 14px;margin:6px 0;cursor:pointer}
+    .menu button.active{background:#374151}
+
+    .content{flex:1;padding:24px}
+    .view{display:none}
+    .view.active{display:block}
+
+    /* Cards & grids */
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+    .card{background:var(--card);border:1px solid var(--muted);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+    .card .body{padding:12px 14px}
+    .card img{width:100%;height:150px;object-fit:cover;background:#d1d5db}
+    .meta{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+
+    /* Auth screen */
+    #authScreen{position:fixed;inset:0;background:#111827;display:flex;align-items:center;justify-content:center;padding:20px}
+    #authScreen .box{background:#fff;color:#111827;border-radius:16px;box-shadow:var(--shadow);width:360px;max-width:95vw;padding:22px}
+    #authScreen h2{margin:0 0 10px}
+    .field{display:flex;flex-direction:column;margin:8px 0}
+    .field input{padding:10px 12px;border-radius:10px;border:1px solid #d1d5db}
+    .helper{font-size:12px;color:#6b7280;height:16px}
+
+    /* Modals */
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}
+    .modal .box{background:#fff;border-radius:16px;max-width:420px;width:100%;padding:18px;color:#111827;box-shadow:var(--shadow)}
+    .modal .actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+
+    /* Profile friends cards */
+    .friend-card{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--muted);border-radius:14px;background:var(--card)}
+    .avatar{width:40px;height:40px;border-radius:10px;background:#e5e7eb;display:flex;align-items:center;justify-content:center;font-weight:700}
+
+    .section-title{margin:8px 0 14px}
+    .row{display:flex;gap:8px}
+    .muted{color:#6b7280}
+    .hidden{display:none}
   </style>
 </head>
 <body>
-  <div id="auth">
-    <h2>Registrarse / Iniciar sesión</h2>
-    <input type="text" id="username" placeholder="Usuario">
-    <input type="password" id="password" placeholder="Contraseña">
-    <button onclick="register()">Registrarse</button>
-    <button onclick="login()">Iniciar sesión</button>
-    <p id="authMsg"></p>
-  </div>
-
-  <div id="app">
-    <header>
-      <h2 id="playerName">Invitado</h2>
-      <div>
-        <span id="robux">💎 100</span>
-        <button onclick="logout()" style="margin-left:20px; padding:5px 10px; cursor:pointer;">Cerrar sesión</button>
+  <!-- AUTH -->
+  <div id="authScreen">
+    <div class="box">
+      <h2>Registrarse / Iniciar sesión</h2>
+      <div class="field"><label>Usuario</label><input id="authUser" autocomplete="username" /></div>
+      <div class="field"><label>Contraseña</label><input id="authPass" type="password" autocomplete="current-password" /></div>
+      <div class="row">
+        <button class="btn success" id="btnRegister">Registrarse</button>
+        <button class="btn primary" id="btnLogin">Iniciar sesión</button>
       </div>
-    </header>
-    <div class="sidebar">
-      <button onclick="showSection('marketplace')">Marketplace</button>
-      <button onclick="showSection('inventory')">Inventory</button>
-      <button onclick="showSection('trades')">Trades</button>
-      <button onclick="showSection('profile')">Profile</button>
-      <button onclick="showSection('friends')">Friends</button>
-    </div>
-    <div class="content">
-      <div id="marketplace" class="section">
-        <h2>Marketplace</h2>
-        <div class="item">
-          <img src="https://tr.rbxcdn.com/4c9dfc9f22bdf37f02bda2c7e6e295e9/420/420/Hat/Png" alt="Classic Fedora">
-          <h3>Classic Fedora</h3>
-          <p>150 💎</p>
-          <button onclick="buyItem('Classic Fedora',150)">Comprar</button>
-        </div>
-        <div class="item">
-          <img src="https://tr.rbxcdn.com/8ebf0e2e8e9c0b8c2ac12e8a3a6fefec/420/420/Hat/Png" alt="Valkyrie Helm">
-          <h3>Valkyrie Helm</h3>
-          <p>750 💎</p>
-          <button onclick="buyItem('Valkyrie Helm',750)">Comprar</button>
-        </div>
-      </div>
-      <div id="inventory" class="section hidden">
-        <h2>Inventory</h2>
-        <ul id="inventoryList"></ul>
-      </div>
-      <div id="trades" class="section hidden">
-        <h2>Trades</h2>
-        <p>Aquí aparecerán tus trades futuros...</p>
-      </div>
-      <div id="profile" class="section hidden">
-        <h2>Profile</h2>
-        <p>Nombre de usuario: <span id="profileName"></span></p>
-      </div>
-      <div id="friends" class="section hidden">
-        <h2>Friends</h2>
-        <input type="text" id="friendSearch" placeholder="Buscar usuario...">
-        <button onclick="searchFriend()">Buscar</button>
-        <p id="friendResult"></p>
-      </div>
+      <div class="helper" id="authMsg"></div>
     </div>
   </div>
 
-  <div id="purchaseModal">
-    <p id="purchaseMsg"></p>
-    <button onclick="confirmPurchase()">Comprar</button>
-    <button onclick="closeModal()">Cancelar</button>
+  <!-- APP -->
+  <header>
+    <div class="left"><span id="playerName">Invitado</span></div>
+    <div class="right">
+      <span class="pill">Robux: <strong id="robuxBalance">0</strong></span>
+      <button class="btn" id="btnLogout">Cerrar sesión</button>
+    </div>
+  </header>
+  <main>
+    <aside>
+      <div class="menu">
+        <button class="active" data-view="market">Marketplace</button>
+        <button data-view="inventory">Inventory</button>
+        <button data-view="trades">Trades</button>
+        <button data-view="profile">Profile</button>
+        <button data-view="friends">Friends</button>
+      </div>
+    </aside>
+    <section class="content">
+      <!-- MARKETPLACE -->
+      <div id="view-market" class="view active">
+        <h2 class="section-title">Marketplace</h2>
+        <div id="marketGrid" class="grid"></div>
+      </div>
+
+      <!-- INVENTORY -->
+      <div id="view-inventory" class="view">
+        <h2 class="section-title">Inventory</h2>
+        <div id="inventoryGrid" class="grid"></div>
+        <p id="invEmpty" class="muted">No tienes objetos todavía.</p>
+      </div>
+
+      <!-- TRADES (placeholder) -->
+      <div id="view-trades" class="view">
+        <h2 class="section-title">Trades</h2>
+        <p class="muted">En construcción.</p>
+      </div>
+
+      <!-- PROFILE -->
+      <div id="view-profile" class="view">
+        <h2 class="section-title">Profile</h2>
+        <p><strong>Usuario:</strong> <span id="profileUsername"></span></p>
+        <p><strong>Robux:</strong> <span id="profileRobux"></span></p>
+        <h3 class="section-title">Amigos</h3>
+        <div id="friendsCards" class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr));"></div>
+        <p id="noFriends" class="muted">Aún no tienes amigos. ¡Envía solicitudes desde la pestaña Friends!</p>
+      </div>
+
+      <!-- FRIENDS -->
+      <div id="view-friends" class="view">
+        <h2 class="section-title">Friends</h2>
+        <div class="card">
+          <div class="body">
+            <h3>Búsqueda</h3>
+            <div class="row">
+              <input id="friendSearch" placeholder="Buscar usuario…" style="flex:1;padding:10px;border:1px solid var(--muted);border-radius:10px" />
+              <button class="btn" id="btnFriendSearch">Buscar</button>
+            </div>
+            <div id="searchResult" style="margin-top:10px"></div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <div class="body">
+            <h3>Solicitudes pendientes</h3>
+            <div id="pendingList" class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr));"></div>
+            <p id="noPending" class="muted">No tienes solicitudes por ahora.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL COMPRA -->
+  <div class="modal" id="purchaseModal">
+    <div class="box">
+      <h3>Confirmar compra</h3>
+      <p id="purchaseText" style="margin:6px 0 2px"></p>
+      <div class="actions">
+        <button class="btn" id="buyCancel">Cancelar</button>
+        <button class="btn primary" id="buyConfirm">Comprar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL SOLICITUD AMISTAD (auto al iniciar) -->
+  <div class="modal" id="requestModal">
+    <div class="box">
+      <h3>Solicitud de amistad</h3>
+      <p id="requestText" style="margin:6px 0 2px"></p>
+      <div class="actions">
+        <button class="btn" id="reqReject">Rechazar</button>
+        <button class="btn success" id="reqAccept">Aceptar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ELIMINAR AMIGO -->
+  <div class="modal" id="removeModal">
+    <div class="box">
+      <h3>Eliminar amigo</h3>
+      <p id="removeText"></p>
+      <div class="actions">
+        <button class="btn" id="rmCancel">Cancelar</button>
+        <button class="btn danger" id="rmConfirm">Eliminar</button>
+      </div>
+    </div>
   </div>
 
   <script>
-    let currentUser = null;
-    let users = JSON.parse(localStorage.getItem('users')||'{}');
-    let inventory = [];
-    let robux = 100;
-    let pendingPurchase = null;
+    // ------------------ Datos & Helpers ------------------
+    const LS_USERS = 'demo_users_v3';
+    const LS_SESSION = 'demo_session_user';
 
-    // Auto login si hay sesión guardada
-    window.onload = () => {
-      let savedUser = localStorage.getItem('currentUser');
-      if(savedUser && users[savedUser]){
-        currentUser = savedUser;
-        robux = users[currentUser].robux;
-        inventory = users[currentUser].inventory;
-        enterApp();
-      }
+    const defaultItems = [
+      {id:'i1',name:'Classic Fedora',price:150,img:'https://tr.rbxcdn.com/4c9dfc9f22bdf37f02bda2c7e6e295e9/420/420/Hat/Png'},
+      {id:'i2',name:'Valkyrie Helm',price:750,img:'https://tr.rbxcdn.com/87f739b6e70ecf62c802d5f3bcd4d1f9/420/420/Hat/Webp'},
+      {id:'i3',name:'Dominus Astra',price:1200,img:'https://tr.rbxcdn.com/f62c97b9a65db0a2b78ccaa6d6c1b03a/420/420/Hat/Webp'},
+      {id:'i4',name:'Top Hat',price:500,img:'https://tr.rbxcdn.com/56e0545d6e92db9275480a219c2f4780/420/420/Hat/Webp'},
+      {id:'i5',name:'Black Iron Commando',price:300,img:'https://tr.rbxcdn.com/d50aef3a94c8e6308a36d5600262ae36/420/420/Hat/Webp'},
+      {id:'i6',name:'Korblox Deathspeaker',price:1700,img:'https://tr.rbxcdn.com/2f4a98b87e42c9f23b1cc0a6f7f4a4b7/420/420/Hat/Webp'}
+    ];
+
+    const getUsers = () => JSON.parse(localStorage.getItem(LS_USERS) || '{}');
+    const setUsers = (obj) => localStorage.setItem(LS_USERS, JSON.stringify(obj));
+    const getUser = (u) => getUsers()[u] || null;
+    const saveUser = (u, data) => { const all = getUsers(); all[u] = data; setUsers(all); };
+
+    const setSession = (u) => localStorage.setItem(LS_SESSION, u);
+    const getSession = () => localStorage.getItem(LS_SESSION);
+    const clearSession = () => localStorage.removeItem(LS_SESSION);
+
+    // ------------------ Estado ------------------
+    let currentUser = null; // string username
+    let pendingItem = null; // item to buy
+
+    // ------------------ Elementos ------------------
+    const authScreen = document.getElementById('authScreen');
+    const authUser = document.getElementById('authUser');
+    const authPass = document.getElementById('authPass');
+    const authMsg  = document.getElementById('authMsg');
+    document.getElementById('btnRegister').onclick = onRegister;
+    document.getElementById('btnLogin').onclick = onLogin;
+
+    const playerName = document.getElementById('playerName');
+    const robuxBalance = document.getElementById('robuxBalance');
+    document.getElementById('btnLogout').onclick = onLogout;
+
+    const marketGrid = document.getElementById('marketGrid');
+    const invGrid = document.getElementById('inventoryGrid');
+    const invEmpty = document.getElementById('invEmpty');
+
+    const profileUsername = document.getElementById('profileUsername');
+    const profileRobux = document.getElementById('profileRobux');
+    const friendsCards = document.getElementById('friendsCards');
+    const noFriends = document.getElementById('noFriends');
+
+    const friendSearch = document.getElementById('friendSearch');
+    const btnFriendSearch = document.getElementById('btnFriendSearch');
+    const searchResult = document.getElementById('searchResult');
+    const pendingList = document.getElementById('pendingList');
+    const noPending = document.getElementById('noPending');
+
+    // Modals
+    const purchaseModal = document.getElementById('purchaseModal');
+    const purchaseText = document.getElementById('purchaseText');
+    document.getElementById('buyCancel').onclick = () => hideModal(purchaseModal);
+    document.getElementById('buyConfirm').onclick = confirmBuy;
+
+    const requestModal = document.getElementById('requestModal');
+    const requestText = document.getElementById('requestText');
+    document.getElementById('reqAccept').onclick = acceptCurrentRequest;
+    document.getElementById('reqReject').onclick = rejectCurrentRequest;
+    let modalRequestQueue = []; // usernames who sent requests
+    let currentModalRequest = null;
+
+    const removeModal = document.getElementById('removeModal');
+    const removeText = document.getElementById('removeText');
+    document.getElementById('rmCancel').onclick = () => hideModal(removeModal);
+    document.getElementById('rmConfirm').onclick = confirmRemoveFriend;
+    let friendToRemove = null;
+
+    // Navegación de vistas
+    document.querySelector('.menu').addEventListener('click', (e)=>{
+      const btn = e.target.closest('button[data-view]');
+      if(!btn) return;
+      const view = btn.getAttribute('data-view');
+      switchView(view);
+    });
+
+    function switchView(view){
+      document.querySelectorAll('.menu button').forEach(b=>b.classList.toggle('active', b.getAttribute('data-view')===view));
+      document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+      const el = document.getElementById(`view-${view}`);
+      if(el){el.classList.add('active');}
+      if(view==='inventory') renderInventory();
+      if(view==='profile') renderProfile();
+      if(view==='friends') { renderPendingRequests(); searchResult.innerHTML=''; friendSearch.value=''; }
     }
 
-    function register(){
-      let u=document.getElementById('username').value;
-      let p=document.getElementById('password').value;
-      if(users[u]){document.getElementById('authMsg').innerText='Ese usuario ya existe';return;}
-      if(u==''||p==''){document.getElementById('authMsg').innerText='Completa todos los campos';return;}
-      users[u]={password:p,robux:100,inventory:[]};
-      localStorage.setItem('users',JSON.stringify(users));
-      currentUser=u;robux=100;inventory=[];
-      localStorage.setItem('currentUser',currentUser);
-      enterApp();
+    // ------------------ Auth ------------------
+    function onRegister(){
+      const u = authUser.value.trim();
+      const p = authPass.value.trim();
+      if(!u || !p){authMsg.textContent='Completa usuario y contraseña';return;}
+      const all = getUsers();
+      if(all[u]){authMsg.textContent='Ese usuario ya existe';return;}
+      all[u] = { password:p, robux: 500, inventory: [], friends: [], friendRequests: [] };
+      setUsers(all);
+      loginUser(u);
     }
-    function login(){
-      let u=document.getElementById('username').value;
-      let p=document.getElementById('password').value;
-      if(!users[u]||users[u].password!==p){document.getElementById('authMsg').innerText='Usuario o contraseña incorrectos';return;}
-      currentUser=u;
-      robux=users[u].robux;
-      inventory=users[u].inventory;
-      localStorage.setItem('currentUser',currentUser);
-      enterApp();
+    function onLogin(){
+      const u = authUser.value.trim();
+      const p = authPass.value.trim();
+      const data = getUser(u);
+      if(!data || data.password!==p){authMsg.textContent='Credenciales inválidas';return;}
+      loginUser(u);
     }
-    function enterApp(){
-      document.getElementById('auth').style.display='none';
-      document.getElementById('app').style.display='block';
-      document.getElementById('playerName').innerText=currentUser;
-      document.getElementById('profileName').innerText=currentUser;
-      updateRobux();
-      renderInventory();
+    function loginUser(u){
+      currentUser = u;
+      setSession(u);
+      authMsg.textContent='';
+      authScreen.style.display='none';
+      applyHeader();
+      renderMarketplace();
+      switchView('market');
+      // Mostrar solicitudes pendientes en modal
+      queueFriendRequests();
+      showNextFriendRequestModal();
     }
-    function logout(){
-      currentUser=null;
-      localStorage.removeItem('currentUser');
-      document.getElementById('app').style.display='none';
-      document.getElementById('auth').style.display='flex';
-      document.getElementById('username').value='';
-      document.getElementById('password').value='';
-      document.getElementById('authMsg').innerText='';
+    function onLogout(){
+      clearSession();
+      currentUser = null;
+      authScreen.style.display='flex';
     }
-    function showSection(id){
-      document.querySelectorAll('.section').forEach(s=>s.classList.add('hidden'));
-      document.getElementById(id).classList.remove('hidden');
-    }
-    function buyItem(name,price){
-      pendingPurchase={name,price};
-      document.getElementById('purchaseMsg').innerText=`¿Comprar ${name} por ${price} Robux?`;
-      document.getElementById('purchaseModal').style.display='block';
-    }
-    function confirmPurchase(){
-      if(robux>=pendingPurchase.price){
-        robux-=pendingPurchase.price;
-        inventory.push(pendingPurchase.name);
-        users[currentUser].robux=robux;
-        users[currentUser].inventory=inventory;
-        localStorage.setItem('users',JSON.stringify(users));
-        renderInventory();
-        updateRobux();
-        alert('Compra realizada con éxito');
-      }else{
-        alert('Robux insuficientes');
+
+    // Restablecer sesión si existe
+    (function init(){
+      const sess = getSession();
+      if(sess && getUser(sess)){
+        currentUser = sess;
+        authScreen.style.display='none';
+        applyHeader();
+        renderMarketplace();
+        // en login automático también revisamos solicitudes
+        queueFriendRequests();
+        showNextFriendRequestModal();
       }
-      closeModal();
+    })();
+
+    function applyHeader(){
+      const u = getUser(currentUser);
+      playerName.textContent = currentUser;
+      robuxBalance.textContent = u?.robux ?? 0;
     }
-    function closeModal(){
-      document.getElementById('purchaseModal').style.display='none';
-      pendingPurchase=null;
-    }
-    function updateRobux(){
-      document.getElementById('robux').innerText=`💎 ${robux}`;
-    }
-    function renderInventory(){
-      let list=document.getElementById('inventoryList');
-      list.innerHTML='';
-      inventory.forEach(item=>{
-        let li=document.createElement('li');
-        li.innerText=item;
-        list.appendChild(li);
+
+    // ------------------ Marketplace ------------------
+    function renderMarketplace(){
+      const u = getUser(currentUser);
+      marketGrid.innerHTML = '';
+      defaultItems.forEach(item=>{
+        const owned = u?.inventory?.some(x=>x.id===item.id);
+        const card = document.createElement('div');
+        card.className='card';
+        card.innerHTML = `
+          <img src="${item.img}" alt="${item.name}">
+          <div class="body">
+            <div style="font-weight:700">${item.name}</div>
+            <div class="meta">
+              <span>${item.price} R$</span>
+              <button class="btn primary" ${owned? 'disabled':''} data-buy="${item.id}">${owned? 'Comprado':'Comprar'}</button>
+            </div>
+          </div>`;
+        marketGrid.appendChild(card);
       });
     }
-    function searchFriend(){
-      let q=document.getElementById('friendSearch').value;
-      if(users[q]){
-        document.getElementById('friendResult').innerText=`${q} está registrado.`;
-      }else{
-        document.getElementById('friendResult').innerText='Usuario no encontrado';
-      }
+
+    marketGrid.addEventListener('click',(e)=>{
+      const btn = e.target.closest('button[data-buy]');
+      if(!btn) return;
+      if(!currentUser){ return; }
+      const id = btn.getAttribute('data-buy');
+      const item = defaultItems.find(i=>i.id===id);
+      pendingItem = item;
+      purchaseText.textContent = `¿Comprar ${item.name} por ${item.price} Robux?`;
+      showModal(purchaseModal);
+    });
+
+    function confirmBuy(){
+      const me = getUser(currentUser);
+      if(!me || !pendingItem) return;
+      if(me.robux < pendingItem.price){ alert('Robux insuficientes'); hideModal(purchaseModal); return; }
+      if(me.inventory.some(x=>x.id===pendingItem.id)){ hideModal(purchaseModal); return; }
+      me.robux -= pendingItem.price;
+      me.inventory.push(pendingItem);
+      saveUser(currentUser, me);
+      applyHeader();
+      renderMarketplace();
+      renderInventory();
+      hideModal(purchaseModal);
+      pendingItem = null;
     }
+
+    // ------------------ Inventory ------------------
+    function renderInventory(){
+      const me = getUser(currentUser);
+      invGrid.innerHTML = '';
+      if(!me || !me.inventory.length){ invEmpty.style.display='block'; return; }
+      invEmpty.style.display='none';
+      me.inventory.forEach(it=>{
+        const c = document.createElement('div');
+        c.className='card';
+        c.innerHTML = `
+          <img src="${it.img}" alt="${it.name}">
+          <div class="body">
+            <div style="font-weight:700">${it.name}</div>
+            <div class="muted">${it.price} R$</div>
+          </div>`;
+        invGrid.appendChild(c);
+      });
+    }
+
+    // ------------------ Profile (friends cards) ------------------
+    function renderProfile(){
+      const me = getUser(currentUser);
+      profileUsername.textContent = currentUser;
+      profileRobux.textContent = me?.robux ?? 0;
+      friendsCards.innerHTML='';
+      const friends = me?.friends || [];
+      if(!friends.length){ noFriends.style.display='block'; return; }
+      noFriends.style.display='none';
+      friends.forEach(friendU => {
+        const card = document.createElement('div');
+        card.className='friend-card';
+        const initials = (friendU[0]||'?').toUpperCase();
+        card.innerHTML = `
+          <div class="avatar">${initials}</div>
+          <div style="flex:1">
+            <div style="font-weight:700">${friendU}</div>
+            <div class="muted">Amigo</div>
+          </div>
+          <button class="btn danger" data-remove-friend="${friendU}">Eliminar</button>
+        `;
+        friendsCards.appendChild(card);
+      });
+    }
+
+    friendsCards.addEventListener('click',(e)=>{
+      const btn = e.target.closest('button[data-remove-friend]');
+      if(!btn) return;
+      friendToRemove = btn.getAttribute('data-remove-friend');
+      removeText.textContent = `¿Seguro que quieres eliminar a ${friendToRemove} de tus amigos?`;
+      showModal(removeModal);
+    });
+
+    function confirmRemoveFriend(){
+      if(!friendToRemove) return;
+      const me = getUser(currentUser);
+      const other = getUser(friendToRemove);
+      if(me){ me.friends = me.friends.filter(f=>f!==friendToRemove); saveUser(currentUser, me); }
+      if(other){ other.friends = (other.friends||[]).filter(f=>f!==currentUser); saveUser(friendToRemove, other); }
+      friendToRemove = null;
+      hideModal(removeModal);
+      renderProfile();
+    }
+
+    // ------------------ Friends (search + requests) ------------------
+    btnFriendSearch.onclick = doFriendSearch;
+    function doFriendSearch(){
+      const q = (friendSearch.value||'').trim();
+      searchResult.innerHTML='';
+      if(!q){ return; }
+      if(q===currentUser){ searchResult.innerHTML = `<p class="muted">No puedes agregarte a ti mismo.</p>`; return; }
+      const user = getUser(q);
+      if(!user){ searchResult.innerHTML = `<p class="muted">Usuario no encontrado.</p>`; return; }
+      const me = getUser(currentUser);
+      if(me.friends.includes(q)){ searchResult.innerHTML = `<p class="muted">${q} ya es tu amigo.</p>`; return; }
+      if((user.friendRequests||[]).includes(currentUser)){
+        searchResult.innerHTML = `<p class="muted">Ya enviaste solicitud. Espera respuesta.</p>`; return;
+      }
+      const btn = document.createElement('button');
+      btn.className='btn primary';
+      btn.textContent = `Enviar solicitud a ${q}`;
+      btn.onclick = ()=>{
+        const target = getUser(q);
+        target.friendRequests = target.friendRequests || [];
+        if(!target.friendRequests.includes(currentUser)) target.friendRequests.push(currentUser);
+        saveUser(q, target);
+        searchResult.innerHTML = `<p class="muted">Solicitud enviada a ${q}.</p>`;
+        renderPendingRequests();
+      };
+      const wrap = document.createElement('div');
+      wrap.appendChild(btn);
+      searchResult.appendChild(wrap);
+    }
+
+    function renderPendingRequests(){
+      const me = getUser(currentUser);
+      const list = me.friendRequests || [];
+      pendingList.innerHTML='';
+      if(!list.length){ noPending.style.display='block'; return; }
+      noPending.style.display='none';
+      list.forEach(fromU=>{
+        const card = document.createElement('div');
+        card.className='friend-card';
+        const initials = (fromU[0]||'?').toUpperCase();
+        card.innerHTML = `
+          <div class="avatar">${initials}</div>
+          <div style="flex:1">
+            <div style="font-weight:700">${fromU}</div>
+            <div class="muted">Te envió una solicitud</div>
+          </div>
+          <div class="row">
+            <button class="btn success" data-acc="${fromU}">Aceptar</button>
+            <button class="btn" data-rej="${fromU}">Rechazar</button>
+          </div>`;
+        pendingList.appendChild(card);
+      });
+    }
+
+    pendingList.addEventListener('click',(e)=>{
+      const acc = e.target.closest('button[data-acc]');
+      const rej = e.target.closest('button[data-rej]');
+      if(acc){ handleAccept(acc.getAttribute('data-acc')); }
+      if(rej){ handleReject(rej.getAttribute('data-rej')); }
+    });
+
+    function handleAccept(fromU){
+      const me = getUser(currentUser);
+      const other = getUser(fromU);
+      if(!me || !other) return;
+      // quitar solicitud
+      me.friendRequests = (me.friendRequests||[]).filter(u=>u!==fromU);
+      // agregar amistades (bidireccional, evitando duplicados)
+      if(!me.friends.includes(fromU)) me.friends.push(fromU);
+      if(!other.friends.includes(currentUser)) other.friends.push(currentUser);
+      saveUser(currentUser, me);
+      saveUser(fromU, other);
+      renderPendingRequests();
+      renderProfile();
+    }
+
+    function handleReject(fromU){
+      const me = getUser(currentUser);
+      if(!me) return;
+      me.friendRequests = (me.friendRequests||[]).filter(u=>u!==fromU);
+      saveUser(currentUser, me);
+      renderPendingRequests();
+    }
+
+    // ----- Modal de solicitudes al iniciar -----
+    function queueFriendRequests(){
+      const me = getUser(currentUser);
+      modalRequestQueue = [...(me.friendRequests||[])];
+    }
+    function showNextFriendRequestModal(){
+      if(currentModalRequest || !modalRequestQueue.length) return;
+      currentModalRequest = modalRequestQueue.shift();
+      requestText.textContent = `El jugador ${currentModalRequest} te envió una solicitud de amistad.`;
+      showModal(requestModal);
+    }
+    function acceptCurrentRequest(){
+      if(!currentModalRequest) return;
+      handleAccept(currentModalRequest);
+      currentModalRequest = null; hideModal(requestModal); showNextFriendRequestModal();
+    }
+    function rejectCurrentRequest(){
+      if(!currentModalRequest) return;
+      handleReject(currentModalRequest);
+      currentModalRequest = null; hideModal(requestModal); showNextFriendRequestModal();
+    }
+
+    // ------------------ Utils ------------------
+    function showModal(m){ m.style.display='flex'; }
+    function hideModal(m){ m.style.display='none'; }
   </script>
 </body>
 </html>
