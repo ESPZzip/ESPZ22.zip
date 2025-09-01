@@ -9,6 +9,7 @@
     input { display: block; margin: 10px 0; padding: 5px; }
     button { margin: 5px 0; padding: 6px 12px; border: none; background: #006644; color: white; border-radius: 6px; cursor: pointer; }
     button:hover { background: #009966; }
+    button:disabled { background: #999; cursor: not-allowed; }
 
     .app { display: none; }
     .header { background: #222; color: white; padding: 10px; display: flex; justify-content: space-between; }
@@ -81,12 +82,21 @@
   </div>
 
   <script>
-    const items = [
-      { id: 1, name: "Dominus Aureus", price: 500, img: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-420-420.png" },
-      { id: 2, name: "Red Sparkle Time Fedora", price: 350, img: "https://tr.rbxcdn.com/30DAY-AvatarBust-420-420.png" },
-      { id: 3, name: "Valkyrie Helm", price: 200, img: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-420-420.png" },
-      { id: 4, name: "Clockwork's Shades", price: 150, img: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-420-420.png" }
-    ];
+    function getItems() {
+      let stored = JSON.parse(localStorage.getItem("items"));
+      if (stored) return stored;
+      const defaultItems = [
+        { id: 1, name: "Dominus Aureus", price: 500, stock: 2, img: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-420-420.png" },
+        { id: 2, name: "Red Sparkle Time Fedora", price: 350, stock: 3, img: "https://tr.rbxcdn.com/30DAY-AvatarBust-420-420.png" },
+        { id: 3, name: "Valkyrie Helm", price: 200, stock: 5, img: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-420-420.png" },
+        { id: 4, name: "Clockwork's Shades", price: 150, stock: 1, img: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-420-420.png" }
+      ];
+      localStorage.setItem("items", JSON.stringify(defaultItems));
+      return defaultItems;
+    }
+    function saveItems(items) {
+      localStorage.setItem("items", JSON.stringify(items));
+    }
 
     function getUsers() {
       return JSON.parse(localStorage.getItem("users") || "{}");
@@ -154,6 +164,7 @@
     function renderMarketplace() {
       const container = document.getElementById("itemsContainer");
       container.innerHTML = "";
+      const items = getItems();
       items.forEach(it => {
         const div = document.createElement("div");
         div.className = "item-card";
@@ -161,7 +172,10 @@
           <img src="${it.img}" onerror="this.src='https://via.placeholder.com/100'">
           <h4>${it.name}</h4>
           <p>💰 ${it.price} Robux</p>
-          <button onclick="buyItem(${it.id})">Comprar</button>
+          <p>📦 Stock: ${it.stock}</p>
+          <button onclick="buyItem(${it.id})" ${it.stock <= 0 ? "disabled" : ""}>
+            ${it.stock > 0 ? "Comprar" : "Agotado"}
+          </button>
         `;
         container.appendChild(div);
       });
@@ -172,6 +186,7 @@
       container.innerHTML = "";
       const username = localStorage.getItem("currentUser");
       const users = getUsers();
+      const items = getItems();
       const inv = users[username].inventory;
       if (inv.length === 0) {
         container.innerHTML = "<p>No tienes ítems.</p>";
@@ -185,6 +200,7 @@
           div.innerHTML = `
             <img src="${item.img}" onerror="this.src='https://via.placeholder.com/100'">
             <h4>${item.name}</h4>
+            <p>📦 Stock actual: ${item.stock}</p>
           `;
           container.appendChild(div);
         }
@@ -195,7 +211,9 @@
       const username = localStorage.getItem("currentUser");
       let users = getUsers();
       let user = users[username];
-      const item = items.find(i => i.id === itemId);
+      let items = getItems();
+      const itemIndex = items.findIndex(i => i.id === itemId);
+      const item = items[itemIndex];
 
       if (user.robux < item.price) {
         alert("Robux insuficientes");
@@ -205,10 +223,17 @@
         alert("Ya tienes este ítem");
         return;
       }
+      if (item.stock <= 0) {
+        alert("Este ítem está agotado");
+        return;
+      }
 
       user.robux -= item.price;
       user.inventory.push(itemId);
+      items[itemIndex].stock -= 1;
+
       saveUsers(users);
+      saveItems(items);
       loadApp();
       alert("Has comprado " + item.name + "!");
     }
