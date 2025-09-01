@@ -2,328 +2,364 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>HOME • ESPZ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PixelShop • Tienda de Ítems</title>
   <style>
     :root{
-      --bg:#0f1113; --panel:#181a1f; --soft:#1f232b;
-      --text:#e9eef3; --muted:#9aa6b2; --accent:#00d47e; --danger:#ef4444;
+      --bg:#0f1220; --card:#161a2f; --muted:#8a93b2; --text:#eef2ff; --accent:#7c5cff; --accent-2:#00e0b8; --danger:#ff5c7a;
+      --radius:18px;
     }
-    *{box-sizing:border-box} html,body{height:100%}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;background:var(--bg);color:var(--text)}
-    a{color:inherit}
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%;background:linear-gradient(180deg,#0c1020,#0f1220 40%,#10142a);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif}
+    a{color:inherit;text-decoration:none}
+    .container{max-width:1100px;margin:0 auto;padding:16px}
+    .app{display:grid;grid-template-columns:1fr;gap:16px}
+    header{position:sticky;top:0;background:rgba(15,18,32,.85);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.06);z-index:10}
+    .nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px}
+    .brand{display:flex;align-items:center;gap:10px}
+    .logo{width:36px;height:36px;border-radius:10px;background:conic-gradient(from 180deg,var(--accent),var(--accent-2));box-shadow:0 0 24px rgba(124,92,255,.35)}
+    .brand h1{font-size:18px;margin:0;letter-spacing:.4px}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:999px}
+    .pill .coin{font-weight:700}
+    .btn{cursor:pointer;border:0;border-radius:12px;padding:10px 14px;background:var(--accent);color:white;font-weight:600;transition:.2s;box-shadow:0 8px 24px rgba(124,92,255,.25)}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(124,92,255,.35)}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.14)}
+    .btn.danger{background:var(--danger);box-shadow:0 8px 24px rgba(255,92,122,.25)}
 
-    /* ---------- AUTH VIEW ---------- */
-    #authView{
-      min-height:100vh;display:grid;place-items:center;padding:24px;
-      background:linear-gradient(0deg, rgba(0,0,0,.55), rgba(0,0,0,.55)),
-        url("https://images.rbxcdn.com/69b1f0a8e2db9b8f9cae3a4f8e33d69f.jpg") center/cover no-repeat fixed;
-    }
-    .auth-card{width:min(640px,100%);background:var(--panel);border:1px solid #242a33;border-radius:16px;padding:24px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
-    .brand{display:flex;justify-content:center;font-weight:900;letter-spacing:.06em;font-size:28px;margin-bottom:8px}
-    .tabs{display:flex;gap:8px;background:var(--soft);padding:6px;border-radius:12px;margin:10px 0 18px}
-    .tab{flex:1;text-align:center;padding:10px 12px;border-radius:8px;cursor:pointer;color:var(--muted);font-weight:800;user-select:none}
-    .tab.active{background:#0b0d11;color:var(--text)}
-    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-    label{display:block;font-size:12px;color:var(--muted);margin:8px 2px}
-    input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #2a313a;background:#0b0d11;color:var(--text);outline:none}
-    input:focus,select:focus{border-color:#344053}
-    .btn{width:100%;padding:12px 14px;border:0;border-radius:12px;cursor:pointer;font-weight:900;background:var(--accent);color:#02130c;margin-top:10px}
-    .btn:disabled{opacity:.6;cursor:not-allowed}
-    .hint{font-size:12px;color:var(--muted);text-align:center;margin-top:10px}
-    .msg{font-size:13px;margin-top:8px;display:none}
-    .msg.error{color:var(--danger)} .msg.ok{color:var(--accent);font-weight:800}
+    .grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:16px}
+    @media (min-width:640px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (min-width:950px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
-    /* ---------- APP VIEW ---------- */
-    #appView{display:none;height:100vh}
-    .sidebar{width:230px;background:var(--panel);border-right:1px solid #1f2630;padding:16px;overflow-y:auto}
-    .sb-brand{font-weight:900;letter-spacing:.06em;margin-bottom:18px}
-    .sb-user{display:flex;align-items:center;gap:10px;background:var(--soft);padding:10px;border-radius:12px;margin-bottom:12px}
-    .sb-user img{width:36px;height:36px;border-radius:50%}
-    .nav a{display:block;padding:10px 12px;border-radius:10px;color:var(--text);text-decoration:none;margin:6px 0}
-    .nav a.active,.nav a:hover{background:#0b0d11}
-    .content{flex:1;display:flex;flex-direction:column;overflow:hidden}
-    .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 16px;background:var(--panel);border-bottom:1px solid #1f2630;position:sticky;top:0;z-index:5}
-    .search{flex:1;max-width:520px}
-    .robux{background:#0b1611;color:#00f18a;border:1px solid #143127;font-weight:900;padding:8px 12px;border-radius:12px}
-    .view{padding:18px;overflow:auto;height:100%}
-    h1{margin:0 0 8px}.subtitle{color:var(--muted);margin:0 0 16px}
+    .card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);overflow:hidden}
+    .card .media{height:160px;background:radial-gradient(90px 90px at 20% 20%,rgba(124,92,255,.22),transparent),radial-gradient(120px 120px at 80% 0%,rgba(0,224,184,.18),transparent);display:grid;place-items:center}
+    .card .media span{font-size:54px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.35))}
+    .card .body{padding:14px 14px 16px}
+    .title{margin:0 0 4px;font-size:18px}
+    .muted{color:var(--muted);font-size:14px}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px}
 
-    /* Home bits */
-    .connections-row{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0 22px}
-    .empty{color:var(--muted);font-size:13px}
-    .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-    .card{background:var(--panel);border:1px solid #1f2630;border-radius:12px;overflow:hidden}
-    .card img{width:100%;aspect-ratio:16/9;object-fit:cover}
-    .card .p{padding:10px 12px}.muted{color:var(--muted);font-size:12px}
+    .panel{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:14px}
+    .stack{display:flex;flex-direction:column;gap:10px}
+    .inline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .tag{padding:6px 10px;border:1px dashed rgba(255,255,255,.14);border-radius:999px;font-size:12px;color:var(--muted)}
 
-    @media (max-width:900px){
-      #appView{flex-direction:column}
-      .sidebar{width:100%;border-right:none;border-bottom:1px solid #1f2630;display:flex;gap:10px;align-items:center}
-      .nav{display:flex;gap:8px;flex-wrap:wrap}
-    }
+    .cart{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:10px}
+    .floating{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:10px 12px;box-shadow:0 14px 40px rgba(0,0,0,.35)}
+
+    dialog{border:0;border-radius:18px;background:var(--card);color:var(--text);padding:0;max-width:520px;width:100%}
+    dialog::backdrop{background:rgba(3,5,12,.6)}
+    .modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 16px;border-bottom:1px solid rgba(255,255,255,.06)}
+    .modal-body{padding:16px}
+
+    .list{display:flex;flex-direction:column;gap:10px}
+    .list li{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:10px 12px}
+    .hr{height:1px;background:rgba(255,255,255,.08);margin:10px 0}
+    .notice{font-size:12px;color:var(--muted)}
+    .inventory{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    @media (min-width:700px){.inventory{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    .badge{font-size:12px;background:rgba(0,224,184,.12);color:#8df0df;border:1px solid rgba(0,224,184,.35);padding:4px 8px;border-radius:999px}
+    .empty{padding:18px;border:1px dashed rgba(255,255,255,.14);border-radius:12px;text-align:center;color:var(--muted)}
   </style>
 </head>
 <body>
-
-  <!-- ========== AUTH (Registro / Login) ========== -->
-  <section id="authView">
-    <div class="auth-card">
-      <div class="brand">ESPZ</div>
-
-      <div class="tabs">
-        <div id="tabReg" class="tab active">Crear cuenta</div>
-        <div id="tabLog" class="tab">Iniciar sesión</div>
+<header>
+  <div class="nav container">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"></div>
+      <h1>PixelShop</h1>
+    </div>
+    <div class="inline">
+      <div class="pill" title="Tu saldo actual">
+        <span>💰</span>
+        <span class="coin" id="balance">0</span>
+        <span class="muted">Coins</span>
       </div>
+      <button class="btn" id="btnAddCoins">Recargar</button>
+      <button class="btn ghost" id="btnInventory">Inventario</button>
+      <button class="btn" id="btnCheckout">Carrito (<span id="cartCount">0</span>)</button>
+    </div>
+  </div>
+</header>
 
-      <!-- Registro -->
-      <div id="paneReg">
-        <label>Fecha de nacimiento</label>
-        <div class="grid-3">
-          <select id="r-day"><option value="">Día</option></select>
-          <select id="r-month"><option value="">Mes</option></select>
-          <select id="r-year"><option value="">Año</option></select>
+<main class="container app" id="app">
+  <section class="panel">
+    <div class="stack">
+      <div class="inline" style="justify-content:space-between">
+        <div>
+          <h2 style="margin:0 0 6px">Ítems Destacados</h2>
+          <p class="muted" style="margin:0">Crea tu propia tienda con tu marca y moneda virtual. Este ejemplo <strong>no usa</strong> marcas de terceros.</p>
         </div>
-
-        <label>Usuario</label>
-        <input id="r-user" minlength="3" maxlength="20" placeholder="No utilices tu nombre real"/>
-
-        <label>Contraseña</label>
-        <input id="r-pass" type="password" minlength="8" placeholder="Por lo menos 8 caracteres"/>
-
-        <button id="btnRegister" class="btn" type="button">Registrarte</button>
-        <div id="rMsgErr" class="msg error"></div>
-        <div id="rMsgOk"  class="msg ok">¡Cuenta creada! <u>REFRESCA LA PÁGINA</u> para entrar al inicio.</div>
-
-        <div class="hint">¿Ya tienes cuenta? <a href="#" id="goLogin">Inicia sesión</a></div>
+        <div class="inline">
+          <span class="tag">Moneda: Coins</span>
+          <span class="tag">Demo sin servidor</span>
+        </div>
       </div>
-
-      <!-- Login -->
-      <div id="paneLog" style="display:none">
-        <label>Usuario</label>
-        <input id="l-user" placeholder="Tu usuario"/>
-
-        <label>Contraseña</label>
-        <input id="l-pass" type="password" placeholder="Tu contraseña"/>
-
-        <button id="btnLogin" class="btn" type="button">Entrar</button>
-        <div id="lMsgErr" class="msg error"></div>
-
-        <div class="hint">¿Nuevo aquí? <a href="#" id="goRegister">Crear cuenta</a></div>
-      </div>
+      <div class="grid" id="itemsGrid"></div>
     </div>
   </section>
 
-  <!-- ========== APP (Inicio) ========== -->
-  <section id="appView" style="display:none">
-    <aside class="sidebar">
-      <div class="sb-brand">ESPZ</div>
-      <div class="sb-user">
-        <img id="sbAvatar" src="https://tr.rbxcdn.com/0e5cc4633a5a97c6f0d948e57843da9b/150/150/AvatarHeadshot/Webp" alt="avatar"/>
-        <div>
-          <div id="sbUsername" style="font-weight:800">Usuario</div>
-          <div id="sbTag" class="muted">@player</div>
-        </div>
-      </div>
-      <nav class="nav">
-        <a href="#" data-view="home" class="active">Home</a>
-        <a href="#" data-view="catalog">Catalog</a>
-        <a href="#" data-view="profile">Profile</a>
-        <a href="#" id="logout">Cerrar sesión</a>
-      </nav>
-    </aside>
+  <section class="panel">
+    <h3 style="margin:0 0 8px">Guía rápida</h3>
+    <ul class="list" style="list-style:none;padding:0;margin:0">
+      <li>Usa “Recargar” para sumar Coins (simulado para pruebas).</li>
+      <li>Agrega ítems al carrito y finaliza la compra con “Carrito”.</li>
+      <li>Todo se guarda en tu navegador con <code>localStorage</code>.</li>
+      <li>Renombra la marca, cambia colores e imágenes a tu estilo.</li>
+    </ul>
+  </section>
+</main>
 
-    <main class="content">
-      <div class="topbar">
-        <div class="search"><input placeholder="Search"/></div>
-        <div id="robux" class="robux">Robux: 100</div>
-      </div>
+<div class="cart">
+  <div class="floating">
+    <div class="inline" style="justify-content:space-between;gap:12px">
+      <strong>Carrito:</strong>
+      <span id="cartSummary" class="muted">0 ítems • 0 Coins</span>
+    </div>
+  </div>
+</div>
 
-      <!-- Home -->
-      <div id="view-home" class="view">
-        <h1>Home</h1>
-        <div id="connTitle" class="subtitle">Connections (0)</div>
-        <div id="connRow" class="connections-row">
-          <div class="empty">Aún no tienes conexiones.</div>
-        </div>
+<dialog id="modalCheckout" aria-labelledby="checkoutTitle">
+  <div class="modal-head">
+    <h3 id="checkoutTitle" style="margin:0">Finalizar compra</h3>
+    <button class="btn ghost" id="closeCheckout">Cerrar</button>
+  </div>
+  <div class="modal-body">
+    <ul class="list" id="cartList"></ul>
+    <div class="hr"></div>
+    <div class="row">
+      <span class="muted">Total</span>
+      <strong id="cartTotal">0 Coins</strong>
+    </div>
+    <div class="row" style="margin-top:16px">
+      <button class="btn danger" id="btnClearCart">Vaciar</button>
+      <button class="btn" id="btnPay">Pagar</button>
+    </div>
+    <p class="notice" style="margin-top:10px">Demo local: no hay pagos reales ni servidor. Integra tu pasarela de pago legítima si lo publicas.</p>
+  </div>
+</dialog>
 
-        <div class="subtitle">Today's Picks</div>
-        <div class="cards">
-          <div class="card">
-            <img src="https://tr.rbxcdn.com/26d2a6f8cabf2b9a63bc8cb6cd1f0c52/768/432/Image/Webp" alt="">
-            <div class="p"><div style="font-weight:700">KPOP Demon Hunters: The Block</div><div class="muted">Event · The Block</div></div>
-          </div>
-          <div class="card">
-            <img src="https://tr.rbxcdn.com/0d1f3b090d6b8ea8d4038a2b8d3cf6c7/768/432/Image/Webp" alt="">
-            <div class="p"><div style="font-weight:700">Tennis Zero [UPD]</div><div class="muted">Ref Style Added</div></div>
-          </div>
-          <div class="card">
-            <img src="https://tr.rbxcdn.com/7b2f9b645f1c1c7e25f847e1fd7b8a78/768/432/Image/Webp" alt="">
-            <div class="p"><div style="font-weight:700">a dusty trip [NEW SEASON]</div><div class="muted">Season 10 is here!</div></div>
-          </div>
-        </div>
-      </div>
+<dialog id="modalInventory" aria-labelledby="inventoryTitle">
+  <div class="modal-head">
+    <h3 id="inventoryTitle" style="margin:0">Tu inventario</h3>
+    <button class="btn ghost" id="closeInventory">Cerrar</button>
+  </div>
+  <div class="modal-body">
+    <div id="inventoryGrid" class="inventory"></div>
+    <div id="inventoryEmpty" class="empty" style="display:none">Aún no tienes ítems. ¡Compra alguno en la tienda!</div>
+  </div>
+</dialog>
 
-      <!-- Catalog -->
-      <div id="view-catalog" class="view" style="display:none">
-        <h1>Catalog</h1>
-        <div class="cards">
-          <div class="card">
-            <img src="https://tr.rbxcdn.com/7e4ed28cf6b17a6c1e3b7c64c95d9f60/768/432/Hat/Webp" alt="">
-            <div class="p"><div style="font-weight:700">Dominus Aureus</div><div class="muted">1,000,000 R$</div></div>
-          </div>
-          <div class="card">
-            <img src="https://tr.rbxcdn.com/31dcd0ff8801c60d0b8dfc7db0c17f7e/768/432/Hat/Webp" alt="">
-            <div class="p"><div style="font-weight:700">Korblox Deathspeaker</div><div class="muted">17,000 R$</div></div>
-          </div>
-          <div class="card">
-            <img src="https://tr.rbxcdn.com/3cfe7c2b40f7e15ae8fc62075852d7f4/768/432/Hat/Webp" alt="">
-            <div class="p"><div style="font-weight:700">Valkyrie Helm</div><div class="muted">250,000 R$</div></div>
-          </div>
-        </div>
-      </div>
+<dialog id="modalTopup" aria-labelledby="topupTitle">
+  <div class="modal-head">
+    <h3 id="topupTitle" style="margin:0">Recargar Coins</h3>
+    <button class="btn ghost" id="closeTopup">Cerrar</button>
+  </div>
+  <div class="modal-body">
+    <div class="stack">
+      <label for="topupAmount" class="muted">Cantidad a añadir</label>
+      <input id="topupAmount" type="number" min="1" step="1" value="1000" style="width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:var(--text)" />
+      <button class="btn" id="applyTopup">Añadir Coins</button>
+      <p class="notice">Solo para pruebas locales. Sustituye por una integración de pago real si lo despliegas.</p>
+    </div>
+  </div>
+</dialog>
 
-      <!-- Profile -->
-      <div id="view-profile" class="view" style="display:none">
-        <h1>Profile</h1>
-        <div class="cards">
-          <div class="card">
-            <img id="profileAvatar" src="https://tr.rbxcdn.com/0e5cc4633a5a97c6f0d948e57843da9b/768/432/AvatarHeadshot/Webp" alt="">
-            <div class="p">
-              <div id="profileName" style="font-weight:800;font-size:18px">Usuario</div>
-              <div id="profileTag" class="muted">@player</div>
-              <div class="muted" style="margin-top:6px">Join Date: <span id="joinDate">—</span></div>
-              <div class="muted">Place Visits: 0</div>
+<script>
+(() => {
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => [...document.querySelectorAll(sel)];
+
+  const STORAGE_KEYS = {
+    balance: 'pxshop.balance',
+    cart: 'pxshop.cart',
+    inventory: 'pxshop.inventory',
+  };
+
+  // --- Estado
+  let state = {
+    balance: 0,
+    cart: [], // {id, name, price}
+    inventory: [], // {id, name, price, acquiredAt}
+  };
+
+  // --- Datos de ejemplo (reemplaza con tu propio catálogo)
+  const ITEMS = [
+    { id: 'sword-neo', name: 'Espada Neo', price: 350, emoji: '⚔️', desc: 'Acero ligero con brillo neón.' },
+    { id: 'jetpack', name: 'Jetpack Mk.I', price: 900, emoji: '🎒', desc: 'Vuela sobre el mapa (cosmético).' },
+    { id: 'pet-slime', name: 'Mascota Slime', price: 250, emoji: '🫧', desc: 'Compañero gelatinoso y feliz.' },
+    { id: 'skin-shadow', name: 'Skin Sombría', price: 600, emoji: '🕶️', desc: 'Textura oscura con partículas.' },
+    { id: 'emote-dance', name: 'Emote: DanceLoop', price: 180, emoji: '🕺', desc: 'Baile en loop (cosmético).' },
+    { id: 'glider', name: 'Ala Delta X', price: 520, emoji: '🪂', desc: 'Planea con estilo (cosmético).'},
+  ];
+
+  // --- Utilidades de persistencia
+  function save(){
+    localStorage.setItem(STORAGE_KEYS.balance, String(state.balance));
+    localStorage.setItem(STORAGE_KEYS.cart, JSON.stringify(state.cart));
+    localStorage.setItem(STORAGE_KEYS.inventory, JSON.stringify(state.inventory));
+  }
+  function load(){
+    const b = parseInt(localStorage.getItem(STORAGE_KEYS.balance) || '0', 10);
+    const cart = JSON.parse(localStorage.getItem(STORAGE_KEYS.cart) || '[]');
+    const inv = JSON.parse(localStorage.getItem(STORAGE_KEYS.inventory) || '[]');
+    state.balance = Number.isFinite(b) ? b : 0;
+    state.cart = Array.isArray(cart) ? cart : [];
+    state.inventory = Array.isArray(inv) ? inv : [];
+  }
+
+  // --- Render
+  function fmtCoins(n){ return `${n} Coins`; }
+
+  function renderHeader(){
+    $('#balance').textContent = state.balance;
+    $('#cartCount').textContent = state.cart.length;
+    const total = state.cart.reduce((s,i)=>s+i.price,0);
+    $('#cartSummary').textContent = `${state.cart.length} ítems • ${total} Coins`;
+  }
+
+  function renderItems(){
+    const grid = $('#itemsGrid');
+    grid.innerHTML = '';
+    ITEMS.forEach(item => {
+      const inInv = state.inventory.some(x=>x.id===item.id);
+      const el = document.createElement('div');
+      el.className = 'card';
+      el.innerHTML = `
+        <div class="media" aria-hidden="true"><span>${item.emoji}</span></div>
+        <div class="body">
+          <h3 class="title">${item.name}</h3>
+          <p class="muted">${item.desc}</p>
+          <div class="row">
+            <strong>${fmtCoins(item.price)}</strong>
+            <div class="inline">
+              ${inInv ? `<span class="badge">Comprado</span>` : ''}
+              <button class="btn add" data-id="${item.id}">${inInv ? 'Recomprar' : 'Agregar'}</button>
             </div>
           </div>
-        </div>
-      </div>
-    </main>
-  </section>
-
-  <script>
-    /* ===== LocalStorage keys ===== */
-    const K_USERS = "rr_users";         // mapa username -> {password,robux,createdAt,avatar,tag}
-    const K_CURRENT = "rr_currentUser"; // username actual
-
-    const $  = (s, r=document)=>r.querySelector(s);
-    const $$ = (s, r=document)=>[...r.querySelectorAll(s)];
-
-    /* ---------- Tabs Auth ---------- */
-    const tabReg=$("#tabReg"), tabLog=$("#tabLog");
-    const paneReg=$("#paneReg"), paneLog=$("#paneLog");
-    $("#goLogin").onclick = e => {e.preventDefault(); showLogin()};
-    $("#goRegister").onclick = e => {e.preventDefault(); showRegister()};
-    tabReg.onclick = showRegister; tabLog.onclick = showLogin;
-
-    function showRegister(){
-      tabReg.classList.add("active"); tabLog.classList.remove("active");
-      paneReg.style.display="block"; paneLog.style.display="none";
-    }
-    function showLogin(){
-      tabLog.classList.add("active"); tabReg.classList.remove("active");
-      paneReg.style.display="none"; paneLog.style.display="block";
-    }
-
-    /* ---------- Poblar fecha ---------- */
-    const rDay=$("#r-day"), rMonth=$("#r-month"), rYear=$("#r-year");
-    for(let d=1; d<=31; d++) rDay.insertAdjacentHTML("beforeend", `<option>${d}</option>`);
-    for(let m=1; m<=12; m++) rMonth.insertAdjacentHTML("beforeend", `<option>${m}</option>`);
-    const year=new Date().getFullYear();
-    for(let y=year; y>=1900; y--) rYear.insertAdjacentHTML("beforeend", `<option>${y}</option>`);
-
-    /* ---------- Helpers Storage ---------- */
-    const getUsers = () => { try{ return JSON.parse(localStorage.getItem(K_USERS))||{} }catch{ return {} } };
-    const setUsers = data => localStorage.setItem(K_USERS, JSON.stringify(data));
-    const setCurrent = u => localStorage.setItem(K_CURRENT, u);
-    const getCurrent = () => localStorage.getItem(K_CURRENT);
-
-    /* ---------- Registro ---------- */
-    $("#btnRegister").onclick = () => {
-      const user = $("#r-user").value.trim();
-      const pass = $("#r-pass").value;
-      const err = $("#rMsgErr"), ok = $("#rMsgOk");
-      err.style.display="none"; ok.style.display="none";
-
-      if(user.length<3 || user.length>20){ err.textContent="El usuario debe tener entre 3 y 20 caracteres."; err.style.display="block"; return; }
-      if(/\s/.test(user)){ err.textContent="El usuario no puede contener espacios."; err.style.display="block"; return; }
-      if(pass.length<8){ err.textContent="La contraseña debe tener al menos 8 caracteres."; err.style.display="block"; return; }
-
-      const users = getUsers();
-      if(users[user]){ err.textContent="Ese usuario ya existe. Elige otro."; err.style.display="block"; return; }
-
-      users[user] = {
-        password: pass,
-        robux: 100,
-        createdAt: new Date().toISOString(),
-        avatar: "https://tr.rbxcdn.com/0e5cc4633a5a97c6f0d948e57843da9b/150/150/AvatarHeadshot/Webp",
-        tag: "@"+user.toLowerCase()
-      };
-      setUsers(users);
-      setCurrent(user);
-
-      // Mensaje solicitado
-      ok.innerHTML = "¡Cuenta creada! <b>REFRESCA LA PÁGINA</b> para entrar al inicio.";
-      ok.style.display="block";
-      $("#btnRegister").disabled = true;
-    };
-
-    /* ---------- Login ---------- */
-    $("#btnLogin").onclick = () => {
-      const user=$("#l-user").value.trim();
-      const pass=$("#l-pass").value;
-      const users=getUsers();
-      if(!users[user] || users[user].password!==pass){
-        $("#lMsgErr").textContent="Usuario o contraseña incorrectos."; $("#lMsgErr").style.display="block"; return;
-      }
-      setCurrent(user);
-      enterApp(user, users[user]); // entra directo si inicia sesión
-    };
-
-    /* ---------- App render ---------- */
-    const authView=$("#authView"), appView=$("#appView");
-    function enterApp(username, data){
-      authView.style.display="none"; appView.style.display="flex";
-
-      // Sidebar/topbar/profile
-      $("#sbUsername").textContent = username;
-      $("#sbTag").textContent = data?.tag || "@"+username.toLowerCase();
-      $("#sbAvatar").src = data?.avatar;
-      $("#robux").textContent = "Robux: " + (data?.robux ?? 100);
-
-      $("#profileName").textContent = username;
-      $("#profileTag").textContent = data?.tag || "@"+username.toLowerCase();
-      $("#profileAvatar").src = data?.avatar.replace("/150/150/","/768/432/");
-      $("#joinDate").textContent = new Date(data?.createdAt||Date.now()).toLocaleDateString();
-
-      // Home header y sin amigos (como pediste)
-      $("#connTitle").textContent = "Connections (0)";
-      $("#connRow").innerHTML = '<div class="empty">Aún no tienes conexiones.</div>';
-
-      switchView("home");
-    }
-
-    // Navegación
-    const views = {home:$("#view-home"), catalog:$("#view-catalog"), profile:$("#view-profile")};
-    $$(".nav a[data-view]").forEach(a=>{
-      a.onclick = e => { e.preventDefault(); switchView(a.dataset.view); };
+        </div>`;
+      grid.appendChild(el);
     });
-    function switchView(name){
-      Object.entries(views).forEach(([k,el])=>{
-        el.style.display = (k===name) ? "block" : "none";
+
+    $$('.add').forEach(btn => btn.addEventListener('click', e => {
+      const id = e.currentTarget.getAttribute('data-id');
+      const item = ITEMS.find(x=>x.id===id);
+      if(!item) return;
+      state.cart.push({id:item.id, name:item.name, price:item.price});
+      save();
+      renderHeader();
+    }));
+  }
+
+  function renderCartModal(){
+    const list = $('#cartList');
+    list.innerHTML = '';
+    if(state.cart.length === 0){
+      const empty = document.createElement('div');
+      empty.className = 'empty';
+      empty.textContent = 'Tu carrito está vacío.';
+      list.appendChild(empty);
+    } else {
+      state.cart.forEach((item, idx)=>{
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <span>${item.name}</span>
+          <div class="inline">
+            <span class="muted">${fmtCoins(item.price)}</span>
+            <button class="btn ghost rm" data-idx="${idx}">Quitar</button>
+          </div>`;
+        list.appendChild(li);
       });
-      $$(".nav a[data-view]").forEach(a=>a.classList.toggle("active", a.dataset.view===name));
     }
+    const total = state.cart.reduce((s,i)=>s+i.price,0);
+    $('#cartTotal').textContent = fmtCoins(total);
 
-    // Logout
-    $("#logout").onclick = e => { e.preventDefault(); localStorage.removeItem(K_CURRENT); location.reload(); };
+    $$('.rm').forEach(btn => btn.addEventListener('click', e => {
+      const i = parseInt(e.currentTarget.getAttribute('data-idx'),10);
+      if(Number.isInteger(i)){
+        state.cart.splice(i,1);
+        save();
+        renderHeader();
+        renderCartModal();
+      }
+    }));
+  }
 
-    // Auto-login si ya se registró/inició
-    (function boot(){
-      const u = getCurrent();
-      if(u){ const users=getUsers(); enterApp(u, users[u]); }
-      else{ authView.style.display="grid"; appView.style.display="none"; showRegister(); }
-    })();
-  </script>
+  function renderInventory(){
+    const grid = $('#inventoryGrid');
+    grid.innerHTML = '';
+    const empty = $('#inventoryEmpty');
+    if(state.inventory.length === 0){
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    state.inventory.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'card';
+      el.innerHTML = `
+        <div class="media" aria-hidden="true"><span>🎁</span></div>
+        <div class="body">
+          <h4 class="title" style="font-size:16px">${item.name}</h4>
+          <p class="muted">Adquirido: ${new Date(item.acquiredAt).toLocaleString()}</p>
+          <div class="row">
+            <span class="muted">${fmtCoins(item.price)}</span>
+            <button class="btn ghost use" data-id="${item.id}">Usar</button>
+          </div>
+        </div>`;
+      grid.appendChild(el);
+    });
+
+    $$('.use').forEach(btn => btn.addEventListener('click', e => {
+      const id = e.currentTarget.getAttribute('data-id');
+      alert('En tu juego/app, aquí activarías el ítem con id: '+id);
+    }));
+  }
+
+  // --- Acciones de pago (demo)
+  function pay(){
+    const total = state.cart.reduce((s,i)=>s+i.price,0);
+    if(total === 0){ alert('Tu carrito está vacío.'); return; }
+    if(state.balance < total){ alert('Saldo insuficiente. Recarga Coins para continuar.'); return; }
+    // Descuenta y mueve a inventario
+    state.balance -= total;
+    const now = Date.now();
+    state.cart.forEach(i => state.inventory.push({ ...i, acquiredAt: now }));
+    state.cart = [];
+    save();
+    renderHeader();
+    renderInventory();
+    $('#modalCheckout').close();
+    alert('¡Compra realizada! Tus ítems ya están en el inventario.');
+  }
+
+  // --- Topup demo
+  function topup(amount){
+    const n = parseInt(amount,10);
+    if(!Number.isInteger(n) || n<=0){ alert('Ingresa una cantidad válida.'); return; }
+    state.balance += n;
+    save();
+    renderHeader();
+    $('#modalTopup').close();
+  }
+
+  // --- Eventos UI
+  $('#btnCheckout').addEventListener('click', () => { renderCartModal(); $('#modalCheckout').showModal(); });
+  $('#closeCheckout').addEventListener('click', () => $('#modalCheckout').close());
+  $('#btnClearCart').addEventListener('click', () => { state.cart = []; save(); renderHeader(); renderCartModal(); });
+  $('#btnPay').addEventListener('click', pay);
+
+  $('#btnInventory').addEventListener('click', () => { renderInventory(); $('#modalInventory').showModal(); });
+  $('#closeInventory').addEventListener('click', () => $('#modalInventory').close());
+
+  $('#btnAddCoins').addEventListener('click', () => { $('#modalTopup').showModal(); $('#topupAmount').focus(); });
+  $('#applyTopup').addEventListener('click', () => topup($('#topupAmount').value));
+  $('#closeTopup').addEventListener('click', () => $('#modalTopup').close());
+
+  // --- Init
+  load();
+  renderHeader();
+  renderItems();
+})();
+</script>
 </body>
 </html>
