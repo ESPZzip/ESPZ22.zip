@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mini ESPZ Demo</title>
+  <title>ESP:Z</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -115,6 +115,7 @@
       <h2 id="playerName">Invitado</h2>
       <div>
         <span id="robux">💎 100</span>
+        <button onclick="logout()" style="margin-left:20px; padding:5px 10px; cursor:pointer;">Cerrar sesión</button>
       </div>
     </header>
     <div class="sidebar">
@@ -200,6 +201,14 @@
       document.getElementById('profileName').innerText=currentUser;
       updateRobux();
       renderInventory();
+    }
+    function logout(){
+      currentUser=null;
+      document.getElementById('app').style.display='none';
+      document.getElementById('auth').style.display='flex';
+      document.getElementById('username').value='';
+      document.getElementById('password').value='';
+      document.getElementById('authMsg').innerText='';
     }
     function showSection(id){
       document.querySelectorAll('.section').forEach(s=>s.classList.add('hidden'));
