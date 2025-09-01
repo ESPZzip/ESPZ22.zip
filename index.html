@@ -10,7 +10,7 @@
       background:#111;
       color:#fff;
     }
-    /* Navbar superior */
+    /* Navbar */
     .navbar {
       display:flex;
       justify-content:space-between;
@@ -18,6 +18,8 @@
       background:#181818;
       padding:10px 20px;
       border-bottom:1px solid #333;
+      position:sticky;
+      top:0;
     }
     .navbar-left, .navbar-right {
       display:flex;
@@ -81,6 +83,47 @@
     }
     button:hover {
       background:#45a049;
+    }
+    /* Perfil estilo Roblox */
+    .profile-header {
+      display:flex;
+      gap:15px;
+      align-items:center;
+      margin-bottom:20px;
+    }
+    .profile-avatar {
+      border-radius:50%;
+      width:100px;
+      height:100px;
+      background:#222;
+    }
+    .profile-stats, .profile-badges, .profile-games {
+      background:#1a1a1a;
+      padding:15px;
+      border-radius:8px;
+      margin-bottom:20px;
+    }
+    .badges {
+      display:flex;
+      gap:10px;
+    }
+    .badges img {
+      width:60px;
+      height:60px;
+    }
+    .games {
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(200px,1fr));
+      gap:15px;
+    }
+    .game {
+      background:#222;
+      padding:10px;
+      border-radius:8px;
+    }
+    .game img {
+      width:100%;
+      border-radius:5px;
     }
   </style>
 </head>
@@ -148,25 +191,42 @@
     <p>Aquí puedes interactuar con otros jugadores.</p>
   </section>
 
-  <!-- Perfil -->
+  <!-- Perfil estilo Roblox -->
   <section id="profile">
-    <h2>Perfil</h2>
-    <div style="display:flex; align-items:center; gap:15px; margin-bottom:20px;">
-      <img src="https://placekitten.com/120/120" alt="Avatar" style="border-radius:50%; width:120px; height:120px;">
+    <div class="profile-header">
+      <img src="https://tr.rbxcdn.com/df36a32e232e85dbe2c6b3a0d1d81857/150/150/AvatarHeadshot/Png" class="profile-avatar" alt="Avatar">
       <div>
         <h2>ItsMat</h2>
         <p style="color:#888;">@7wJ_xdpq</p>
-        <p>
-          <b>16</b> Connections · 
-          <b>121</b> Followers · 
-          <b>68</b> Following
-        </p>
+        <p><b>16</b> Connections · <b>121</b> Followers · <b>68</b> Following</p>
       </div>
     </div>
-    <div style="background:#1a1a1a; padding:15px; border-radius:8px;">
+
+    <div class="profile-stats">
       <h3>Statistics</h3>
       <p><b>Join Date:</b> 15/3/2023</p>
       <p><b>Place Visits:</b> 311</p>
+    </div>
+
+    <div class="profile-badges">
+      <h3>Roblox Badges</h3>
+      <div class="badges">
+        <img src="https://images.rbxcdn.com/8a0d995af8ed1c09a6b203fe67964f02.png" alt="20 Friends">
+        <img src="https://images.rbxcdn.com/5be6ff567f43246ef2f3b38c4b4a8f92.png" alt="1 Year">
+        <img src="https://images.rbxcdn.com/74bce4ff84986bc9d3e7278f481b2a89.png" alt="100 Visits">
+      </div>
+    </div>
+
+    <div class="profile-games">
+      <h3>Experiences</h3>
+      <div class="games">
+        <div class="game">
+          <img src="https://tr.rbxcdn.com/0a4f8a3a5c331ba66e178b38eae5b43b/768/432/Image/Png" alt="Game">
+          <p><b>99 Nights In The Forest But Bad</b></p>
+          <p>Visits: 158</p>
+          <button>Play</button>
+        </div>
+      </div>
     </div>
   </section>
 
