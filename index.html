@@ -1,274 +1,145 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ESPZ Shop • Tienda de Ítems</title>
+  <meta charset="UTF-8">
+  <title>ESPZ</title>
   <style>
-    :root{
-      --bg:#0f1220; --card:#161a2f; --muted:#8a93b2; --text:#eef2ff; --accent:#7c5cff; --accent-2:#00e0b8; --danger:#ff5c7a;
-      --radius:18px;
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;height:100%;background:linear-gradient(180deg,#0c1020,#0f1220 40%,#10142a);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif}
-    a{color:inherit;text-decoration:none}
-    .container{max-width:1100px;margin:0 auto;padding:16px}
-    .app{display:grid;grid-template-columns:1fr;gap:16px}
-    header{position:sticky;top:0;background:rgba(15,18,32,.85);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.06);z-index:10}
-    .nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px}
-    .brand{display:flex;align-items:center;gap:10px}
-    .logo{width:36px;height:36px;border-radius:10px;background:conic-gradient(from 180deg,var(--accent),var(--accent-2));box-shadow:0 0 24px rgba(124,92,255,.35)}
-    .brand h1{font-size:18px;margin:0;letter-spacing:.4px}
-    .pill{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:999px}
-    .pill .coin{font-weight:700}
-    .btn{cursor:pointer;border:0;border-radius:12px;padding:10px 14px;background:var(--accent);color:white;font-weight:600;transition:.2s;box-shadow:0 8px 24px rgba(124,92,255,.25)}
-    .btn:hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(124,92,255,.35)}
-    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.14)}
-    .btn.danger{background:var(--danger);box-shadow:0 8px 24px rgba(255,92,122,.25)}
-
-    .grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:16px}
-    @media (min-width:640px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-    @media (min-width:950px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-
-    .card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);overflow:hidden;position:relative}
-    .card .media{height:160px;background:radial-gradient(90px 90px at 20% 20%,rgba(124,92,255,.22),transparent),radial-gradient(120px 120px at 80% 0%,rgba(0,224,184,.18),transparent);display:grid;place-items:center}
-    .card .media span{font-size:54px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.35))}
-    .card .body{padding:14px 14px 16px}
-    .title{margin:0 0 4px;font-size:18px}
-    .muted{color:var(--muted);font-size:14px}
-    .row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px}
-
-    .label-limitado{position:absolute;top:10px;left:10px;background:var(--danger);color:white;padding:4px 8px;border-radius:8px;font-size:12px;font-weight:700}
-
-    .panel{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:14px}
-    .stack{display:flex;flex-direction:column;gap:10px}
-    .inline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-    .tag{padding:6px 10px;border:1px dashed rgba(255,255,255,.14);border-radius:999px;font-size:12px;color:var(--muted)}
-
-    .cart{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:10px}
-    .floating{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:10px 12px;box-shadow:0 14px 40px rgba(0,0,0,.35)}
-
-    dialog{border:0;border-radius:18px;background:var(--card);color:var(--text);padding:0;max-width:520px;width:100%}
-    dialog::backdrop{background:rgba(3,5,12,.6)}
-    .modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 16px;border-bottom:1px solid rgba(255,255,255,.06)}
-    .modal-body{padding:16px}
-
-    .list{display:flex;flex-direction:column;gap:10px}
-    .list li{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:10px 12px}
-    .hr{height:1px;background:rgba(255,255,255,.08);margin:10px 0}
-    .notice{font-size:12px;color:var(--muted)}
-    .inventory{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-    @media (min-width:700px){.inventory{grid-template-columns:repeat(3,minmax(0,1fr))}}
-    .badge{font-size:12px;background:rgba(0,224,184,.12);color:#8df0df;border:1px solid rgba(0,224,184,.35);padding:4px 8px;border-radius:999px}
-    .empty{padding:18px;border:1px dashed rgba(255,255,255,.14);border-radius:12px;text-align:center;color:var(--muted)}
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f4f4; }
+    header { background: #4CAF50; color: white; padding: 10px; text-align: center; }
+    #saldo { font-weight: bold; }
+    .container { padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 20px; }
+    .item { background: white; border-radius: 10px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: relative; }
+    .item h3 { margin: 0 0 10px 0; }
+    .item button { background: #4CAF50; border: none; color: white; padding: 8px; border-radius: 6px; cursor: pointer; }
+    .item button:disabled { background: grey; cursor: not-allowed; }
+    #carrito { position: fixed; right: 0; top: 0; background: white; height: 100%; width: 300px; box-shadow: -2px 0 5px rgba(0,0,0,0.2); padding: 20px; overflow-y: auto; }
+    #carrito h2 { margin-top: 0; }
+    .limitado { position: absolute; top: 10px; left: 10px; background: gold; color: black; font-weight: bold; padding: 2px 6px; border-radius: 5px; font-size: 12px; }
+    dialog { border: none; border-radius: 8px; padding: 20px; }
+    dialog input { display:block; margin-bottom:10px; width:100%; padding:5px; }
+    dialog button { margin-top:5px; }
   </style>
 </head>
 <body>
-<header>
-  <div class="nav container">
-    <div class="brand">
-      <div class="logo" aria-hidden="true"></div>
-      <h1>ESPZ</h1>
-    </div>
-    <div class="inline">
-      <div class="pill" title="Tu saldo actual">
-        <span>💰</span>
-        <span class="coin" id="balance">0</span>
-        <span class="muted">ROBUKZ</span>
-      </div>
-      <button class="btn" id="btnAddCoins">Recargar</button>
-      <button class="btn ghost" id="btnInventory">Inventario</button>
-      <button class="btn" id="btnCheckout">Carrito (<span id="cartCount">0</span>)</button>
-    </div>
-  </div>
-</header>
+  <header>
+    <h1>ESPZ</h1>
+    <p>Saldo: <span id="saldo">100</span> Robux</p>
+  </header>
 
-<main class="container app" id="app">
-  <section class="panel">
-    <div class="stack">
-      <div class="inline" style="justify-content:space-between">
-        <div>
-          <h2 style="margin:0 0 6px">Ítems Destacados</h2>
-          <p class="muted" style="margin:0">Crea tu propia tienda con tu marca y moneda virtual. Este ejemplo <strong>no usa</strong> marcas de terceros.</p>
-        </div>
-        <div class="inline">
-          <span class="tag">Moneda: Coins</span>
-          <span class="tag">Demo sin servidor</span>
-        </div>
-      </div>
-      <div class="grid" id="itemsGrid"></div>
-    </div>
-  </section>
-</main>
+  <main class="container" id="tienda"></main>
 
-<div class="cart">
-  <div class="floating">
-    <div class="inline" style="justify-content:space-between;gap:12px">
-      <strong>Carrito:</strong>
-      <span id="cartSummary" class="muted">0 ítems • 0 Coins</span>
-    </div>
-  </div>
-</div>
+  <aside id="carrito">
+    <h2>Carrito</h2>
+    <ul id="carritoLista"></ul>
+    <p>Total: <span id="total">0</span> Coins</p>
+    <button onclick="comprar()">Comprar</button>
+  </aside>
 
-<!-- Diálogo de Checkout -->
-<dialog id="modalCheckout">
-  <div class="modal-head">
-    <h3>Finalizar compra</h3>
-    <button class="btn ghost" id="closeCheckout">Cerrar</button>
-  </div>
-  <div class="modal-body">
-    <ul class="list" id="cartList"></ul>
-    <div class="hr"></div>
-    <div class="row">
-      <span class="muted">Total</span>
-      <strong id="cartTotal">0 Coins</strong>
-    </div>
-    <div class="row" style="margin-top:16px">
-      <button class="btn danger" id="btnClearCart">Vaciar</button>
-      <button class="btn" id="btnPay">Pagar</button>
-    </div>
-  </div>
-</dialog>
+  <dialog id="adminDialog">
+    <h3>Agregar Ítem Limitado</h3>
+    <input type="text" id="newNombre" placeholder="Nombre del ítem">
+    <input type="number" id="newPrecio" placeholder="Precio">
+    <input type="number" id="newStock" placeholder="Stock">
+    <button onclick="agregarItemLimitado()">Agregar</button>
+    <button onclick="document.getElementById('adminDialog').close()">Cerrar</button>
+  </dialog>
 
-<!-- Inventario -->
-<dialog id="modalInventory">
-  <div class="modal-head">
-    <h3>Tu inventario</h3>
-    <button class="btn ghost" id="closeInventory">Cerrar</button>
-  </div>
-  <div class="modal-body">
-    <div id="inventoryGrid" class="inventory"></div>
-    <div id="inventoryEmpty" class="empty" style="display:none">Aún no tienes ítems. ¡Compra alguno en la tienda!</div>
-  </div>
-</dialog>
+  <script>
+    let saldo = parseInt(localStorage.getItem('saldo')) || 1000;
+    let inventario = JSON.parse(localStorage.getItem('inventario')) || [];
+    let itemsBase = JSON.parse(localStorage.getItem('catalogo')) || [
+      { nombre: "Espada", precio: 200, stock: Infinity, limitado: false },
+      { nombre: "Escudo", precio: 150, stock: Infinity, limitado: false }
+    ];
 
-<!-- Recarga -->
-<dialog id="modalTopup">
-  <div class="modal-head">
-    <h3>Recargar Coins</h3>
-    <button class="btn ghost" id="closeTopup">Cerrar</button>
-  </div>
-  <div class="modal-body">
-    <div class="stack">
-      <label for="topupAmount" class="muted">Cantidad a añadir</label>
-      <input id="topupAmount" type="number" min="1" step="1" value="1000" style="width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:var(--text)" />
-      <button class="btn" id="applyTopup">Añadir Coins</button>
-    </div>
-  </div>
-</dialog>
+    let carrito = [];
 
-<!-- Admin: añadir item -->
-<dialog id="modalAdmin">
-  <div class="modal-head">
-    <h3>Nuevo ítem limitado</h3>
-    <button class="btn ghost" id="closeAdmin">Cerrar</button>
-  </div>
-  <div class="modal-body">
-    <div class="stack">
-      <input id="adminName" placeholder="Nombre del ítem" style="padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:var(--text)" />
-      <input id="adminPrice" type="number" placeholder="Costo en Coins" style="padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:var(--text)" />
-      <input id="adminStock" type="number" placeholder="Stock disponible" style="padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:var(--text)" />
-      <button class="btn" id="adminAdd">Añadir ítem</button>
-    </div>
-  </div>
-</dialog>
+    function renderTienda() {
+      const tienda = document.getElementById("tienda");
+      tienda.innerHTML = "";
+      itemsBase.forEach((item, i) => {
+        const div = document.createElement("div");
+        div.className = "item";
 
-<script>
-(() => {
-  const $ = (s) => document.querySelector(s);
-  const $$ = (s) => [...document.querySelectorAll(s)];
+        if(item.limitado) {
+          const badge = document.createElement("div");
+          badge.className = "limitado";
+          badge.textContent = "Limitado";
+          div.appendChild(badge);
+        }
 
-  const STORAGE_KEYS = {
-    balance: 'pxshop.balance',
-    cart: 'pxshop.cart',
-    inventory: 'pxshop.inventory',
-    items: 'pxshop.items'
-  };
+        div.innerHTML += `<h3>${item.nombre}</h3>
+          <p>Precio: ${item.precio} Coins</p>
+          <p>Stock: ${item.stock === Infinity ? '∞' : item.stock}</p>`;
+        const btn = document.createElement("button");
+        btn.textContent = "Agregar al carrito";
+        btn.onclick = () => addToCarrito(i);
+        if(item.stock !== Infinity && item.stock <= 0) btn.disabled = true;
+        div.appendChild(btn);
+        tienda.appendChild(div);
+      });
+      document.getElementById("saldo").textContent = saldo;
+    }
 
-  let state = {
-    balance: 0,
-    cart: [],
-    inventory: [],
-    items: []
-  };
+    function renderCarrito() {
+      const lista = document.getElementById("carritoLista");
+      lista.innerHTML = "";
+      let total = 0;
+      carrito.forEach((item, i) => {
+        const li = document.createElement("li");
+        li.textContent = `${item.nombre} - ${item.precio} Coins`;
+        total += item.precio;
+        lista.appendChild(li);
+      });
+      document.getElementById("total").textContent = total;
+    }
 
-  const DEFAULT_ITEMS = [
-    { id: 'sword-neo', name: 'Espada Neo', price: 350, emoji: '⚔️', desc: 'Acero ligero con brillo neón.', limitado:false },
-    { id: 'jetpack', name: 'Jetpack Mk.I', price: 900, emoji: '🎒', desc: 'Vuela sobre el mapa (cosmético).', limitado:false }
-  ];
+    function addToCarrito(index) {
+      const item = itemsBase[index];
+      if(item.stock !== Infinity && item.stock <= 0) return;
+      carrito.push(item);
+      if(item.stock !== Infinity) item.stock--;
+      renderTienda();
+      renderCarrito();
+      localStorage.setItem('catalogo', JSON.stringify(itemsBase));
+    }
 
-  function save(){
-    localStorage.setItem(STORAGE_KEYS.balance, state.balance);
-    localStorage.setItem(STORAGE_KEYS.cart, JSON.stringify(state.cart));
-    localStorage.setItem(STORAGE_KEYS.inventory, JSON.stringify(state.inventory));
-    localStorage.setItem(STORAGE_KEYS.items, JSON.stringify(state.items));
-  }
-  function load(){
-    state.balance = parseInt(localStorage.getItem(STORAGE_KEYS.balance)||'0');
-    state.cart = JSON.parse(localStorage.getItem(STORAGE_KEYS.cart)||'[]');
-    state.inventory = JSON.parse(localStorage.getItem(STORAGE_KEYS.inventory)||'[]');
-    const items = JSON.parse(localStorage.getItem(STORAGE_KEYS.items)||'null');
-    state.items = items || DEFAULT_ITEMS;
-  }
-
-  function renderHeader(){
-    $('#balance').textContent = state.balance;
-    $('#cartCount').textContent = state.cart.length;
-    const total = state.cart.reduce((s,i)=>s+i.price,0);
-    $('#cartSummary').textContent = `${state.cart.length} ítems • ${total} Coins`;
-  }
-
-  function renderItems(){
-    const grid = $('#itemsGrid');
-    grid.innerHTML = '';
-    state.items.forEach(item => {
-      const el = document.createElement('div');
-      el.className = 'card';
-      el.innerHTML = `
-        ${item.limitado ? '<div class="label-limitado">Limitado</div>' : ''}
-        <div class="media"><span>${item.emoji||'🎁'}</span></div>
-        <div class="body">
-          <h3 class="title">${item.name}</h3>
-          <p class="muted">${item.desc||''}</p>
-          <div class="row">
-            <strong>${item.price} Coins</strong>
-            <button class="btn add" data-id="${item.id}">Agregar</button>
-          </div>
-        </div>`;
-      grid.appendChild(el);
-    });
-    $$('.add').forEach(btn=>btn.addEventListener('click',e=>{
-      const id = e.currentTarget.dataset.id;
-      const item = state.items.find(x=>x.id===id);
-      if(item){
-        if(item.limitado && item.stock<=0){alert('Este ítem limitado está agotado.');return;}
-        state.cart.push({id:item.id,name:item.name,price:item.price});
-        if(item.limitado){item.stock--;}
-        save();renderHeader();renderItems();
+    function comprar() {
+      let total = carrito.reduce((sum, item) => sum + item.precio, 0);
+      if(total > saldo) {
+        alert("No tienes suficientes Coins");
+        return;
       }
-    }));
-  }
+      saldo -= total;
+      inventario = inventario.concat(carrito);
+      carrito = [];
+      localStorage.setItem('saldo', saldo);
+      localStorage.setItem('inventario', JSON.stringify(inventario));
+      renderTienda();
+      renderCarrito();
+      alert("Compra realizada");
+    }
 
-  function renderCartModal(){
-    const list = $('#cartList');
-    list.innerHTML='';
-    state.cart.forEach((it,i)=>{
-      const li=document.createElement('li');
-      li.innerHTML=`<span>${it.name}</span><span>${it.price} Coins</span>`;
-      list.appendChild(li);
+    function agregarItemLimitado() {
+      const nombre = document.getElementById("newNombre").value;
+      const precio = parseInt(document.getElementById("newPrecio").value);
+      const stock = parseInt(document.getElementById("newStock").value);
+      if(!nombre || !precio || !stock) return alert("Completa todos los campos");
+      itemsBase.push({ nombre, precio, stock, limitado: true });
+      localStorage.setItem('catalogo', JSON.stringify(itemsBase));
+      document.getElementById("adminDialog").close();
+      renderTienda();
+    }
+
+    document.addEventListener("keydown", e => {
+      if(e.key === "F9") {
+        e.preventDefault();
+        document.getElementById("adminDialog").showModal();
+      }
     });
-    $('#cartTotal').textContent = state.cart.reduce((s,i)=>s+i.price,0)+ ' Coins';
-  }
 
-  function pay(){
-    const total=state.cart.reduce((s,i)=>s+i.price,0);
-    if(state.balance<total){alert('Saldo insuficiente');return;}
-    state.balance-=total;
-    state.cart=[];
-    save();renderHeader();$('#modalCheckout').close();
-  }
-
-  function topup(n){state.balance+=parseInt(n);save();renderHeader();$('#modalTopup').close();}
-
-  // Eventos
-  $('#btnCheckout').onclick=()=>{renderCartModal();$('#modalCheckout').showModal();};
+    renderTienda();
+    renderCarrito();
+  </script>
+</body>
+</html>
