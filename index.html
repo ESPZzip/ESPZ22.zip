@@ -2,200 +2,271 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ESPZ</title>
   <style>
-    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f4f4f4;color:#222;}
-    header{background:#202020;color:#fff;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;}
-    .brand{font-weight:bold;}
-    .pill{background:#444;color:#fff;padding:5px 10px;border-radius:20px;}
-    main{display:flex;}
-    aside{width:200px;background:#eee;padding:10px;}
-    .menu button{display:block;width:100%;padding:10px;margin:5px 0;border:none;background:#ddd;cursor:pointer;border-radius:6px;}
-    .menu button.active{background:#bbb;}
-    .content{flex:1;padding:20px;}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:15px;}
-    .card{background:#fff;border:1px solid #ccc;border-radius:8px;overflow:hidden;box-shadow:0 2px 4px rgba(0,0,0,0.1)}
-    .card img{width:100%;height:150px;object-fit:cover;}
-    .card h4{margin:10px;}
-    .card .meta{display:flex;justify-content:space-between;align-items:center;padding:10px;}
-    .btn{padding:6px 12px;border:none;border-radius:6px;cursor:pointer;}
-    .btn.primary{background:#007bff;color:#fff;}
-    .btn.success{background:#28a745;color:#fff;}
-    .btn.danger{background:#dc3545;color:#fff;}
-    .btn:disabled{opacity:.6;cursor:not-allowed;}
-    .hidden{display:none;}
-    .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;}
-    .modal .box{background:#fff;padding:20px;border-radius:8px;max-width:400px;width:100%;}
-    .modal h3{margin-top:0;}
-    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:6px;display:none;}
-    #authScreen{position:fixed;top:0;left:0;width:100%;height:100%;background:#202020;color:#fff;display:flex;align-items:center;justify-content:center;}
-    #authScreen .box{background:#fff;color:#000;padding:20px;border-radius:8px;width:300px;}
-    #authScreen input{width:100%;padding:8px;margin:5px 0;}
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #111;
+      color: #fff;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #222;
+      padding: 10px 20px;
+    }
+    #username {
+      font-weight: bold;
+    }
+    #robux {
+      font-weight: bold;
+    }
+    .container {
+      display: flex;
+    }
+    nav {
+      width: 200px;
+      background: #1b1b1b;
+      padding: 10px;
+    }
+    nav button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      background: #333;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    nav button:hover {
+      background: #444;
+    }
+    main {
+      flex: 1;
+      padding: 20px;
+    }
+    .item {
+      background: #222;
+      padding: 10px;
+      margin: 10px;
+      display: inline-block;
+      width: 150px;
+      text-align: center;
+      border-radius: 5px;
+    }
+    .item img {
+      max-width: 100%;
+    }
+    .hidden {
+      display: none;
+    }
+    #authModal, #buyModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #authModalContent, #buyModalContent {
+      background: #1b1b1b;
+      padding: 20px;
+      border-radius: 8px;
+      width: 300px;
+      text-align: center;
+    }
+    input {
+      width: 90%;
+      margin: 5px 0;
+      padding: 8px;
+    }
+    button {
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <div id="authScreen">
-    <div class="box">
-      <h2>Registro / Login</h2>
-      <input type="text" id="authUser" placeholder="Usuario" />
-      <input type="password" id="authPass" placeholder="Contraseña" />
-      <button id="btnRegister" class="btn success">Registrar</button>
-      <button id="btnLoginAuth" class="btn primary">Login</button>
-      <p id="authMsg" style="color:red"></p>
-    </div>
-  </div>
-
   <header>
-    <div class="brand">ESPZ Demo</div>
+    <div id="username">Invitado</div>
     <div>
-      <span id="playerName">Invitado</span>
-      <span class="pill">Robux: <span id="robuxBalance">0</span></span>
-      <button id="btnLogout" class="btn danger hidden">Salir</button>
+      <span id="robux">💎 0</span>
+      <button id="authBtn">Iniciar sesión / Registrarse</button>
     </div>
   </header>
-
-  <main>
-    <aside>
-      <div class="menu">
-        <button data-view="marketplace" class="active">Marketplace</button>
-        <button data-view="inventory">Inventory</button>
-        <button data-view="trades">Trades</button>
-        <button data-view="profile">Profile</button>
-        <button data-view="friends">Friends</button>
-      </div>
-    </aside>
-    <section class="content">
-      <div id="view-marketplace" class="view">
+  <div class="container">
+    <nav>
+      <button onclick="showSection('marketplace')">Marketplace</button>
+      <button onclick="showSection('inventory')">Inventory</button>
+      <button onclick="showSection('trades')">Trades</button>
+      <button onclick="showSection('profile')">Profile</button>
+      <button onclick="showSection('friends')">Friends</button>
+    </nav>
+    <main>
+      <section id="marketplace" class="section">
         <h2>Marketplace</h2>
-        <div id="marketGrid" class="grid"></div>
-      </div>
-      <div id="view-inventory" class="view hidden">
+        <div id="items"></div>
+      </section>
+      <section id="inventory" class="section hidden">
         <h2>Inventory</h2>
-        <div id="inventoryGrid" class="grid"></div>
-        <p id="emptyInventory">No tienes objetos</p>
-      </div>
-      <div id="view-trades" class="view hidden">
+        <ul id="inventoryList"></ul>
+      </section>
+      <section id="trades" class="section hidden">
         <h2>Trades</h2>
-        <p>Pendiente...</p>
-      </div>
-      <div id="view-profile" class="view hidden">
+        <p>Aún en desarrollo.</p>
+      </section>
+      <section id="profile" class="section hidden">
         <h2>Profile</h2>
-        <p><strong>Usuario:</strong> <span id="profileUsername"></span></p>
-        <p><strong>Robux:</strong> <span id="profileRobux"></span></p>
-        <button id="grantRobux" class="btn success">+100 Robux</button>
-      </div>
-      <div id="view-friends" class="view hidden">
+        <p id="profileInfo"></p>
+        <button onclick="addRobux(100)">+100 Robux (demo)</button>
+      </section>
+      <section id="friends" class="section hidden">
         <h2>Friends</h2>
-        <input id="friendSearch" placeholder="Buscar usuario..." />
-        <button id="btnSearchFriend" class="btn">Buscar</button>
-        <div id="friendResults" class="grid"></div>
-      </div>
-    </section>
-  </main>
+        <input type="text" id="friendSearch" placeholder="Buscar usuario..." />
+        <button onclick="searchFriend()">Buscar</button>
+        <ul id="friendsList"></ul>
+      </section>
+    </main>
+  </div>
 
-  <div id="confirmModal" class="modal hidden">
-    <div class="box">
-      <h3>Confirmar compra</h3>
-      <p id="confirmText">¿Deseas comprar este artículo?</p>
-      <button id="confirmYes" class="btn success">Comprar</button>
-      <button id="confirmNo" class="btn">Cancelar</button>
+  <!-- Modal de autenticación -->
+  <div id="authModal">
+    <div id="authModalContent">
+      <h3>Registro / Iniciar Sesión</h3>
+      <input type="text" id="authUser" placeholder="Usuario" />
+      <input type="password" id="authPass" placeholder="Contraseña" />
+      <button onclick="register()">Registrarse</button>
+      <button onclick="login()">Iniciar Sesión</button>
     </div>
   </div>
 
-  <div id="toast" class="toast"></div>
+  <!-- Modal de compra -->
+  <div id="buyModal" class="hidden">
+    <div id="buyModalContent">
+      <h3>Confirmar compra</h3>
+      <p id="buyText"></p>
+      <button onclick="confirmBuy()">Comprar</button>
+      <button onclick="closeBuyModal()">Cancelar</button>
+    </div>
+  </div>
 
   <script>
-    const defaultItems=[
-      {id:'1',name:'Classic Fedora',price:150,img:'https://via.placeholder.com/300x150?text=Classic+Fedora'},
-      {id:'2',name:'Dominus Astra',price:1000,img:'https://via.placeholder.com/300x150?text=Dominus+Astra'},
-      {id:'3',name:'Valkyrie Helm',price:750,img:'https://via.placeholder.com/300x150?text=Valkyrie+Helm'}
+    let currentUser = null;
+    let users = JSON.parse(localStorage.getItem('users')) || {};
+    let robux = 0;
+    let inventory = [];
+    let buyingItem = null;
+
+    const items = [
+      { name: 'Classic Fedora', price: 150, img: 'https://tr.rbxcdn.com/8d7b48c37a2f65f0a3bda8659f70903a/420/420/Hat/Webp' },
+      { name: 'Valkyrie Helm', price: 750, img: 'https://tr.rbxcdn.com/87f739b6e70ecf62c802d5f3bcd4d1f9/420/420/Hat/Webp' },
+      { name: 'Red Sparkle Time', price: 1200, img: 'https://tr.rbxcdn.com/f62c97b9a65db0a2b78ccaa6d6c1b03a/420/420/Hat/Webp' },
+      { name: 'Top Hat', price: 500, img: 'https://tr.rbxcdn.com/56e0545d6e92db9275480a219c2f4780/420/420/Hat/Webp' }
     ];
 
-    const LS_USERS='demo_users';
-    const LS_SESSION='demo_session';
-    const getUsers=()=>JSON.parse(localStorage.getItem(LS_USERS)||'[]');
-    const setUsers=a=>localStorage.setItem(LS_USERS,JSON.stringify(a));
-    const getSession=()=>JSON.parse(localStorage.getItem(LS_SESSION)||'null');
-    const setSession=o=>localStorage.setItem(LS_SESSION,JSON.stringify(o));
+    function renderItems() {
+      const container = document.getElementById('items');
+      container.innerHTML = '';
+      items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = `
+          <img src="${item.img}" alt="${item.name}" />
+          <h4>${item.name}</h4>
+          <p>💎 ${item.price}</p>
+          <button onclick='openBuyModal(${JSON.stringify(JSON.stringify(item))})'>Comprar</button>
+        `;
+        container.appendChild(div);
+      });
+    }
 
-    const views={
-      marketplace:document.getElementById('view-marketplace'),
-      inventory:document.getElementById('view-inventory'),
-      trades:document.getElementById('view-trades'),
-      profile:document.getElementById('view-profile'),
-      friends:document.getElementById('view-friends')
-    };
+    function openBuyModal(itemStr) {
+      buyingItem = JSON.parse(itemStr);
+      document.getElementById('buyText').innerText = `¿Deseas comprar ${buyingItem.name} por ${buyingItem.price} Robux?`;
+      document.getElementById('buyModal').classList.remove('hidden');
+    }
 
-    const marketGrid=document.getElementById('marketGrid');
-    const inventoryGrid=document.getElementById('inventoryGrid');
-    const emptyInventory=document.getElementById('emptyInventory');
-    const playerName=document.getElementById('playerName');
-    const robuxBalance=document.getElementById('robuxBalance');
-    const btnLogout=document.getElementById('btnLogout');
+    function closeBuyModal() {
+      document.getElementById('buyModal').classList.add('hidden');
+    }
 
-    const confirmModal=document.getElementById('confirmModal');
-    const confirmText=document.getElementById('confirmText');
-    const confirmYes=document.getElementById('confirmYes');
-    const confirmNo=document.getElementById('confirmNo');
-    const toast=document.getElementById('toast');
+    function confirmBuy() {
+      if (robux >= buyingItem.price) {
+        robux -= buyingItem.price;
+        inventory.push(buyingItem);
+        updateUI();
+        alert('Compra realizada con éxito!');
+      } else {
+        alert('Robux insuficientes');
+      }
+      closeBuyModal();
+    }
 
-    let pendingItem=null;
+    function register() {
+      const user = document.getElementById('authUser').value;
+      const pass = document.getElementById('authPass').value;
+      if (users[user]) {
+        alert('Usuario ya existe');
+        return;
+      }
+      users[user] = { pass, robux: 100, inventory: [], friends: [] };
+      localStorage.setItem('users', JSON.stringify(users));
+      currentUser = user;
+      robux = 100;
+      inventory = [];
+      document.getElementById('authModal').style.display = 'none';
+      updateUI();
+    }
 
-    function showView(v){Object.keys(views).forEach(k=>views[k].classList.add('hidden'));views[v].classList.remove('hidden');document.querySelectorAll('.menu button').forEach(b=>b.classList.toggle('active',b.dataset.view===v));}
+    function login() {
+      const user = document.getElementById('authUser').value;
+      const pass = document.getElementById('authPass').value;
+      if (!users[user] || users[user].pass !== pass) {
+        alert('Credenciales inválidas');
+        return;
+      }
+      currentUser = user;
+      robux = users[user].robux;
+      inventory = users[user].inventory;
+      document.getElementById('authModal').style.display = 'none';
+      updateUI();
+    }
 
-    document.querySelector('.menu').addEventListener('click',e=>{if(e.target.tagName==='BUTTON'){showView(e.target.dataset.view);if(e.target.dataset.view==='inventory')renderInventory();if(e.target.dataset.view==='profile')renderProfile();}});
+    function updateUI() {
+      document.getElementById('username').innerText = currentUser;
+      document.getElementById('robux').innerText = `💎 ${robux}`;
+      document.getElementById('inventoryList').innerHTML = inventory.map(i => `<li>${i.name}</li>`).join('');
+      document.getElementById('profileInfo').innerText = `Usuario: ${currentUser}`;
+      users[currentUser].robux = robux;
+      users[currentUser].inventory = inventory;
+      localStorage.setItem('users', JSON.stringify(users));
+    }
 
-    function renderMarketplace(){marketGrid.innerHTML='';defaultItems.forEach(it=>{const owned=getCurrentUser()?.inventory?.some(x=>x.id===it.id);const div=document.createElement('div');div.className='card';div.innerHTML=`<img src="${it.img}" alt="${it.name}"><h4>${it.name}</h4><div class=\"meta\"><span>${it.price} R$</span><button class=\"btn primary\" data-buy=\"${it.id}\" ${owned? 'disabled':''}>${owned?'Comprado':'Comprar'}</button></div>`;marketGrid.appendChild(div);});}
+    function addRobux(amount) {
+      robux += amount;
+      updateUI();
+    }
 
-    function renderInventory(){const user=getCurrentUser();inventoryGrid.innerHTML='';if(!user||user.inventory.length===0){emptyInventory.style.display='block';return;}emptyInventory.style.display='none';user.inventory.forEach(it=>{const div=document.createElement('div');div.className='card';div.innerHTML=`<img src=\"${it.img}\" alt=\"${it.name}\"><h4>${it.name}</h4><div class=\"meta\"><span>${it.price} R$</span><span>En propiedad</span></div>`;inventoryGrid.appendChild(div);});}
+    function showSection(id) {
+      document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+    }
 
-    function renderProfile(){const u=getCurrentUser();document.getElementById('profileUsername').textContent=u?.username||'';document.getElementById('profileRobux').textContent=u?.robux||0;}
+    function searchFriend() {
+      const query = document.getElementById('friendSearch').value;
+      if (users[query] && query !== currentUser) {
+        alert(`${query} encontrado!`);
+      } else {
+        alert('Usuario no encontrado');
+      }
+    }
 
-    marketGrid.addEventListener('click',e=>{const btn=e.target.closest('button[data-buy]');if(!btn)return;const id=btn.getAttribute('data-buy');const item=defaultItems.find(i=>i.id===id);const u=getCurrentUser();if(!u){showToast('Inicia sesión primero');return;}if(u.inventory.some(x=>x.id===id)){showToast('Ya lo tienes');return;}pendingItem=item;confirmText.textContent=`¿Comprar ${item.name} por ${item.price} R$?`;confirmModal.classList.remove('hidden');});
-
-    confirmYes.addEventListener('click',()=>{if(!pendingItem)return;const u=getCurrentUser();if(u.robux<pendingItem.price){showToast('Robux insuficientes');confirmModal.classList.add('hidden');return;}u.robux-=pendingItem.price;u.inventory.push(pendingItem);updateUser(u);applySession(u);showToast('Compra realizada');renderMarketplace();confirmModal.classList.add('hidden');pendingItem=null;});
-    confirmNo.addEventListener('click',()=>{confirmModal.classList.add('hidden');pendingItem=null;});
-
-    function showToast(msg){toast.textContent=msg;toast.style.display='block';setTimeout(()=>toast.style.display='none',2000);}
-
-    function getCurrentUser(){const s=getSession();if(!s)return null;return getUsers().find(u=>u.username===s.username)||null;}
-    function updateUser(u){const arr=getUsers();const idx=arr.findIndex(x=>x.username===u.username);if(idx>=0){arr[idx]=u;setUsers(arr);}}
-
-    function applySession(u){if(u){playerName.textContent=u.username;robuxBalance.textContent=u.robux;btnLogout.classList.remove('hidden');document.getElementById('authScreen').style.display='none';}else{playerName.textContent='Invitado';robuxBalance.textContent=0;btnLogout.classList.add('hidden');document.getElementById('authScreen').style.display='flex';}renderMarketplace();}
-
-    btnLogout.addEventListener('click',()=>{localStorage.removeItem(LS_SESSION);applySession(null);showToast('Sesión cerrada');});
-
-    document.getElementById('grantRobux').addEventListener('click',()=>{const u=getCurrentUser();if(!u)return;u.robux+=100;updateUser(u);applySession(u);renderProfile();showToast('+100 Robux');});
-
-    // Auth
-    const authUser=document.getElementById('authUser');
-    const authPass=document.getElementById('authPass');
-    const authMsg=document.getElementById('authMsg');
-
-    document.getElementById('btnRegister').addEventListener('click',()=>{
-      const u=authUser.value.trim();
-      const p=authPass.value.trim();
-      if(!u||!p){authMsg.textContent='Completa todos los campos';return;}
-      let users=getUsers();
-      if(users.some(x=>x.username===u)){authMsg.textContent='Usuario en uso';return;}
-      const newUser={username:u,password:p,robux:500,inventory:[],friends:[]};
-      users.push(newUser);setUsers(users);setSession({username:u});applySession(newUser);
-    });
-
-    document.getElementById('btnLoginAuth').addEventListener('click',()=>{
-      const u=authUser.value.trim();
-      const p=authPass.value.trim();
-      if(!u||!p){authMsg.textContent='Completa todos los campos';return;}
-      const users=getUsers();
-      const user=users.find(x=>x.username===u&&x.password===p);
-      if(!user){authMsg.textContent='Datos incorrectos';return;}
-      setSession({username:u});applySession(user);
-    });
-
-    renderMarketplace();
-    const session=getSession();
-    if(session){applySession(getCurrentUser());}else{applySession(null);}
+    renderItems();
   </script>
 </body>
 </html>
