@@ -2,32 +2,78 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>ESP:Z</title>
+  <title>ESPZ</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f2f2f2; display: flex; justify-content: center; align-items: center; height: 100vh; }
-    .container { background: white; padding: 20px; border-radius: 10px; width: 300px; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
+    body { 
+      font-family: Arial, sans-serif; 
+      background: #f2f2f2; 
+      margin: 0;
+      display: flex; 
+      height: 100vh; 
+    }
+    .container { 
+      background: white; 
+      padding: 20px; 
+      border-radius: 10px; 
+      width: 300px; 
+      box-shadow: 0 0 10px rgba(0,0,0,0.2); 
+      margin: auto; 
+    }
     h2 { text-align: center; }
     input { width: 100%; padding: 10px; margin: 5px 0; }
     button { width: 100%; padding: 10px; margin: 5px 0; cursor: pointer; border: none; border-radius: 5px; }
     .btn-register { background: #4CAF50; color: white; }
     .btn-login { background: #2196F3; color: white; }
     #welcome { display: none; text-align: center; }
+    
+    /* Panel lateral */
+    #sidebar {
+      width: 200px;
+      background: #fff;
+      border-left: 2px solid #ccc;
+      padding: 10px;
+      overflow-y: auto;
+    }
+    #sidebar h3 {
+      text-align: center;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+    .user-item {
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 5px;
+      background: #eee;
+    }
+    .current-user {
+      background: #4CAF50;
+      color: white;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
 
-<div class="container" id="authBox">
-  <h2>Registro / Login</h2>
-  <input type="text" id="username" placeholder="Usuario">
-  <input type="password" id="password" placeholder="Contraseña">
-  <button class="btn-register" onclick="register()">Registrarse</button>
-  <button class="btn-login" onclick="login()">Iniciar Sesión</button>
+<div style="flex:1; display:flex; justify-content:center; align-items:center;">
+  <div class="container" id="authBox">
+    <h2>Registro / Login</h2>
+    <input type="text" id="username" placeholder="Usuario">
+    <input type="password" id="password" placeholder="Contraseña">
+    <button class="btn-register" onclick="register()">Registrarse</button>
+    <button class="btn-login" onclick="login()">Iniciar Sesión</button>
+  </div>
+
+  <div class="container" id="welcome">
+    <h2 id="welcomeMsg"></h2>
+    <p>Robux: <span id="userRobux"></span></p>
+    <button onclick="logout()">Cerrar Sesión</button>
+  </div>
 </div>
 
-<div class="container" id="welcome">
-  <h2 id="welcomeMsg"></h2>
-  <p>Robux: <span id="userRobux"></span></p>
-  <button onclick="logout()">Cerrar Sesión</button>
+<!-- Panel lateral -->
+<div id="sidebar">
+  <h3>Jugadores</h3>
+  <div id="usersList"></div>
 </div>
 
 <script>
@@ -55,9 +101,10 @@
       return;
     }
 
-    users[username] = { password: password, robux: 100 }; // cada nuevo usuario empieza con 100 robux
+    users[username] = { password: password, robux: 100 };
     saveUsers(users);
     alert("Registro exitoso. Ahora puedes iniciar sesión.");
+    renderUsers();
   }
 
   function login() {
@@ -89,16 +136,36 @@
     document.getElementById("welcome").style.display = "block";
     document.getElementById("welcomeMsg").innerText = "Bienvenido, " + currentUser;
     document.getElementById("userRobux").innerText = users[currentUser].robux;
+
+    renderUsers();
   }
 
   function logout() {
     localStorage.removeItem("currentUser");
     document.getElementById("authBox").style.display = "block";
     document.getElementById("welcome").style.display = "none";
+    renderUsers();
   }
 
-  // cargar usuario si ya estaba logueado
-  window.onload = loadUser;
+  function renderUsers() {
+    let users = getUsers();
+    let currentUser = localStorage.getItem("currentUser");
+    let container = document.getElementById("usersList");
+    container.innerHTML = "";
+
+    Object.keys(users).forEach(user => {
+      let div = document.createElement("div");
+      div.className = "user-item";
+      if (user === currentUser) div.classList.add("current-user");
+      div.textContent = user;
+      container.appendChild(div);
+    });
+  }
+
+  window.onload = () => {
+    loadUser();
+    renderUsers();
+  };
 </script>
 
 </body>
