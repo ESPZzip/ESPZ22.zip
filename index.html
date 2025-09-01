@@ -1,248 +1,329 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Mini Roblox - Registro/Login + Marketplace</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HOME • ESPZ</title>
   <style>
-    body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f0f2f5; }
-    header { background:#24292e; color:#fff; padding:10px; display:flex; justify-content:space-between; }
-    #userInfo { font-weight:bold; }
-    nav { background:#444; padding:10px; display:flex; gap:10px; }
-    nav button { padding:8px 12px; border:none; cursor:pointer; border-radius:5px; }
-    .tab { display:none; padding:20px; }
-    .item { background:#fff; padding:10px; margin:10px; border-radius:8px; display:inline-block; width:150px; text-align:center; box-shadow:0 2px 5px rgba(0,0,0,0.2);}
-    .item img { max-width:100%; border-radius:5px; }
-    #loginBox, #registerBox { background:#fff; padding:20px; max-width:300px; margin:50px auto; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.2);}
-    input, button { margin:5px 0; padding:8px; width:100%; }
-    #admin { display:none; }
-    #adminPanel { background:#fff; padding:15px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.2); margin-top:20px; }
+    :root{
+      --bg:#0f1113; --panel:#181a1f; --soft:#1f232b;
+      --text:#e9eef3; --muted:#9aa6b2; --accent:#00d47e; --danger:#ef4444;
+    }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;background:var(--bg);color:var(--text)}
+    a{color:inherit}
+
+    /* ---------- AUTH VIEW ---------- */
+    #authView{
+      min-height:100vh;display:grid;place-items:center;padding:24px;
+      background:linear-gradient(0deg, rgba(0,0,0,.55), rgba(0,0,0,.55)),
+        url("https://images.rbxcdn.com/69b1f0a8e2db9b8f9cae3a4f8e33d69f.jpg") center/cover no-repeat fixed;
+    }
+    .auth-card{width:min(640px,100%);background:var(--panel);border:1px solid #242a33;border-radius:16px;padding:24px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    .brand{display:flex;justify-content:center;font-weight:900;letter-spacing:.06em;font-size:28px;margin-bottom:8px}
+    .tabs{display:flex;gap:8px;background:var(--soft);padding:6px;border-radius:12px;margin:10px 0 18px}
+    .tab{flex:1;text-align:center;padding:10px 12px;border-radius:8px;cursor:pointer;color:var(--muted);font-weight:800;user-select:none}
+    .tab.active{background:#0b0d11;color:var(--text)}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    label{display:block;font-size:12px;color:var(--muted);margin:8px 2px}
+    input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #2a313a;background:#0b0d11;color:var(--text);outline:none}
+    input:focus,select:focus{border-color:#344053}
+    .btn{width:100%;padding:12px 14px;border:0;border-radius:12px;cursor:pointer;font-weight:900;background:var(--accent);color:#02130c;margin-top:10px}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .hint{font-size:12px;color:var(--muted);text-align:center;margin-top:10px}
+    .msg{font-size:13px;margin-top:8px;display:none}
+    .msg.error{color:var(--danger)} .msg.ok{color:var(--accent);font-weight:800}
+
+    /* ---------- APP VIEW ---------- */
+    #appView{display:none;height:100vh}
+    .sidebar{width:230px;background:var(--panel);border-right:1px solid #1f2630;padding:16px;overflow-y:auto}
+    .sb-brand{font-weight:900;letter-spacing:.06em;margin-bottom:18px}
+    .sb-user{display:flex;align-items:center;gap:10px;background:var(--soft);padding:10px;border-radius:12px;margin-bottom:12px}
+    .sb-user img{width:36px;height:36px;border-radius:50%}
+    .nav a{display:block;padding:10px 12px;border-radius:10px;color:var(--text);text-decoration:none;margin:6px 0}
+    .nav a.active,.nav a:hover{background:#0b0d11}
+    .content{flex:1;display:flex;flex-direction:column;overflow:hidden}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 16px;background:var(--panel);border-bottom:1px solid #1f2630;position:sticky;top:0;z-index:5}
+    .search{flex:1;max-width:520px}
+    .robux{background:#0b1611;color:#00f18a;border:1px solid #143127;font-weight:900;padding:8px 12px;border-radius:12px}
+    .view{padding:18px;overflow:auto;height:100%}
+    h1{margin:0 0 8px}.subtitle{color:var(--muted);margin:0 0 16px}
+
+    /* Home bits */
+    .connections-row{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0 22px}
+    .empty{color:var(--muted);font-size:13px}
+    .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+    .card{background:var(--panel);border:1px solid #1f2630;border-radius:12px;overflow:hidden}
+    .card img{width:100%;aspect-ratio:16/9;object-fit:cover}
+    .card .p{padding:10px 12px}.muted{color:var(--muted);font-size:12px}
+
+    @media (max-width:900px){
+      #appView{flex-direction:column}
+      .sidebar{width:100%;border-right:none;border-bottom:1px solid #1f2630;display:flex;gap:10px;align-items:center}
+      .nav{display:flex;gap:8px;flex-wrap:wrap}
+    }
   </style>
 </head>
 <body>
 
-<header>
-  <div id="userInfo">No conectado</div>
-  <div id="robuxInfo">R$: 0</div>
-</header>
+  <!-- ========== AUTH (Registro / Login) ========== -->
+  <section id="authView">
+    <div class="auth-card">
+      <div class="brand">ESPZ</div>
 
-<!-- Registro / Login -->
-<div id="auth">
-  <div id="registerBox">
-    <h2>Registrarse</h2>
-    <input type="text" id="regUser" placeholder="Usuario">
-    <input type="password" id="regPass" placeholder="Contraseña">
-    <button onclick="register()">Registrarse</button>
-  </div>
-  <div id="loginBox">
-    <h2>Iniciar Sesión</h2>
-    <input type="text" id="logUser" placeholder="Usuario">
-    <input type="password" id="logPass" placeholder="Contraseña">
-    <button onclick="login()">Iniciar Sesión</button>
-  </div>
-</div>
+      <div class="tabs">
+        <div id="tabReg" class="tab active">Crear cuenta</div>
+        <div id="tabLog" class="tab">Iniciar sesión</div>
+      </div>
 
-<!-- App -->
-<div id="app" style="display:none;">
-  <nav>
-    <button onclick="showTab('market')">Marketplace</button>
-    <button onclick="showTab('inventory')">Inventario</button>
-    <button id="logoutBtn" onclick="logout()">Cerrar Sesión</button>
-  </nav>
-
-  <div id="market" class="tab">
-    <h2>Marketplace Global</h2>
-    <div id="marketItems"></div>
-  </div>
-
-  <div id="inventory" class="tab">
-    <h2>Mi Inventario</h2>
-    <div id="myItems"></div>
-  </div>
-
-  <!-- Panel de Admin -->
-  <div id="admin" class="tab">
-    <h2>Admin Panel (solo ROBLOX)</h2>
-    <div id="adminPanel">
-      <h3>Añadir Item</h3>
-      <input type="text" id="itemName" placeholder="Nombre del Item">
-      <input type="text" id="itemImg" placeholder="URL de Imagen">
-      <input type="number" id="itemPrice" placeholder="Precio en Robux">
-      <input type="number" id="itemStock" placeholder="Stock">
-      <button onclick="addItem()">Añadir al Marketplace</button>
-
-      <h3>Eliminar Item</h3>
-      <input type="text" id="deleteItemId" placeholder="ID del Item">
-      <button onclick="deleteItem()">Eliminar del Marketplace</button>
-    </div>
-  </div>
-</div>
-
-<script>
-  let currentUser = null;
-
-  // ===== Mantener sesión al recargar =====
-  window.onload = function() {
-    let savedUser = localStorage.getItem("currentUser");
-    if (savedUser) {
-      currentUser = savedUser;
-      showApp();
-    }
-  };
-
-  // ===== Registro =====
-  function register() {
-    let user = document.getElementById("regUser").value;
-    let pass = document.getElementById("regPass").value;
-
-    if (!user || !pass) { alert("Completa todos los campos"); return; }
-
-    let users = JSON.parse(localStorage.getItem("users")) || {};
-    if (users[user]) {
-      alert("Usuario ya existe");
-      return;
-    }
-
-    users[user] = { password: pass, robux: 100, inventory: [] };
-    localStorage.setItem("users", JSON.stringify(users));
-    alert("Registrado con éxito. Tienes 100 robux gratis.");
-  }
-
-  // ===== Login =====
-  function login() {
-    let user = document.getElementById("logUser").value;
-    let pass = document.getElementById("logPass").value;
-
-    let users = JSON.parse(localStorage.getItem("users")) || {};
-    if (!users[user]) { alert("No existe usuario"); return; }
-    if (users[user].password !== pass) { alert("Contraseña incorrecta"); return; }
-
-    currentUser = user;
-    localStorage.setItem("currentUser", currentUser);
-    showApp();
-  }
-
-  // ===== Cerrar Sesión =====
-  function logout() {
-    localStorage.removeItem("currentUser");
-    currentUser = null;
-    document.getElementById("auth").style.display = "block";
-    document.getElementById("app").style.display = "none";
-    document.getElementById("userInfo").innerText = "No conectado";
-  }
-
-  // ===== Mostrar app =====
-  function showApp() {
-    document.getElementById("auth").style.display = "none";
-    document.getElementById("app").style.display = "block";
-    document.getElementById("userInfo").innerText = "Usuario: " + currentUser;
-    updateRobux();
-    loadInventory();
-    showTab("market");
-  }
-
-  // ===== Tabs =====
-  function showTab(tab) {
-    document.querySelectorAll(".tab").forEach(t => t.style.display = "none");
-    document.getElementById(tab).style.display = "block";
-    if (tab === "market") loadMarket();
-    if (tab === "inventory") loadInventory();
-  }
-
-  // ===== Robux =====
-  function updateRobux() {
-    let users = JSON.parse(localStorage.getItem("users")) || {};
-    document.getElementById("robuxInfo").innerText = "R$: " + users[currentUser].robux;
-  }
-
-  // ===== Inventario =====
-  function loadInventory() {
-    let users = JSON.parse(localStorage.getItem("users")) || {};
-    let items = users[currentUser].inventory || [];
-    let invDiv = document.getElementById("myItems");
-    invDiv.innerHTML = items.map(i => `<div class="item"><h4>${i}</h4></div>`).join("");
-  }
-
-  // ===== Marketplace =====
-  function loadMarket() {
-    let market = JSON.parse(localStorage.getItem("marketplace")) || [];
-    let marketDiv = document.getElementById("marketItems");
-    marketDiv.innerHTML = "";
-    market.forEach((item, idx) => {
-      marketDiv.innerHTML += `
-        <div class="item">
-          <img src="${item.img}">
-          <h3>${item.name}</h3>
-          <p>Precio: ${item.price} R$</p>
-          <p>Stock: ${item.stock}</p>
-          <p><small>ID: ${idx}</small></p>
-          <button onclick="buyItem(${idx})">Comprar</button>
+      <!-- Registro -->
+      <div id="paneReg">
+        <label>Fecha de nacimiento</label>
+        <div class="grid-3">
+          <select id="r-day"><option value="">Día</option></select>
+          <select id="r-month"><option value="">Mes</option></select>
+          <select id="r-year"><option value="">Año</option></select>
         </div>
-      `;
+
+        <label>Usuario</label>
+        <input id="r-user" minlength="3" maxlength="20" placeholder="No utilices tu nombre real"/>
+
+        <label>Contraseña</label>
+        <input id="r-pass" type="password" minlength="8" placeholder="Por lo menos 8 caracteres"/>
+
+        <button id="btnRegister" class="btn" type="button">Registrarte</button>
+        <div id="rMsgErr" class="msg error"></div>
+        <div id="rMsgOk"  class="msg ok">¡Cuenta creada! <u>REFRESCA LA PÁGINA</u> para entrar al inicio.</div>
+
+        <div class="hint">¿Ya tienes cuenta? <a href="#" id="goLogin">Inicia sesión</a></div>
+      </div>
+
+      <!-- Login -->
+      <div id="paneLog" style="display:none">
+        <label>Usuario</label>
+        <input id="l-user" placeholder="Tu usuario"/>
+
+        <label>Contraseña</label>
+        <input id="l-pass" type="password" placeholder="Tu contraseña"/>
+
+        <button id="btnLogin" class="btn" type="button">Entrar</button>
+        <div id="lMsgErr" class="msg error"></div>
+
+        <div class="hint">¿Nuevo aquí? <a href="#" id="goRegister">Crear cuenta</a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== APP (Inicio) ========== -->
+  <section id="appView" style="display:none">
+    <aside class="sidebar">
+      <div class="sb-brand">ESPZ</div>
+      <div class="sb-user">
+        <img id="sbAvatar" src="https://tr.rbxcdn.com/0e5cc4633a5a97c6f0d948e57843da9b/150/150/AvatarHeadshot/Webp" alt="avatar"/>
+        <div>
+          <div id="sbUsername" style="font-weight:800">Usuario</div>
+          <div id="sbTag" class="muted">@player</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="#" data-view="home" class="active">Home</a>
+        <a href="#" data-view="catalog">Catalog</a>
+        <a href="#" data-view="profile">Profile</a>
+        <a href="#" id="logout">Cerrar sesión</a>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <div class="topbar">
+        <div class="search"><input placeholder="Search"/></div>
+        <div id="robux" class="robux">Robux: 100</div>
+      </div>
+
+      <!-- Home -->
+      <div id="view-home" class="view">
+        <h1>Home</h1>
+        <div id="connTitle" class="subtitle">Connections (0)</div>
+        <div id="connRow" class="connections-row">
+          <div class="empty">Aún no tienes conexiones.</div>
+        </div>
+
+        <div class="subtitle">Today's Picks</div>
+        <div class="cards">
+          <div class="card">
+            <img src="https://tr.rbxcdn.com/26d2a6f8cabf2b9a63bc8cb6cd1f0c52/768/432/Image/Webp" alt="">
+            <div class="p"><div style="font-weight:700">KPOP Demon Hunters: The Block</div><div class="muted">Event · The Block</div></div>
+          </div>
+          <div class="card">
+            <img src="https://tr.rbxcdn.com/0d1f3b090d6b8ea8d4038a2b8d3cf6c7/768/432/Image/Webp" alt="">
+            <div class="p"><div style="font-weight:700">Tennis Zero [UPD]</div><div class="muted">Ref Style Added</div></div>
+          </div>
+          <div class="card">
+            <img src="https://tr.rbxcdn.com/7b2f9b645f1c1c7e25f847e1fd7b8a78/768/432/Image/Webp" alt="">
+            <div class="p"><div style="font-weight:700">a dusty trip [NEW SEASON]</div><div class="muted">Season 10 is here!</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Catalog -->
+      <div id="view-catalog" class="view" style="display:none">
+        <h1>Catalog</h1>
+        <div class="cards">
+          <div class="card">
+            <img src="https://tr.rbxcdn.com/7e4ed28cf6b17a6c1e3b7c64c95d9f60/768/432/Hat/Webp" alt="">
+            <div class="p"><div style="font-weight:700">Dominus Aureus</div><div class="muted">1,000,000 R$</div></div>
+          </div>
+          <div class="card">
+            <img src="https://tr.rbxcdn.com/31dcd0ff8801c60d0b8dfc7db0c17f7e/768/432/Hat/Webp" alt="">
+            <div class="p"><div style="font-weight:700">Korblox Deathspeaker</div><div class="muted">17,000 R$</div></div>
+          </div>
+          <div class="card">
+            <img src="https://tr.rbxcdn.com/3cfe7c2b40f7e15ae8fc62075852d7f4/768/432/Hat/Webp" alt="">
+            <div class="p"><div style="font-weight:700">Valkyrie Helm</div><div class="muted">250,000 R$</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile -->
+      <div id="view-profile" class="view" style="display:none">
+        <h1>Profile</h1>
+        <div class="cards">
+          <div class="card">
+            <img id="profileAvatar" src="https://tr.rbxcdn.com/0e5cc4633a5a97c6f0d948e57843da9b/768/432/AvatarHeadshot/Webp" alt="">
+            <div class="p">
+              <div id="profileName" style="font-weight:800;font-size:18px">Usuario</div>
+              <div id="profileTag" class="muted">@player</div>
+              <div class="muted" style="margin-top:6px">Join Date: <span id="joinDate">—</span></div>
+              <div class="muted">Place Visits: 0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </section>
+
+  <script>
+    /* ===== LocalStorage keys ===== */
+    const K_USERS = "rr_users";         // mapa username -> {password,robux,createdAt,avatar,tag}
+    const K_CURRENT = "rr_currentUser"; // username actual
+
+    const $  = (s, r=document)=>r.querySelector(s);
+    const $$ = (s, r=document)=>[...r.querySelectorAll(s)];
+
+    /* ---------- Tabs Auth ---------- */
+    const tabReg=$("#tabReg"), tabLog=$("#tabLog");
+    const paneReg=$("#paneReg"), paneLog=$("#paneLog");
+    $("#goLogin").onclick = e => {e.preventDefault(); showLogin()};
+    $("#goRegister").onclick = e => {e.preventDefault(); showRegister()};
+    tabReg.onclick = showRegister; tabLog.onclick = showLogin;
+
+    function showRegister(){
+      tabReg.classList.add("active"); tabLog.classList.remove("active");
+      paneReg.style.display="block"; paneLog.style.display="none";
+    }
+    function showLogin(){
+      tabLog.classList.add("active"); tabReg.classList.remove("active");
+      paneReg.style.display="none"; paneLog.style.display="block";
+    }
+
+    /* ---------- Poblar fecha ---------- */
+    const rDay=$("#r-day"), rMonth=$("#r-month"), rYear=$("#r-year");
+    for(let d=1; d<=31; d++) rDay.insertAdjacentHTML("beforeend", `<option>${d}</option>`);
+    for(let m=1; m<=12; m++) rMonth.insertAdjacentHTML("beforeend", `<option>${m}</option>`);
+    const year=new Date().getFullYear();
+    for(let y=year; y>=1900; y--) rYear.insertAdjacentHTML("beforeend", `<option>${y}</option>`);
+
+    /* ---------- Helpers Storage ---------- */
+    const getUsers = () => { try{ return JSON.parse(localStorage.getItem(K_USERS))||{} }catch{ return {} } };
+    const setUsers = data => localStorage.setItem(K_USERS, JSON.stringify(data));
+    const setCurrent = u => localStorage.setItem(K_CURRENT, u);
+    const getCurrent = () => localStorage.getItem(K_CURRENT);
+
+    /* ---------- Registro ---------- */
+    $("#btnRegister").onclick = () => {
+      const user = $("#r-user").value.trim();
+      const pass = $("#r-pass").value;
+      const err = $("#rMsgErr"), ok = $("#rMsgOk");
+      err.style.display="none"; ok.style.display="none";
+
+      if(user.length<3 || user.length>20){ err.textContent="El usuario debe tener entre 3 y 20 caracteres."; err.style.display="block"; return; }
+      if(/\s/.test(user)){ err.textContent="El usuario no puede contener espacios."; err.style.display="block"; return; }
+      if(pass.length<8){ err.textContent="La contraseña debe tener al menos 8 caracteres."; err.style.display="block"; return; }
+
+      const users = getUsers();
+      if(users[user]){ err.textContent="Ese usuario ya existe. Elige otro."; err.style.display="block"; return; }
+
+      users[user] = {
+        password: pass,
+        robux: 100,
+        createdAt: new Date().toISOString(),
+        avatar: "https://tr.rbxcdn.com/0e5cc4633a5a97c6f0d948e57843da9b/150/150/AvatarHeadshot/Webp",
+        tag: "@"+user.toLowerCase()
+      };
+      setUsers(users);
+      setCurrent(user);
+
+      // Mensaje solicitado
+      ok.innerHTML = "¡Cuenta creada! <b>REFRESCA LA PÁGINA</b> para entrar al inicio.";
+      ok.style.display="block";
+      $("#btnRegister").disabled = true;
+    };
+
+    /* ---------- Login ---------- */
+    $("#btnLogin").onclick = () => {
+      const user=$("#l-user").value.trim();
+      const pass=$("#l-pass").value;
+      const users=getUsers();
+      if(!users[user] || users[user].password!==pass){
+        $("#lMsgErr").textContent="Usuario o contraseña incorrectos."; $("#lMsgErr").style.display="block"; return;
+      }
+      setCurrent(user);
+      enterApp(user, users[user]); // entra directo si inicia sesión
+    };
+
+    /* ---------- App render ---------- */
+    const authView=$("#authView"), appView=$("#appView");
+    function enterApp(username, data){
+      authView.style.display="none"; appView.style.display="flex";
+
+      // Sidebar/topbar/profile
+      $("#sbUsername").textContent = username;
+      $("#sbTag").textContent = data?.tag || "@"+username.toLowerCase();
+      $("#sbAvatar").src = data?.avatar;
+      $("#robux").textContent = "Robux: " + (data?.robux ?? 100);
+
+      $("#profileName").textContent = username;
+      $("#profileTag").textContent = data?.tag || "@"+username.toLowerCase();
+      $("#profileAvatar").src = data?.avatar.replace("/150/150/","/768/432/");
+      $("#joinDate").textContent = new Date(data?.createdAt||Date.now()).toLocaleDateString();
+
+      // Home header y sin amigos (como pediste)
+      $("#connTitle").textContent = "Connections (0)";
+      $("#connRow").innerHTML = '<div class="empty">Aún no tienes conexiones.</div>';
+
+      switchView("home");
+    }
+
+    // Navegación
+    const views = {home:$("#view-home"), catalog:$("#view-catalog"), profile:$("#view-profile")};
+    $$(".nav a[data-view]").forEach(a=>{
+      a.onclick = e => { e.preventDefault(); switchView(a.dataset.view); };
     });
-  }
-
-  // ===== Comprar Item =====
-  function buyItem(itemId) {
-    let users = JSON.parse(localStorage.getItem("users")) || {};
-    let market = JSON.parse(localStorage.getItem("marketplace")) || [];
-
-    let userData = users[currentUser];
-    let item = market[itemId];
-
-    if (userData.robux < item.price) { alert("Robux insuficientes"); return; }
-    if (item.stock <= 0) { alert("Sin stock"); return; }
-
-    userData.robux -= item.price;
-    userData.inventory.push(item.name);
-    item.stock--;
-
-    users[currentUser] = userData;
-    market[itemId] = item;
-    localStorage.setItem("users", JSON.stringify(users));
-    localStorage.setItem("marketplace", JSON.stringify(market));
-
-    updateRobux();
-    loadInventory();
-    loadMarket();
-    alert("¡Comprado!");
-  }
-
-  // ===== Admin: Añadir Item =====
-  function addItem() {
-    let name = document.getElementById("itemName").value;
-    let img = document.getElementById("itemImg").value;
-    let price = parseInt(document.getElementById("itemPrice").value);
-    let stock = parseInt(document.getElementById("itemStock").value);
-
-    let market = JSON.parse(localStorage.getItem("marketplace")) || [];
-    market.push({ name, img, price, stock });
-    localStorage.setItem("marketplace", JSON.stringify(market));
-
-    alert("Item añadido");
-    loadMarket();
-  }
-
-  // ===== Admin: Eliminar Item =====
-  function deleteItem() {
-    let id = parseInt(document.getElementById("deleteItemId").value);
-    let market = JSON.parse(localStorage.getItem("marketplace")) || [];
-    if (market[id]) {
-      market.splice(id, 1);
-      localStorage.setItem("marketplace", JSON.stringify(market));
-      alert("Item eliminado");
-      loadMarket();
-    } else {
-      alert("No existe ese ID");
+    function switchView(name){
+      Object.entries(views).forEach(([k,el])=>{
+        el.style.display = (k===name) ? "block" : "none";
+      });
+      $$(".nav a[data-view]").forEach(a=>a.classList.toggle("active", a.dataset.view===name));
     }
-  }
 
-  // ===== Admin Panel con F9 =====
-  document.addEventListener("keydown", function(e) {
-    if (e.key === "F9" && currentUser === "ROBLOX") {
-      let panel = document.getElementById("admin");
-      panel.style.display = (panel.style.display === "block") ? "none" : "block";
-    }
-  });
-</script>
+    // Logout
+    $("#logout").onclick = e => { e.preventDefault(); localStorage.removeItem(K_CURRENT); location.reload(); };
+
+    // Auto-login si ya se registró/inició
+    (function boot(){
+      const u = getCurrent();
+      if(u){ const users=getUsers(); enterApp(u, users[u]); }
+      else{ authView.style.display="grid"; appView.style.display="none"; showRegister(); }
+    })();
+  </script>
 </body>
 </html>
