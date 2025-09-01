@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Proyecto Revival — Sitio no oficial</title>
+  <meta name="description" content="Landing page ligera para un proyecto revival de estilo retro. Esta página es un template original, sin copiar código de terceros." />
+  <style>
+    :root{
+      --bg:#0f1115;         /* fondo oscuro */
+      --panel:#171a21;      /* panel */
+      --panel-2:#1f2430;    /* panel alterno */
+      --text:#e8edf2;       /* texto primario */
+      --muted:#a8b3c1;      /* texto secundario */
+      --brand:#39c07f;      /* acento principal */
+      --brand-2:#4da3ff;    /* acento secundario */
+      --warn:#ffd166;
+      --danger:#ff6b6b;
+      --ok:#64d18a;
+      --radius:18px;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Noto Sans, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text); background:radial-gradient(1200px 600px at 80% -20%, rgba(77,163,255,.12), transparent 60%), radial-gradient(900px 600px at -10% 120%, rgba(57,192,127,.12), transparent 60%), var(--bg);
+    }
+    a{color:inherit; text-decoration:none}
+    .container{max-width:1100px; margin:0 auto; padding:24px}
+    header{
+      position:sticky; top:0; z-index:50; backdrop-filter:saturate(120%) blur(8px);
+      background:linear-gradient(to bottom, rgba(15,17,21,.85), rgba(15,17,21,.6));
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .nav{display:flex; align-items:center; justify-content:space-between}
+    .brand{display:flex; align-items:center; gap:12px; font-weight:800; letter-spacing:.4px}
+    .brand-mark{width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow:var(--shadow)}
+    .nav a{opacity:.9}
+    .btn{display:inline-flex; align-items:center; gap:10px; padding:12px 16px; border-radius:14px; background:linear-gradient(135deg, var(--brand), var(--brand-2)); color:#0b0e13; font-weight:700; box-shadow:var(--shadow); border:0; cursor:pointer}
+    .btn.secondary{background:transparent; color:var(--text); border:1px solid rgba(255,255,255,.14)}
+
+    .hero{display:grid; grid-template-columns: 1.2fr .8fr; gap:30px; align-items:center; padding:48px 0}
+    .hero-card{background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); padding:28px; box-shadow:var(--shadow)}
+    .pill{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; background:rgba(77,163,255,.15); color:#d7e7ff; font-size:12px; font-weight:700; letter-spacing:.35px}
+    .hero h1{margin:14px 0 8px; font-size:clamp(28px, 4vw, 48px)}
+    .lead{color:var(--muted); line-height:1.6; font-size:18px}
+    .hero-actions{display:flex; gap:12px; margin-top:18px; flex-wrap:wrap}
+
+    .stats{display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-top:18px}
+    .stat{background:var(--panel); border-radius:16px; padding:16px; border:1px solid rgba(255,255,255,.06)}
+    .stat b{font-size:22px}
+    .card{background:var(--panel); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); padding:22px; box-shadow:var(--shadow)}
+
+    .grid-3{display:grid; grid-template-columns:repeat(3, 1fr); gap:18px}
+    .grid-2{display:grid; grid-template-columns:repeat(2, 1fr); gap:18px}
+
+    .section{padding:40px 0}
+    .section h2{margin:0 0 14px; font-size:clamp(22px, 2.8vw, 34px)}
+    .muted{color:var(--muted)}
+
+    .showcase{aspect-ratio: 16/10; border-radius:16px; background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.08); display:grid; place-items:center; font-weight:700; letter-spacing:.4px}
+
+    .badge{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border:1px solid rgba(255,255,255,.12); border-radius:12px; background:var(--panel-2)}
+    .list{display:grid; gap:12px}
+    .list li{display:flex; gap:10px; align-items:flex-start}
+
+    .footer{margin-top:40px; border-top:1px solid rgba(255,255,255,.06); padding:24px 0; color:var(--muted); font-size:14px}
+
+    @media (max-width: 880px){
+      .hero{grid-template-columns:1fr}
+      .grid-3{grid-template-columns:1fr}
+      .grid-2{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <span>Proyecto Revival</span>
+      </div>
+      <nav style="display:flex; gap:18px; align-items:center">
+        <a href="#caracteristicas">Características</a>
+        <a href="#descargas">Descargas</a>
+        <a href="#faq">FAQ</a>
+        <a class="btn secondary" href="#contacto">Contacto</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div>
+        <span class="pill">Revive la era clásica</span>
+        <h1>Un cliente retro, modernizado y fácil de instalar</h1>
+        <p class="lead">Este es un <strong>template original</strong> para una landing de comunidad revival. No utiliza marcas registradas ni activos de terceros y lo puedes publicar tal cual en GitHub Pages. Personalízalo con tu nombre, imágenes propias y enlaces reales.</p>
+        <div class="hero-actions">
+          <a class="btn" href="#descargas">Descargar</a>
+          <a class="btn secondary" href="#demo">Ver demo</a>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="muted">Usuarios</div><b>12,4k+</b></div>
+          <div class="stat"><div class="muted">Servidores</div><b>8</b></div>
+          <div class="stat"><div class="muted">Versiones</div><b>2008 · 2011 · 2014</b></div>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="showcase">Coloca aquí una captura de tu cliente</div>
+        <ul class="list" style="margin:16px 0 0; padding:0; list-style:none">
+          <li><span class="badge">Instalador guiado</span></li>
+          <li><span class="badge">Modo seguro (sandbox)</span></li>
+          <li><span class="badge">Opciones de avatar clásico</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="caracteristicas" class="section">
+      <h2>Características</h2>
+      <div class="grid-3">
+        <article class="card">
+          <h3>Rápido y liviano</h3>
+          <p class="muted">Carga mínima, assets locales y sin dependencias pesadas. Ideal para equipos modestos.</p>
+        </article>
+        <article class="card">
+          <h3>Diseño retro moderno</h3>
+          <p class="muted">Bloques, sombras suaves y colores de acento para evocar la estética de 2010 sin copiar diseños ajenos.</p>
+        </article>
+        <article class="card">
+          <h3>Seguridad primero</h3>
+          <p class="muted">Guías para ejecutar en sandbox, verificación de hashes y enlaces firmados.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="descargas" class="section">
+      <h2>Descargas</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Launcher</h3>
+          <p class="muted">Elige tu versión favorita y el launcher se encarga del resto.</p>
+          <div style="display:flex; gap:10px; margin-top:10px">
+            <a class="btn" href="#">Windows</a>
+            <a class="btn secondary" href="#">Linux</a>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Documentación</h3>
+          <p class="muted">Guías de instalación, preguntas frecuentes y buenas prácticas.</p>
+          <div style="display:flex; gap:10px; margin-top:10px">
+            <a class="btn secondary" href="#faq">Leer FAQ</a>
+            <a class="btn secondary" href="#contacto">Soporte</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="section">
+      <h2>FAQ</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>¿Es oficial?</h3>
+          <p class="muted">No. Este template es para proyectos comunitarios no oficiales. Respeta marcas y derechos de autor.</p>
+        </div>
+        <div class="card">
+          <h3>¿Puedo usar assets de terceros?</h3>
+          <p class="muted">Solo si tienes permiso explícito y cumples con sus licencias. Recomendamos gráficos propios o de dominio público.</p>
+        </div>
+        <div class="card">
+          <h3>¿Cómo publico en GitHub Pages?</h3>
+          <p class="muted">Crea un repositorio, sube este <code>index.html</code>, activa Pages en Settings → Pages y selecciona la rama principal.</p>
+        </div>
+        <div class="card">
+          <h3>¿Puedo personalizar colores y textos?</h3>
+          <p class="muted">Sí. Ajusta las variables CSS en <code>:root</code> y edita el contenido como quieras.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="contacto" class="section">
+      <h2>Contacto</h2>
+      <div class="card">
+        <p class="muted">Discord: Karambitss<a href=""></a>.</p>
+        <form onsubmit="event.preventDefault(); alert('¡Gracias! Esto es una demo.');" style="display:grid; gap:12px; max-width:520px; margin-top:12px">
+          <input required placeholder="Tu email" type="email" style="padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:var(--panel); color:var(--text)" />
+          <textarea required placeholder="Mensaje" rows="4" style="padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:var(--panel); color:var(--text)"></textarea>
+          <button class="btn" type="submit">Enviar</button>
+        </form>
+      </div>
+    </section>
+
+    <div class="footer">
+      <div class="container" style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap">
+        <span>© <span id="year"></span> Proyecto Revival!</span>
+        <a href="#legal">Aviso legal</a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
