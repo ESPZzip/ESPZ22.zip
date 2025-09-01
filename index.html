@@ -1,4 +1,4 @@
-SP<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -65,7 +65,7 @@ SP<!DOCTYPE html>
     <button onclick="giveRobuxToUser()">Dar Robux</button>
 
     <hr>
-    <h4>Agregar ítem al Marketplace</h4>
+    <h4>Agregar ítem al Marketplace (GLOBAL)</h4>
     <input id="newItemName" placeholder="Nombre del ítem">
     <input id="newItemImg" placeholder="URL de imagen">
     <input type="number" id="newItemPrice" placeholder="Precio en Robux">
@@ -147,148 +147,109 @@ SP<!DOCTYPE html>
       });
     }
 
-    function buyItem(itemId){
-      const username=localStorage.getItem("currentUser");
-      let users=getUsers();
-      let user=users[username];
-      let items=getItems();
-      const index=items.findIndex(i=>i.id===itemId);
-      const item=items[index];
+    function buyItem(id){
+      const u=localStorage.getItem("currentUser");
+      const users=getUsers();
+      const items=getItems();
+      const item=items.find(i=>i.id===id);
 
-      if(!item){ alert("El ítem no existe."); return; }
-      if(user.robux<item.price){ alert("Robux insuficientes"); return; }
-      if(item.stock<=0){ alert("Agotado"); return; }
+      if(!item||item.stock<=0){alert("Item no disponible.");return;}
+      if(users[u].robux<item.price){alert("Robux insuficientes.");return;}
 
-      user.robux-=item.price;
-      user.inventory=user.inventory||[];
-      user.inventory.push(itemId);
-      items[index].stock--;
+      users[u].robux-=item.price;
+      users[u].inventory.push(item.id);
+      item.stock--;
 
-      saveUsers(users); 
+      saveUsers(users);
       saveItems(items);
-
-      document.getElementById("playerRobux").textContent=user.robux;
-      renderMarketplace(); 
+      document.getElementById("playerRobux").textContent=users[u].robux;
+      alert(`Has comprado ${item.name}`);
       renderInventory();
-
-      alert("Has comprado "+item.name+"!");
+      renderMarketplace();
     }
 
     // ------------------ Profile ------------------
     function renderProfile(){
       const c=document.getElementById("profileContainer");
+      c.innerHTML="";
       const u=localStorage.getItem("currentUser");
       const users=getUsers();
-      const user=users[u];
-      c.innerHTML=`<div class="card"><h3>${u}</h3><p>Robux: ${user.robux}</p></div>`;
-    }
-
-    // ------------------ Friends ------------------
-    function searchFriend(){
-      const q=document.getElementById("searchFriend").value.trim().toLowerCase();
-      const results=document.getElementById("friendResults");
-      results.innerHTML="";
-      const users=getUsers();
-      Object.keys(users).forEach(u=>{
-        if(u.toLowerCase()===q){
-          results.innerHTML=`<div class="card"><h4>${u}</h4><button>Enviar solicitud</button></div>`;
-        }
-      });
-      if(results.innerHTML==="") results.innerHTML="<p>Usuario no encontrado</p>";
+      c.innerHTML=`<h3>${u}</h3><p>Robux: ${users[u].robux}</p>`;
     }
 
     // ------------------ Admin Panel ------------------
-    function logAction(msg){
-      const log=document.getElementById("adminLog");
-      const p=document.createElement("p");
-      p.textContent=msg;
-      log.appendChild(p);
+    function openAdminPanel(){
+      document.getElementById("adminPanel").style.display="block";
+    }
+    function closeAdminPanel(){
+      document.getElementById("adminPanel").style.display="none";
+    }
+    function logAction(txt){
+      document.getElementById("adminLog").innerHTML+=`<p>${txt}</p>`;
     }
 
     function addRobuxSelf(){
-      const amt=parseInt(document.getElementById("selfRobux").value);
       const u=localStorage.getItem("currentUser");
-      let users=getUsers();
-      if(isNaN(amt)||amt<=0){ alert("Cantidad inválida"); return; }
-      users[u].robux+=amt;
-      saveUsers(users);
-      document.getElementById("playerRobux").textContent=users[u].robux;
-      logAction(`Se agregaron ${amt} robux a ${u}`);
+      const users=getUsers();
+      const amt=parseInt(document.getElementById("selfRobux").value);
+      if(amt>0){users[u].robux+=amt;saveUsers(users);document.getElementById("playerRobux").textContent=users[u].robux;logAction(`${u} se dio ${amt} Robux`);}
     }
 
     function giveRobuxToUser(){
       const usernameInput=document.getElementById("targetUser").value.trim();
       const robuxToGive=parseInt(document.getElementById("targetRobux").value);
-
-      if(!usernameInput||isNaN(robuxToGive)||robuxToGive<=0){
-        alert("Debes escribir un nombre válido y una cantidad positiva."); return;
-      }
-
+      if(!usernameInput||isNaN(robuxToGive)||robuxToGive<=0){alert("Datos inválidos");return;}
       let users=getUsers();
-      let foundUserKey=Object.keys(users).find(
-        key=>key.toLowerCase()===usernameInput.toLowerCase()
-      );
-
-      if(!foundUserKey){ alert("Ese usuario no existe."); return; }
-
+      let foundUserKey=Object.keys(users).find(k=>k.toLowerCase()===usernameInput.toLowerCase());
+      if(!foundUserKey){alert("Ese usuario no existe.");return;}
       users[foundUserKey].robux+=robuxToGive;
       saveUsers(users);
-
-      const currentUser=localStorage.getItem("currentUser");
-      if(foundUserKey===currentUser){
-        document.getElementById("playerRobux").textContent=users[currentUser].robux;
-      }
-
-      logAction(`Se dieron ${robuxToGive} robux a ${foundUserKey}`);
-      alert(`Has dado ${robuxToGive} robux a ${foundUserKey}`);
+      logAction(`Se dieron ${robuxToGive} Robux a ${foundUserKey}`);
+      alert(`Has dado ${robuxToGive} Robux a ${foundUserKey}`);
     }
 
     function addItem(){
-      const name=document.getElementById("newItemName").value;
-      const img=document.getElementById("newItemImg").value;
+      const name=document.getElementById("newItemName").value.trim();
+      const img=document.getElementById("newItemImg").value.trim();
       const price=parseInt(document.getElementById("newItemPrice").value);
       const stock=parseInt(document.getElementById("newItemStock").value);
-
-      if(!name||!img||isNaN(price)||isNaN(stock)){ alert("Datos inválidos"); return; }
-
-      let items=getItems();
+      if(!name||!img||isNaN(price)||isNaN(stock)){alert("Datos inválidos");return;}
+      const items=getItems();
       const id=name.toLowerCase().replace(/\s+/g,"_")+"_"+Date.now();
       items.push({id,name,img,price,stock});
       saveItems(items);
+      logAction(`Se agregó ítem global: ${name}`);
       renderMarketplace();
-      logAction(`Se agregó el ítem '${name}' con stock ${stock}`);
     }
 
     function removeItem(){
-      const query=document.getElementById("removeItemId").value.trim().toLowerCase();
-      if(!query){ alert("Debes escribir el ID o nombre del ítem."); return; }
+      const id=document.getElementById("removeItemId").value.trim().toLowerCase();
       let items=getItems();
-      const index=items.findIndex(it=>it.id.toLowerCase()===query||it.name.toLowerCase()===query);
-      if(index===-1){ alert("No se encontró ningún ítem."); return; }
-      const removed=items.splice(index,1)[0];
+      const idx=items.findIndex(it=>it.id.toLowerCase()===id||it.name.toLowerCase()===id);
+      if(idx===-1){alert("Ítem no encontrado");return;}
+      let removed=items[idx].name;
+      items.splice(idx,1);
       saveItems(items);
+      logAction(`Se eliminó del catálogo: ${removed}`);
       renderMarketplace();
-      logAction(`Se eliminó el ítem '${removed.name}' (${removed.id})`);
-      alert(`Ítem '${removed.name}' eliminado correctamente.`);
     }
-
-    function closeAdminPanel(){ document.getElementById("adminPanel").style.display="none"; }
 
     // ------------------ Inicialización ------------------
     window.onload=function(){
       const u=localStorage.getItem("currentUser");
-      if(!u){ alert("Debes registrarte o iniciar sesión primero."); return; }
+      if(!u){alert("Debes registrarte/iniciar sesión primero.");return;}
       const users=getUsers();
+      if(!users[u]){users[u]={robux:0,inventory:[]};saveUsers(users);}
       document.getElementById("playerName").textContent=u;
       document.getElementById("playerRobux").textContent=users[u].robux;
       showSection("marketplace");
-    };
+    }
 
-    document.addEventListener("keydown",function(e){
-      const u=localStorage.getItem("currentUser");
-      if(e.key==="F9"&&u==="ROBLOX"){
-        const p=document.getElementById("adminPanel");
-        p.style.display=(p.style.display==="block")?"none":"block";
+    // Abrir admin panel con F9 solo si eres ROBLOX
+    document.addEventListener("keydown",e=>{
+      if(e.key==="F9"){
+        const u=localStorage.getItem("currentUser");
+        if(u==="ROBLOX") openAdminPanel();
       }
     });
   </script>
