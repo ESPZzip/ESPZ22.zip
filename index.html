@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>ESPZ</title>
+  <title>Registro, Login y Tradeos</title>
   <style>
     body { 
       font-family: Arial, sans-serif; 
@@ -21,14 +21,14 @@
     }
     h2 { text-align: center; }
     input { width: 100%; padding: 10px; margin: 5px 0; }
-    button { width: 100%; padding: 10px; margin: 5px 0; cursor: pointer; border: none; border-radius: 5px; }
-    .btn-register { background: #4CAF50; color: white; }
-    .btn-login { background: #2196F3; color: white; }
+    button { padding: 5px 10px; margin: 3px; cursor: pointer; border: none; border-radius: 5px; }
+    .btn-register { background: #4CAF50; color: white; width: 100%; }
+    .btn-login { background: #2196F3; color: white; width: 100%; }
     #welcome { display: none; text-align: center; }
     
     /* Panel lateral */
     #sidebar {
-      width: 200px;
+      width: 250px;
       background: #fff;
       border-left: 2px solid #ccc;
       padding: 10px;
@@ -44,11 +44,19 @@
       margin: 5px 0;
       border-radius: 5px;
       background: #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     .current-user {
       background: #4CAF50;
       color: white;
       font-weight: bold;
+    }
+    .trade-btn {
+      background: #FF9800;
+      color: white;
+      font-size: 12px;
     }
   </style>
 </head>
@@ -101,7 +109,7 @@
       return;
     }
 
-    users[username] = { password: password, robux: 100 };
+    users[username] = { password: password, robux: 100, trades: [] };
     saveUsers(users);
     alert("Registro exitoso. Ahora puedes iniciar sesión.");
     renderUsers();
@@ -125,6 +133,7 @@
 
     localStorage.setItem("currentUser", username);
     loadUser();
+    checkTrades();
   }
 
   function loadUser() {
@@ -156,15 +165,67 @@
     Object.keys(users).forEach(user => {
       let div = document.createElement("div");
       div.className = "user-item";
-      if (user === currentUser) div.classList.add("current-user");
-      div.textContent = user;
+      if (user === currentUser) {
+        div.classList.add("current-user");
+        div.textContent = user;
+      } else {
+        div.innerHTML = `
+          <span>${user}</span>
+          <button class="trade-btn" onclick="sendTrade('${user}')">Trade</button>
+        `;
+      }
       container.appendChild(div);
     });
+  }
+
+  function sendTrade(targetUser) {
+    let currentUser = localStorage.getItem("currentUser");
+    if (!currentUser) {
+      alert("Debes iniciar sesión para enviar tradeos.");
+      return;
+    }
+
+    let users = getUsers();
+
+    if (!users[targetUser]) {
+      alert("Ese usuario no existe.");
+      return;
+    }
+
+    users[targetUser].trades.push({ from: currentUser, status: "pendiente" });
+    saveUsers(users);
+
+    alert("Has enviado un trade a " + targetUser);
+  }
+
+  function checkTrades() {
+    let currentUser = localStorage.getItem("currentUser");
+    if (!currentUser) return;
+
+    let users = getUsers();
+    let trades = users[currentUser].trades || [];
+
+    trades.forEach((trade, index) => {
+      if (trade.status === "pendiente") {
+        let accept = confirm(trade.from + " te ha enviado un trade. ¿Aceptar?");
+        if (accept) {
+          trades[index].status = "aceptado";
+          alert("Trade aceptado.");
+        } else {
+          trades[index].status = "rechazado";
+          alert("Trade rechazado.");
+        }
+      }
+    });
+
+    users[currentUser].trades = trades;
+    saveUsers(users);
   }
 
   window.onload = () => {
     loadUser();
     renderUsers();
+    checkTrades();
   };
 </script>
 
