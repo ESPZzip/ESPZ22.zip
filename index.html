@@ -3,63 +3,127 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESPZ</title>
+  <title>Mi Roblox Revival Mejorado</title>
   <style>
     * {margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
     body {background:#111;color:#fff;display:flex;height:100vh;overflow:hidden;}
 
     /* Sidebar */
-    .sidebar {width:220px;background:#1a1a1a;padding:20px 10px;display:flex;flex-direction:column;overflow-y:auto;}
-    .sidebar h2 {font-size:18px;margin-bottom:15px;}
-    .sidebar a {color:#ccc;padding:10px;display:block;border-radius:6px;text-decoration:none;margin-bottom:5px;transition:0.2s;}
+    .sidebar {
+      width:240px;background:#1a1a1a;padding:20px 15px;
+      display:flex;flex-direction:column;overflow-y:auto;
+      transition:transform 0.3s ease;
+    }
+    .sidebar h2 {font-size:20px;margin-bottom:20px;color:#00b7ff;text-align:center;}
+    .sidebar a {
+      color:#ccc;padding:12px;border-radius:8px;
+      text-decoration:none;margin-bottom:8px;transition:0.2s;cursor:pointer;
+      font-weight:bold;display:block;
+    }
     .sidebar a:hover {background:#333;color:#fff;}
 
     /* Main */
     .main {flex:1;display:flex;flex-direction:column;overflow-y:auto;}
 
     /* Topbar */
-    .topbar {background:#1a1a1a;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;}
-    .topbar .left a {color:#ccc;margin-right:15px;text-decoration:none;font-weight:bold;cursor:pointer;}
+    .topbar {
+      background:#1a1a1a;padding:12px 20px;
+      display:flex;align-items:center;justify-content:space-between;
+      box-shadow:0 2px 6px rgba(0,0,0,0.5);
+    }
+    .topbar .left a {
+      color:#ccc;margin-right:15px;text-decoration:none;font-weight:bold;cursor:pointer;
+    }
     .topbar .left a:hover {color:#fff;}
-    .search-box {background:#333;border-radius:6px;padding:6px 10px;border:none;color:#fff;}
+    #menuBtn {display:none;font-size:20px;cursor:pointer;color:#ccc;}
+    #menuBtn:hover {color:#fff;}
+    .search-box {
+      background:#333;border-radius:6px;padding:8px 12px;border:none;color:#fff;
+    }
 
     /* Sections */
     .section {padding:20px;}
-    .section h3 {margin-bottom:10px;}
+    .section h3 {margin-bottom:15px;font-size:18px;color:#00b7ff;}
 
     /* Connections */
-    .connections {display:flex;gap:10px;overflow-x:auto;padding:10px 0;}
-    .connections img {width:60px;height:60px;border-radius:50%;border:2px solid #333;}
+    .connections {display:flex;gap:12px;overflow-x:auto;padding:10px 0;}
+    .connections img {width:60px;height:60px;border-radius:50%;border:2px solid #333;transition:0.3s;}
+    .connections img:hover {transform:scale(1.1);border-color:#00b7ff;}
 
     /* Game Cards */
     .scroll-row {display:flex;gap:15px;overflow-x:auto;padding:10px 0;}
-    .game-card {background:#222;border-radius:8px;overflow:hidden;min-width:220px;flex-shrink:0;}
+    .game-card {
+      background:#222;border-radius:10px;overflow:hidden;
+      min-width:220px;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,0.4);
+      transition:0.3s;
+    }
+    .game-card:hover {transform:translateY(-4px);}
     .game-card img {width:100%;height:120px;object-fit:cover;}
     .game-card .info {padding:10px;font-size:14px;}
+
     .grid {display:grid;grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));gap:15px;}
     .grid .game-card img {height:100px;}
 
-    /* Hidden sections */
-    .page {display:none;}
+    /* Catalog Items */
+    .item {
+      background:#222;padding:12px;border-radius:10px;
+      display:flex;flex-direction:column;align-items:center;
+      text-align:center;box-shadow:0 2px 6px rgba(0,0,0,0.4);
+      transition:0.3s;
+    }
+    .item:hover {transform:translateY(-4px);}
+    .item img {width:120px;height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px;}
+    .item button {
+      margin-top:8px;padding:8px 12px;border:none;border-radius:6px;
+      background:#00b7ff;color:#fff;cursor:pointer;font-weight:bold;transition:0.2s;
+    }
+    .item button:hover {background:#0090cc;}
+
+    /* Pages */
+    .page {display:none;animation:fadeIn 0.4s ease;}
     .page.active {display:block;}
+    @keyframes fadeIn {from{opacity:0;}to{opacity:1;}}
 
     /* Admin */
-    #adminBtn {display:none;color:#ccc;margin-left:15px;cursor:pointer;}
-    #adminBtn:hover {color:#fff;}
-    #adminPanel {display:none;position:fixed;top:20%;left:50%;transform:translateX(-50%);background:#1a1a1a;padding:20px;border-radius:10px;box-shadow:0 0 15px rgba(0,0,0,0.7);}
-    #adminPanel h3 {margin-bottom:10px;}
-    #adminPanel button {background:#333;color:#fff;border:none;padding:8px 12px;margin:5px;cursor:pointer;border-radius:6px;}
+    #adminBtn {display:none;color:#ff6;margin-left:15px;cursor:pointer;}
+    #adminBtn:hover {color:#ff9;}
+    #adminPanel {
+      display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+      background:#1a1a1a;padding:25px;border-radius:12px;
+      box-shadow:0 0 20px rgba(0,0,0,0.8);width:300px;z-index:1000;
+      animation:fadeIn 0.3s ease;
+    }
+    #adminPanel h3 {margin-bottom:15px;color:#ff6;}
+    #adminPanel button {
+      background:#333;color:#fff;border:none;padding:10px 14px;
+      margin:6px 0;cursor:pointer;border-radius:8px;width:100%;
+      transition:0.2s;
+    }
     #adminPanel button:hover {background:#555;}
+
+    /* Notifications */
+    #notif {
+      position:fixed;bottom:20px;right:20px;background:#00b7ff;
+      padding:12px 20px;border-radius:8px;color:#fff;display:none;
+      box-shadow:0 0 12px rgba(0,0,0,0.6);
+    }
+
+    /* Responsive */
+    @media(max-width:768px){
+      .sidebar {position:fixed;height:100%;left:0;top:0;transform:translateX(-100%);z-index:100;}
+      .sidebar.active {transform:translateX(0);}
+      #menuBtn {display:block;}
+    }
   </style>
 </head>
 <body>
   <!-- Sidebar -->
-  <div class="sidebar">
-    <h2>ESPZ</h2>
-    <a onclick="showPage('home')">Profile</a>
-    <a onclick="showPage('catalog')">Messages</a>
-    <a onclick="showPage('community')">Friends</a>
-    <a onclick="showPage('profile')">Avatar</a>
+  <div class="sidebar" id="sidebar">
+    <h2>MiRevival</h2>
+    <a onclick="showPage('home')">Inicio</a>
+    <a onclick="showPage('catalog')">Catálogo</a>
+    <a onclick="showPage('profile')">Perfil</a>
+    <a onclick="showPage('community')">Comunidad</a>
   </div>
 
   <!-- Main -->
@@ -67,6 +131,7 @@
     <!-- Topbar -->
     <div class="topbar">
       <div class="left">
+        <span id="menuBtn">☰</span>
         <a onclick="showPage('home')">Home</a>
         <a onclick="showPage('catalog')">Marketplace</a>
         <a onclick="showPage('profile')">Create</a>
@@ -108,11 +173,19 @@
     </div>
 
     <div id="catalog" class="page">
-      <div class="section"><h3>Catálogo</h3><p>Aquí va el catálogo de items...</p></div>
+      <div class="section">
+        <h3>Catálogo</h3>
+        <div id="catalogItems" class="grid"></div>
+      </div>
     </div>
 
     <div id="profile" class="page">
-      <div class="section"><h3>Perfil</h3><p>Monedas: <span id="coins">1000</span></p></div>
+      <div class="section">
+        <h3>Perfil</h3>
+        <p>Monedas: <span id="coins">0</span></p>
+        <h4>Objetos comprados:</h4>
+        <ul id="ownedItems"></ul>
+      </div>
     </div>
 
     <div id="community" class="page">
@@ -124,30 +197,104 @@
   <div id="adminPanel">
     <h3>Admin Panel</h3>
     <button onclick="addCoins()">Agregar 500 monedas</button>
-    <button onclick="toggleBan('Usuario1')">Banear Usuario1</button>
-    <button onclick="toggleBan('Usuario2')">Banear Usuario2</button>
-    <button onclick="toggleBan('Usuario3')">Banear Usuario3</button>
-    <p id="adminMsg"></p>
+    <button onclick="toggleBan('Usuario1')">Banear/Desbanear Usuario1</button>
+    <button onclick="toggleBan('Usuario2')">Banear/Desbanear Usuario2</button>
+    <button onclick="toggleBan('Usuario3')">Banear/Desbanear Usuario3</button>
   </div>
 
+  <!-- Notificación -->
+  <div id="notif"></div>
+
   <script>
-    // Navegación entre páginas
+    // Estado inicial
+    let coins = parseInt(localStorage.getItem("coins")) || 1000;
+    let banned = JSON.parse(localStorage.getItem("banned")) || {};
+    let owned = JSON.parse(localStorage.getItem("owned")) || [];
+
+    document.getElementById("coins").innerText = coins;
+
+    // Catálogo de items
+    const items = [
+      {id:1,name:"Sombrero Épico",price:200,img:"https://placekitten.com/120/120"},
+      {id:2,name:"Espada Dorada",price:350,img:"https://placekitten.com/121/120"},
+      {id:3,name:"Capa Oscura",price:150,img:"https://placekitten.com/122/120"},
+      {id:4,name:"Mascota Dragón",price:500,img:"https://placekitten.com/123/120"}
+    ];
+
+    // Renderizar catálogo
+    const catalogDiv = document.getElementById("catalogItems");
+    function renderCatalog() {
+      catalogDiv.innerHTML = "";
+      items.forEach(it=>{
+        let div=document.createElement("div");
+        div.className="item";
+        div.innerHTML=`
+          <img src="${it.img}">
+          <h4>${it.name}</h4>
+          <p>${it.price} monedas</p>
+          <button onclick="buyItem(${it.id})">Comprar</button>
+        `;
+        catalogDiv.appendChild(div);
+      });
+    }
+    renderCatalog();
+
+    // Comprar item
+    function buyItem(id){
+      let it = items.find(x=>x.id===id);
+      if(owned.includes(it.name)){
+        notify("Ya compraste este objeto.");
+        return;
+      }
+      if(coins >= it.price){
+        coins -= it.price;
+        owned.push(it.name);
+        localStorage.setItem("coins", coins);
+        localStorage.setItem("owned", JSON.stringify(owned));
+        document.getElementById("coins").innerText = coins;
+        renderOwned();
+        notify("Has comprado: "+it.name);
+      } else {
+        notify("No tienes suficientes monedas.");
+      }
+    }
+
+    // Renderizar objetos comprados
+    function renderOwned(){
+      let list=document.getElementById("ownedItems");
+      list.innerHTML="";
+      owned.forEach(it=>{
+        let li=document.createElement("li");
+        li.innerText=it;
+        list.appendChild(li);
+      });
+    }
+    renderOwned();
+
+    // Navegación
     function showPage(id) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.getElementById(id).classList.add('active');
+      closeSidebar();
     }
 
-    // Admin panel
-    let coins = 1000;
-    let banned = {};
+    // Sidebar responsive
+    document.getElementById("menuBtn").addEventListener("click", () => {
+      document.getElementById("sidebar").classList.toggle("active");
+    });
+    function closeSidebar(){document.getElementById("sidebar").classList.remove("active");}
+
+    // Admin
     function addCoins() {
       coins += 500;
+      localStorage.setItem("coins", coins);
       document.getElementById("coins").innerText = coins;
-      document.getElementById("adminMsg").innerText = "Se agregaron 500 monedas.";
+      notify("Se agregaron 500 monedas.");
     }
     function toggleBan(user) {
       banned[user] = !banned[user];
-      document.getElementById("adminMsg").innerText = banned[user] ? user+" ha sido baneado." : user+" ha sido desbaneado.";
+      localStorage.setItem("banned", JSON.stringify(banned));
+      notify(banned[user] ? user+" ha sido baneado." : user+" ha sido desbaneado.");
     }
     function toggleAdmin() {
       let panel = document.getElementById("adminPanel");
@@ -158,8 +305,17 @@
     document.addEventListener("keydown", function(e) {
       if (e.key === "F8") {
         document.getElementById("adminBtn").style.display = "inline";
+        notify("Admin desbloqueado");
       }
     });
+
+    // Notificación
+    function notify(msg){
+      let notif=document.getElementById("notif");
+      notif.innerText=msg;
+      notif.style.display="block";
+      setTimeout(()=>notif.style.display="none",2500);
+    }
   </script>
 </body>
 </html>
