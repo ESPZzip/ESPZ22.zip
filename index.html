@@ -7,128 +7,117 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #1c1c1c;
+      background: #111;
       color: white;
     }
 
-    /* Fondo tipo Roblox en login */
+    /* Login */
     .login-bg {
-      background: url("https://tr.rbxcdn.com/6be7dbd6cf4d3945e0a73f8a8c92a59b/768/432/Image/Png") repeat;
-      background-size: cover;
       height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
+      background: url("https://tr.rbxcdn.com/6be7dbd6cf4d3945e0a73f8a8c92a59b/768/432/Image/Png") center/cover;
     }
-
     .overlay {
-      background: rgba(0, 0, 0, 0.7);
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
     }
-
     .form-container {
-      position: relative;
       z-index: 2;
+      position: relative;
       background: #1c1c1c;
       padding: 30px;
       border-radius: 8px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.8);
       width: 350px;
       text-align: center;
+      box-shadow: 0 0 15px black;
     }
-
-    h1 {
-      margin-bottom: 20px;
-      font-size: 22px;
-    }
-
     input {
       width: 100%;
       padding: 10px;
       margin: 8px 0;
-      border: none;
       border-radius: 4px;
-      font-size: 14px;
+      border: none;
       background: #2a2a2a;
       color: white;
     }
-
     button {
-      padding: 10px 15px;
+      padding: 10px;
       background: #00a2ff;
-      color: white;
-      font-size: 14px;
       border: none;
-      border-radius: 4px;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover { background: #008ada; }
+    .switch { margin-top: 15px; }
+
+    /* Layout estilo Roblox */
+    .app {
+      display: flex;
+      height: 100vh;
+    }
+    .sidebar {
+      width: 220px;
+      background: #1a1a1a;
+      padding: 20px;
+    }
+    .sidebar h2 {
+      margin-bottom: 20px;
+    }
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+    .sidebar ul li {
+      margin: 12px 0;
       cursor: pointer;
     }
-
-    button:hover {
-      background: #008ada;
+    .content {
+      flex: 1;
+      background: #111;
+      padding: 20px;
+      overflow-y: auto;
     }
-
-    .switch {
-      margin-top: 15px;
-      font-size: 14px;
-    }
-
-    .switch a {
-      color: #00a2ff;
-      cursor: pointer;
-    }
-
-    /* Barra superior en Home */
     .navbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #111;
-      padding: 10px 20px;
+      margin-bottom: 20px;
     }
-
-    .navbar .logo {
-      font-size: 20px;
-      font-weight: bold;
-    }
-
-    .navbar .user-info {
-      font-size: 14px;
-    }
-
-    .navbar .user-info span {
-      margin-left: 20px;
-    }
-
-    /* Contenido del Home */
-    .home {
-      padding: 20px;
-    }
-
-    .stats {
-      margin-top: 20px;
-      background: #222;
-      padding: 20px;
-      border-radius: 8px;
-    }
-
-    .friend-card {
-      background: #333;
-      padding: 10px;
-      margin: 5px 0;
-      border-radius: 5px;
+    .connections {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      gap: 15px;
+      overflow-x: auto;
+      padding: 10px 0;
     }
-
-    .friend-card button {
-      background: #28a745;
+    .circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 12px;
     }
-
-    .friend-card button:hover {
-      background: #218838;
+    .games {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .game-card {
+      background: #222;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+    .game-card img {
+      width: 100%;
+      border-radius: 5px;
     }
   </style>
 </head>
@@ -136,8 +125,8 @@
   <!-- LOGIN -->
   <div class="login-bg" id="loginPage">
     <div class="overlay"></div>
-    <div class="form-container" id="authForm">
-      <h1 id="formTitle">¡Regístrate y diviértete!</h1>
+    <div class="form-container">
+      <h1 id="formTitle">Registrarse</h1>
       <div id="registerForm">
         <input type="text" id="regUser" placeholder="Usuario">
         <input type="password" id="regPass" placeholder="Contraseña">
@@ -154,29 +143,45 @@
   </div>
 
   <!-- HOME -->
-  <div id="homePage" style="display:none;">
-    <div class="navbar">
-      <div class="logo">ROBLOX REVIVAL</div>
-      <div class="user-info">
-        Bienvenido, <span id="playerName"></span> |
-        Amigos: <span id="friendCount">0</span>
-      </div>
+  <div class="app" id="homePage" style="display:none;">
+    <div class="sidebar">
+      <h2>ROBLOX</h2>
+      <ul>
+        <li>Profile</li>
+        <li>Messages</li>
+        <li>Friends</li>
+        <li>Avatar</li>
+        <li>Inventory</li>
+        <li>Settings</li>
+      </ul>
     </div>
-    <div class="home">
-      <h2>Inicio</h2>
-
-      <!-- Buscar personas -->
-      <div class="stats">
-        <h3>Buscar personas</h3>
-        <input type="text" id="searchInput" placeholder="Escribe un usuario">
-        <button onclick="searchUser()">Buscar</button>
-        <div id="searchResults"></div>
+    <div class="content">
+      <div class="navbar">
+        <h2>Home</h2>
+        <div>Bienvenido, <span id="playerName"></span></div>
       </div>
 
-      <!-- Lista de amigos -->
-      <div class="stats">
-        <h3>Mis amigos</h3>
-        <div id="friendList">No tienes amigos aún</div>
+      <!-- Conexiones -->
+      <h3>Connections</h3>
+      <div class="connections" id="friendList">
+        <div class="circle">+</div>
+      </div>
+
+      <!-- Juegos -->
+      <h3>Juegos recomendados</h3>
+      <div class="games">
+        <div class="game-card">
+          <img src="https://tr.rbxcdn.com/8b54f1a44bf75b1b27a4c0a8c04e6a77/420/420/Image/Png" alt="">
+          <p>Adopt Me!</p>
+        </div>
+        <div class="game-card">
+          <img src="https://tr.rbxcdn.com/40144b61f8d19f3e40104bfeab8c083d/420/420/Image/Png" alt="">
+          <p>Brookhaven 🏡RP</p>
+        </div>
+        <div class="game-card">
+          <img src="https://tr.rbxcdn.com/c63ad65c9fa2b1c06dcf07ecbe0281e7/420/420/Image/Png" alt="">
+          <p>Blox Fruits</p>
+        </div>
       </div>
     </div>
   </div>
@@ -184,6 +189,13 @@
   <script>
     let currentUser = null;
     let users = JSON.parse(localStorage.getItem("users")) || {};
+    let loggedUser = localStorage.getItem("loggedUser");
+
+    // Si ya hay un usuario logueado, entrar directo
+    if (loggedUser) {
+      currentUser = loggedUser;
+      showHome();
+    }
 
     function toggleForm() {
       const reg = document.getElementById("registerForm");
@@ -192,7 +204,7 @@
       if (reg.style.display === "none") {
         reg.style.display = "block";
         log.style.display = "none";
-        title.innerText = "¡Regístrate y diviértete!";
+        title.innerText = "Registrarse";
       } else {
         reg.style.display = "none";
         log.style.display = "block";
@@ -213,8 +225,8 @@
       }
       users[user] = { password: pass, friends: [] };
       localStorage.setItem("users", JSON.stringify(users));
-      alert("Registrado con éxito. Ahora inicia sesión.");
-      toggleForm();
+      localStorage.setItem("loggedUser", user);
+      alert("✅ Te has registrado con éxito. Refresca la página!");
     }
 
     function login() {
@@ -222,63 +234,17 @@
       const pass = document.getElementById("logPass").value;
       if (users[user] && users[user].password === pass) {
         currentUser = user;
-        document.getElementById("playerName").innerText = currentUser;
-        loadFriends();
-        document.getElementById("loginPage").style.display = "none";
-        document.getElementById("homePage").style.display = "block";
+        localStorage.setItem("loggedUser", user);
+        showHome();
       } else {
         alert("Usuario o contraseña incorrectos");
       }
     }
 
-    function searchUser() {
-      const query = document.getElementById("searchInput").value.trim();
-      const resultsDiv = document.getElementById("searchResults");
-      resultsDiv.innerHTML = "";
-      if (!query) {
-        resultsDiv.innerHTML = "<p>Escribe un nombre de usuario</p>";
-        return;
-      }
-      if (users[query] && query !== currentUser) {
-        const card = document.createElement("div");
-        card.className = "friend-card";
-        card.innerHTML = `
-          <span>${query}</span>
-          <button onclick="addFriend('${query}')">Agregar amigo</button>
-        `;
-        resultsDiv.appendChild(card);
-      } else {
-        resultsDiv.innerHTML = "<p>No se encontró el usuario</p>";
-      }
-    }
-
-    function addFriend(friendName) {
-      if (!users[currentUser].friends.includes(friendName)) {
-        users[currentUser].friends.push(friendName);
-        localStorage.setItem("users", JSON.stringify(users));
-        loadFriends();
-        document.getElementById("searchResults").innerHTML = "<p>Amigo agregado ✅</p>";
-      } else {
-        alert("Ya es tu amigo");
-      }
-    }
-
-    function loadFriends() {
-      const listDiv = document.getElementById("friendList");
-      const countSpan = document.getElementById("friendCount");
-      const friends = users[currentUser].friends;
-      countSpan.innerText = friends.length;
-      if (friends.length === 0) {
-        listDiv.innerHTML = "No tienes amigos aún";
-      } else {
-        listDiv.innerHTML = "";
-        friends.forEach(f => {
-          const div = document.createElement("div");
-          div.className = "friend-card";
-          div.innerHTML = `<span>${f}</span>`;
-          listDiv.appendChild(div);
-        });
-      }
+    function showHome() {
+      document.getElementById("loginPage").style.display = "none";
+      document.getElementById("homePage").style.display = "flex";
+      document.getElementById("playerName").innerText = currentUser;
     }
   </script>
 </body>
