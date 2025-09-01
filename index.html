@@ -14,6 +14,7 @@
     .item img { max-width:100%; border-radius:5px; }
     #loginBox, #registerBox { background:#fff; padding:20px; max-width:300px; margin:50px auto; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.2);}
     input, button { margin:5px 0; padding:8px; width:100%; }
+    #admin { display:none; }
     #adminPanel { background:#fff; padding:15px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.2); margin-top:20px; }
   </style>
 </head>
@@ -45,7 +46,7 @@
   <nav>
     <button onclick="showTab('market')">Marketplace</button>
     <button onclick="showTab('inventory')">Inventario</button>
-    <button id="adminBtn" style="display:none;" onclick="showTab('admin')">Admin Panel</button>
+    <button id="logoutBtn" onclick="logout()">Cerrar Sesión</button>
   </nav>
 
   <div id="market" class="tab">
@@ -58,6 +59,7 @@
     <div id="myItems"></div>
   </div>
 
+  <!-- Panel de Admin -->
   <div id="admin" class="tab">
     <h2>Admin Panel (solo ROBLOX)</h2>
     <div id="adminPanel">
@@ -78,7 +80,16 @@
 <script>
   let currentUser = null;
 
-  // -------- Registro --------
+  // ===== Mantener sesión al recargar =====
+  window.onload = function() {
+    let savedUser = localStorage.getItem("currentUser");
+    if (savedUser) {
+      currentUser = savedUser;
+      showApp();
+    }
+  };
+
+  // ===== Registro =====
   function register() {
     let user = document.getElementById("regUser").value;
     let pass = document.getElementById("regPass").value;
@@ -93,10 +104,10 @@
 
     users[user] = { password: pass, robux: 100, inventory: [] };
     localStorage.setItem("users", JSON.stringify(users));
-    alert("Registrado con éxito, ahora inicia sesión");
+    alert("Registrado con éxito. Tienes 100 robux gratis.");
   }
 
-  // -------- Login --------
+  // ===== Login =====
   function login() {
     let user = document.getElementById("logUser").value;
     let pass = document.getElementById("logPass").value;
@@ -106,19 +117,30 @@
     if (users[user].password !== pass) { alert("Contraseña incorrecta"); return; }
 
     currentUser = user;
+    localStorage.setItem("currentUser", currentUser);
+    showApp();
+  }
+
+  // ===== Cerrar Sesión =====
+  function logout() {
+    localStorage.removeItem("currentUser");
+    currentUser = null;
+    document.getElementById("auth").style.display = "block";
+    document.getElementById("app").style.display = "none";
+    document.getElementById("userInfo").innerText = "No conectado";
+  }
+
+  // ===== Mostrar app =====
+  function showApp() {
     document.getElementById("auth").style.display = "none";
     document.getElementById("app").style.display = "block";
     document.getElementById("userInfo").innerText = "Usuario: " + currentUser;
     updateRobux();
     loadInventory();
     showTab("market");
-
-    if (currentUser === "ROBLOX") {
-      document.getElementById("adminBtn").style.display = "inline-block";
-    }
   }
 
-  // -------- Tabs --------
+  // ===== Tabs =====
   function showTab(tab) {
     document.querySelectorAll(".tab").forEach(t => t.style.display = "none");
     document.getElementById(tab).style.display = "block";
@@ -126,13 +148,13 @@
     if (tab === "inventory") loadInventory();
   }
 
-  // -------- Robux --------
+  // ===== Robux =====
   function updateRobux() {
     let users = JSON.parse(localStorage.getItem("users")) || {};
     document.getElementById("robuxInfo").innerText = "R$: " + users[currentUser].robux;
   }
 
-  // -------- Inventario --------
+  // ===== Inventario =====
   function loadInventory() {
     let users = JSON.parse(localStorage.getItem("users")) || {};
     let items = users[currentUser].inventory || [];
@@ -140,7 +162,7 @@
     invDiv.innerHTML = items.map(i => `<div class="item"><h4>${i}</h4></div>`).join("");
   }
 
-  // -------- Marketplace --------
+  // ===== Marketplace =====
   function loadMarket() {
     let market = JSON.parse(localStorage.getItem("marketplace")) || [];
     let marketDiv = document.getElementById("marketItems");
@@ -159,7 +181,7 @@
     });
   }
 
-  // -------- Comprar Item --------
+  // ===== Comprar Item =====
   function buyItem(itemId) {
     let users = JSON.parse(localStorage.getItem("users")) || {};
     let market = JSON.parse(localStorage.getItem("marketplace")) || [];
@@ -185,7 +207,7 @@
     alert("¡Comprado!");
   }
 
-  // -------- Admin: Añadir Item --------
+  // ===== Admin: Añadir Item =====
   function addItem() {
     let name = document.getElementById("itemName").value;
     let img = document.getElementById("itemImg").value;
@@ -200,7 +222,7 @@
     loadMarket();
   }
 
-  // -------- Admin: Eliminar Item --------
+  // ===== Admin: Eliminar Item =====
   function deleteItem() {
     let id = parseInt(document.getElementById("deleteItemId").value);
     let market = JSON.parse(localStorage.getItem("marketplace")) || [];
@@ -214,6 +236,13 @@
     }
   }
 
+  // ===== Admin Panel con F9 =====
+  document.addEventListener("keydown", function(e) {
+    if (e.key === "F9" && currentUser === "ROBLOX") {
+      let panel = document.getElementById("admin");
+      panel.style.display = (panel.style.display === "block") ? "none" : "block";
+    }
+  });
 </script>
 </body>
 </html>
