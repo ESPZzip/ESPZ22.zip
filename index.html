@@ -28,9 +28,7 @@
       color: white;
       cursor: pointer;
     }
-    nav button:hover {
-      background: #009966;
-    }
+    nav button:hover { background: #009966; }
     .section { display: none; padding: 20px; }
     .active { display: block; }
     .item-card {
@@ -65,7 +63,7 @@
     #adminPanel {
       display: none;
       position: fixed;
-      top: 20%;
+      top: 10%;
       left: 50%;
       transform: translateX(-50%);
       background: white;
@@ -73,16 +71,20 @@
       border: 2px solid black;
       border-radius: 8px;
       z-index: 1000;
+      width: 350px;
     }
+    #adminPanel h3 { margin-top: 0; }
     #adminPanel input {
       margin: 5px 0;
       padding: 4px;
+      width: 90%;
     }
     #adminPanel button {
       background: #222;
       color: white;
       border: none;
       padding: 5px 10px;
+      margin-top: 5px;
       cursor: pointer;
     }
   </style>
@@ -140,9 +142,20 @@
   <!-- Panel Admin -->
   <div id="adminPanel">
     <h3>Panel Admin</h3>
-    <p>Añadir Robux</p>
+
+    <h4>Añadir Robux</h4>
     <input id="robuxAmount" type="number" placeholder="Cantidad">
     <button onclick="addRobux()">Añadir</button>
+
+    <hr>
+    <h4>Agregar ítem al Marketplace</h4>
+    <input id="itemName" placeholder="Nombre del ítem">
+    <input id="itemImg" placeholder="URL de la imagen">
+    <input id="itemPrice" type="number" placeholder="Precio en Robux">
+    <input id="itemStock" type="number" placeholder="Stock">
+    <button onclick="addItem()">Agregar ítem</button>
+
+    <hr>
     <button onclick="closeAdmin()">Cerrar</button>
   </div>
 
@@ -311,24 +324,41 @@
   }
 
   // ---- ADMIN PANEL ----
-  function openAdmin() {
-    document.getElementById("adminPanel").style.display = "block";
-  }
-  function closeAdmin() {
-    document.getElementById("adminPanel").style.display = "none";
-  }
+  function openAdmin() { document.getElementById("adminPanel").style.display = "block"; }
+  function closeAdmin() { document.getElementById("adminPanel").style.display = "none"; }
+
   function addRobux() {
     const amount = parseInt(document.getElementById("robuxAmount").value);
-    if (isNaN(amount) || amount <= 0) {
-      alert("Cantidad inválida");
-      return;
-    }
+    if (isNaN(amount) || amount <= 0) { alert("Cantidad inválida"); return; }
     const username = localStorage.getItem("currentUser");
     let users = getUsers();
     users[username].robux += amount;
     saveUsers(users);
     document.getElementById("playerRobux").textContent = users[username].robux;
     alert("Has añadido " + amount + " Robux.");
+  }
+
+  function addItem() {
+    const name = document.getElementById("itemName").value.trim();
+    const img = document.getElementById("itemImg").value.trim();
+    const price = parseInt(document.getElementById("itemPrice").value);
+    const stock = parseInt(document.getElementById("itemStock").value);
+
+    if (!name || isNaN(price) || isNaN(stock) || price <= 0 || stock <= 0) {
+      alert("Completa todos los campos correctamente.");
+      return;
+    }
+
+    let items = getItems();
+    const newItem = {
+      id: "custom_" + Date.now(),
+      name, img: img || "https://via.placeholder.com/80",
+      price, stock
+    };
+    items.push(newItem);
+    saveItems(items);
+    renderMarketplace();
+    alert("Nuevo ítem agregado al Marketplace.");
   }
 
   // Abrir panel admin con F9 solo para ROBLOX
