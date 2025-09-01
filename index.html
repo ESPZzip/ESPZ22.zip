@@ -2,288 +2,84 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>ESP:Z UPD!</title>
+  <title>ESP:Z</title>
   <style>
-    body { font-family: Arial, sans-serif; margin:0; background:#f2f2f2; }
-    header { background:#fff; padding:10px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 4px rgba(0,0,0,0.1);}
-    .btn { padding:6px 12px; border:none; border-radius:6px; cursor:pointer; background:#00b06f; color:#fff; }
-    .btn:hover { background:#00945c; }
-    .hidden { display:none; }
-    nav { background:#e5e5e5; padding:10px; display:flex; gap:10px;}
-    nav button { background:#ddd; border:none; border-radius:6px; padding:6px 12px; cursor:pointer; }
-    nav button:hover { background:#bbb; }
-    .content { padding:20px; }
-    .card { background:#fff; border-radius:10px; padding:15px; box-shadow:0 2px 6px rgba(0,0,0,0.1); margin:10px 0; display:flex; align-items:center; justify-content:space-between; }
-    .flex { display:flex; align-items:center; gap:10px; }
-    .avatar { width:40px; height:40px; border-radius:50%; object-fit:cover; }
-    .modal { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; }
-    .modal-content { background:#fff; padding:20px; border-radius:10px; text-align:center; max-width:300px; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #777;
+      color: black;
+    }
+    .login-container {
+      padding: 20px;
+    }
+    input {
+      display: block;
+      margin: 10px 0;
+      padding: 5px;
+    }
+    button {
+      margin-right: 5px;
+      padding: 6px 12px;
+      border: none;
+      background: #006644;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #009966;
+    }
   </style>
 </head>
 <body>
-
-<!-- Pantalla login -->
-<div id="login-screen">
-  <div class="content">
+  <div class="login-container">
     <h2>ESP:Z</h2>
-    <input id="reg-username" placeholder="Usuario"><br><br>
-    <input id="reg-password" type="password" placeholder="Contraseña"><br><br>
-    <button class="btn" onclick="register()">Registrarse</button>
-    <button class="btn" onclick="login()">Iniciar Sesión</button>
+    <input id="username" placeholder="Usuario">
+    <input id="password" type="password" placeholder="Contraseña">
+    <button onclick="register()">Registrarse</button>
+    <button onclick="login()">Iniciar Sesión</button>
   </div>
-</div>
 
-<!-- App principal -->
-<div id="app" class="hidden">
-  <header>
-    <span id="username-display"></span>
-    <div>
-      <span id="robux-display">Robux: 0</span>
-      <button class="btn" onclick="logout()">Cerrar sesión</button>
-    </div>
-  </header>
-  <nav>
-    <button onclick="showTab('marketplace')">Marketplace</button>
-    <button onclick="showTab('inventory')">Inventory</button>
-    <button onclick="showTab('profile')">Profile</button>
-    <button onclick="showTab('friends')">Friends</button>
-  </nav>
-  <div class="content">
-    <div id="marketplace" class="tab"></div>
-    <div id="inventory" class="tab hidden"></div>
-    <div id="profile" class="tab hidden"></div>
-    <div id="friends" class="tab hidden"></div>
-  </div>
-</div>
-
-<!-- Modal -->
-<div id="modal" class="modal hidden">
-  <div class="modal-content" id="modal-content"></div>
-</div>
-
-<script>
-  let currentUser = null;
-  let users = JSON.parse(localStorage.getItem("users") || "{}");
-  const defaultAvatar = "https://i.ibb.co/7WBNZ9x/avatar.png"; // avatar por defecto
-
-  function saveUsers(){ localStorage.setItem("users", JSON.stringify(users)); }
-
-  function register(){
-    let u = document.getElementById("reg-username").value.trim();
-    let p = document.getElementById("reg-password").value;
-    if(!u || !p) return alert("Completa los campos");
-    if(users[u]) return alert("Usuario ya existe");
-    users[u] = {password:p, robux:1000, inventory:[], friends:[], friendRequests:[], avatar:defaultAvatar};
-    saveUsers();
-    currentUser = u;
-    localStorage.setItem("session",u);
-    enterApp();
-  }
-
-  function login(){
-    let u = document.getElementById("reg-username").value.trim();
-    let p = document.getElementById("reg-password").value;
-    if(users[u] && users[u].password===p){
-      currentUser = u;
-      localStorage.setItem("session",u);
-      enterApp();
-    } else alert("Datos incorrectos");
-  }
-
-  function logout(){
-    localStorage.removeItem("session");
-    currentUser=null;
-    document.getElementById("app").classList.add("hidden");
-    document.getElementById("login-screen").classList.remove("hidden");
-  }
-
-  function enterApp(){
-    document.getElementById("login-screen").classList.add("hidden");
-    document.getElementById("app").classList.remove("hidden");
-    document.getElementById("username-display").innerText=currentUser;
-    updateRobux();
-    renderMarketplace();
-    renderInventory();
-    renderProfile();
-    renderFriends();
-    checkFriendRequests();
-  }
-
-  function updateRobux(){ 
-    document.getElementById("robux-display").innerText="Robux: "+users[currentUser].robux; 
-    saveUsers(); 
-  }
-
-  // Tabs
-  function showTab(id){
-    document.querySelectorAll(".tab").forEach(t=>t.classList.add("hidden"));
-    document.getElementById(id).classList.remove("hidden");
-    if(id==="inventory") renderInventory();
-    if(id==="profile") renderProfile();
-    if(id==="friends") renderFriends();
-  }
-
-  // Marketplace
-  let items=[
-    {name:"Classic Fedora", price:500, img:"https://tr.rbxcdn.com/5b0706ea095df0b7f409775888b8593f/150/150/Hat/Png"},
-    {name:"Valkyrie Helm", price:1000, img:"https://tr.rbxcdn.com/d19ccabf9272e8d19604223a1ff717a6/150/150/Hat/Png"}
-  ];
-  function renderMarketplace(){
-    let c=document.getElementById("marketplace"); c.innerHTML="";
-    items.forEach((it,i)=>{
-      let div=document.createElement("div");
-      div.className="card";
-      div.innerHTML=`<div class="flex">
-        <img src="${it.img}" width="50" onerror="this.src='https://via.placeholder.com/50?text=Item'">
-        <div>${it.name} - ${it.price}R$</div>
-      </div>
-      <button class="btn" onclick="buyItem(${i})">Comprar</button>`;
-      c.appendChild(div);
-    });
-  }
-
-  function buyItem(i){
-    let it=items[i];
-    showModal(`¿Comprar ${it.name} por ${it.price}R$?<br>
-      <button class='btn' onclick='confirmBuy(${i})'>Sí</button>
-      <button class='btn' onclick='closeModal()'>No</button>`);
-  }
-
-  function confirmBuy(i){
-    let it=items[i];
-    if(users[currentUser].robux>=it.price){
-      users[currentUser].robux-=it.price;
-      users[currentUser].inventory.push(it);
-      saveUsers(); updateRobux(); renderInventory();
-      alert("Compra realizada!");
-    } else alert("Robux insuficientes");
-    closeModal();
-  }
-
-  // Inventory
-  function renderInventory(){
-    let c=document.getElementById("inventory"); c.innerHTML="";
-    users[currentUser].inventory.forEach(it=>{
-      let div=document.createElement("div");
-      div.className="card";
-      div.innerHTML=`<img src="${it.img}" width="50" onerror="this.src='https://via.placeholder.com/50?text=Item'"> ${it.name}`;
-      c.appendChild(div);
-    });
-  }
-
-  // Profile
-  function renderProfile(){
-    let c=document.getElementById("profile");
-    c.innerHTML=`<h3>Perfil de ${currentUser}</h3>`;
-    users[currentUser].friends.forEach(f=>{
-      let div=document.createElement("div");
-      div.className="card";
-      div.innerHTML=`<div class="flex">
-        <img src="${users[f].avatar || defaultAvatar}" class="avatar">
-        ${f}</div>
-      <button class="btn" onclick="removeFriend('${f}')">Eliminar</button>`;
-      c.appendChild(div);
-    });
-  }
-
-  function removeFriend(f){
-    showModal(`¿Eliminar a ${f}?<br>
-      <button class='btn' onclick="confirmRemoveFriend('${f}')">Confirmar</button>
-      <button class='btn' onclick="closeModal()">Cancelar</button>`);
-  }
-
-  function confirmRemoveFriend(f){
-    users[currentUser].friends=users[currentUser].friends.filter(x=>x!==f);
-    users[f].friends=users[f].friends.filter(x=>x!==currentUser);
-    saveUsers(); renderProfile(); closeModal();
-  }
-
-  // Friends
-  function renderFriends(){
-    let c=document.getElementById("friends");
-    c.innerHTML=`
-      <h3>Buscar usuario</h3>
-      <input id="searchUser" placeholder="Nombre">
-      <button class="btn" onclick="searchUser()">Buscar</button>
-      <div id="searchResult"></div>
-      <h3>Solicitudes pendientes</h3>
-      <div id="pendingRequests"></div>`;
-    renderPendingRequests();
-  }
-
-  function searchUser(){
-    let name=document.getElementById("searchUser").value.trim().toLowerCase();
-    let res=document.getElementById("searchResult");
-    res.innerHTML="";
-    if(!name) return;
-    let found=null;
-    for(let u in users){ if(u.toLowerCase()===name) found=u; }
-    if(!found || found===currentUser){ res.innerText="Usuario no encontrado"; return; }
-    let status="";
-    if(users[currentUser].friends.includes(found)) status="Ya es tu amigo";
-    else if(users[found].friendRequests.includes(currentUser)) status="Solicitud enviada";
-    let div=document.createElement("div");
-    div.className="card";
-    div.innerHTML=`<div class="flex">
-      <img src="${users[found].avatar || defaultAvatar}" class="avatar"> ${found}</div>
-      ${status?status:`<button class='btn' onclick="sendRequest('${found}')">Enviar solicitud</button>`}`;
-    res.appendChild(div);
-  }
-
-  function sendRequest(to){
-    if(!users[to].friendRequests.includes(currentUser)){
-      users[to].friendRequests.push(currentUser);
-      saveUsers(); searchUser();
-      alert("Solicitud enviada a "+to);
+  <script>
+    function getUsers() {
+      return JSON.parse(localStorage.getItem("users") || "{}");
     }
-  }
 
-  function renderPendingRequests(){
-    let c=document.getElementById("pendingRequests"); c.innerHTML="";
-    users[currentUser].friendRequests.forEach(req=>{
-      let div=document.createElement("div");
-      div.className="card";
-      div.innerHTML=`<div class="flex">
-        <img src="${users[req].avatar || defaultAvatar}" class="avatar"> ${req}</div>
-      <button class="btn" onclick="acceptRequest('${req}')">Aceptar</button>
-      <button class="btn" onclick="rejectRequest('${req}')">Rechazar</button>`;
-      c.appendChild(div);
-    });
-  }
-
-  function acceptRequest(from){
-    if(!users[currentUser].friends.includes(from)) users[currentUser].friends.push(from);
-    if(!users[from].friends.includes(currentUser)) users[from].friends.push(currentUser);
-    users[currentUser].friendRequests=users[currentUser].friendRequests.filter(x=>x!==from);
-    saveUsers(); renderProfile(); renderPendingRequests();
-  }
-
-  function rejectRequest(from){
-    users[currentUser].friendRequests=users[currentUser].friendRequests.filter(x=>x!==from);
-    saveUsers(); renderPendingRequests();
-  }
-
-  // Modal
-  function showModal(html){ 
-    document.getElementById("modal").classList.remove("hidden"); 
-    document.getElementById("modal-content").innerHTML=html; 
-  }
-  function closeModal(){ document.getElementById("modal").classList.add("hidden"); }
-
-  function checkFriendRequests(){
-    if(users[currentUser].friendRequests.length>0){
-      let req=users[currentUser].friendRequests[0];
-      showModal(`El jugador ${req} te envió una solicitud<br>
-        <button class='btn' onclick="acceptRequest('${req}');closeModal()">Aceptar</button>
-        <button class='btn' onclick="rejectRequest('${req}');closeModal()">Rechazar</button>`);
+    function saveUsers(users) {
+      localStorage.setItem("users", JSON.stringify(users));
     }
-  }
 
-  // Auto login
-  window.onload=()=>{
-    let s=localStorage.getItem("session");
-    if(s && users[s]){ currentUser=s; enterApp(); }
-  }
-</script>
+    function register() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      if (!username || !password) {
+        alert("Completa todos los campos");
+        return;
+      }
+      let users = getUsers();
+      if (users[username]) {
+        alert("Ese usuario ya existe");
+        return;
+      }
+      users[username] = { password, robux: 100, friends: [], requests: [] };
+      saveUsers(users);
+      alert("Usuario registrado con éxito. Ahora puedes iniciar sesión.");
+    }
+
+    function login() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      let users = getUsers();
+      if (!users[username] || users[username].password !== password) {
+        alert("Usuario o contraseña incorrectos");
+        return;
+      }
+      localStorage.setItem("currentUser", username);
+      alert("Bienvenido " + username);
+      // Aquí luego puedes redirigir a la página principal
+    }
+  </script>
 </body>
 </html>
