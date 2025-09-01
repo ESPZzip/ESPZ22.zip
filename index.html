@@ -2,232 +2,221 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Registro, Login y Tradeos</title>
+  <title>Mini Roblox - Trade System</title>
   <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      background: #f2f2f2; 
+    body {
+      font-family: Arial, sans-serif;
       margin: 0;
-      display: flex; 
-      height: 100vh; 
+      display: flex;
     }
-    .container { 
-      background: white; 
-      padding: 20px; 
-      border-radius: 10px; 
-      width: 300px; 
-      box-shadow: 0 0 10px rgba(0,0,0,0.2); 
-      margin: auto; 
-    }
-    h2 { text-align: center; }
-    input { width: 100%; padding: 10px; margin: 5px 0; }
-    button { padding: 5px 10px; margin: 3px; cursor: pointer; border: none; border-radius: 5px; }
-    .btn-register { background: #4CAF50; color: white; width: 100%; }
-    .btn-login { background: #2196F3; color: white; width: 100%; }
-    #welcome { display: none; text-align: center; }
-    
-    /* Panel lateral */
     #sidebar {
-      width: 250px;
-      background: #fff;
-      border-left: 2px solid #ccc;
+      width: 200px;
+      background: #f2f2f2;
       padding: 10px;
+      height: 100vh;
       overflow-y: auto;
     }
-    #sidebar h3 {
-      text-align: center;
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 5px;
+    #main {
+      flex: 1;
+      padding: 20px;
     }
     .user-item {
-      padding: 8px;
-      margin: 5px 0;
-      border-radius: 5px;
-      background: #eee;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 5px;
+      margin: 5px 0;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 5px;
     }
-    .current-user {
-      background: #4CAF50;
-      color: white;
+    .user-item.current-user {
+      background: #d9ffd9;
       font-weight: bold;
     }
-    .trade-btn {
-      background: #FF9800;
-      color: white;
-      font-size: 12px;
+    #tradeModal {
+      display: none;
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border: 2px solid #333;
+      border-radius: 8px;
+      z-index: 1000;
+    }
+    #tradeModal input {
+      display: block;
+      margin: 10px 0;
+      width: 100%;
+    }
+    #overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 500;
     }
   </style>
 </head>
 <body>
-
-<div style="flex:1; display:flex; justify-content:center; align-items:center;">
-  <div class="container" id="authBox">
-    <h2>Registro / Login</h2>
-    <input type="text" id="username" placeholder="Usuario">
-    <input type="password" id="password" placeholder="Contraseña">
-    <button class="btn-register" onclick="register()">Registrarse</button>
-    <button class="btn-login" onclick="login()">Iniciar Sesión</button>
+  <div id="sidebar">
+    <h3>Usuarios</h3>
+    <div id="usersList"></div>
+  </div>
+  <div id="main">
+    <h2 id="welcome">Inicia sesión o regístrate</h2>
+    <div id="auth">
+      <input id="username" placeholder="Usuario">
+      <input id="password" type="password" placeholder="Contraseña">
+      <button onclick="register()">Registrar</button>
+      <button onclick="login()">Iniciar Sesión</button>
+    </div>
+    <div id="game" style="display:none;">
+      <h3>Bienvenido, <span id="playerName"></span></h3>
+      <p>Robux: <span id="playerRobux">0</span></p>
+    </div>
   </div>
 
-  <div class="container" id="welcome">
-    <h2 id="welcomeMsg"></h2>
-    <p>Robux: <span id="userRobux"></span></p>
-    <button onclick="logout()">Cerrar Sesión</button>
+  <!-- Overlay + Modal de trade -->
+  <div id="overlay"></div>
+  <div id="tradeModal">
+    <h3>Enviar trade a <span id="tradeTarget"></span></h3>
+    <label>Robux a ofrecer:</label>
+    <input type="number" id="tradeRobux" placeholder="Cantidad de Robux">
+    <button onclick="confirmTradeOffer()">Enviar</button>
+    <button onclick="closeTradeModal()">Cancelar</button>
   </div>
-</div>
 
-<!-- Panel lateral -->
-<div id="sidebar">
-  <h3>Jugadores</h3>
-  <div id="usersList"></div>
-</div>
-
-<script>
-  function getUsers() {
-    return JSON.parse(localStorage.getItem("users") || "{}");
-  }
-
-  function saveUsers(users) {
-    localStorage.setItem("users", JSON.stringify(users));
-  }
-
-  function register() {
-    let username = document.getElementById("username").value.trim();
-    let password = document.getElementById("password").value.trim();
-
-    if (!username || !password) {
-      alert("Por favor completa todos los campos.");
-      return;
+  <script>
+    function getUsers() {
+      return JSON.parse(localStorage.getItem("users") || "{}");
+    }
+    function saveUsers(users) {
+      localStorage.setItem("users", JSON.stringify(users));
     }
 
-    let users = getUsers();
-
-    if (users[username]) {
-      alert("Ese usuario ya está registrado.");
-      return;
-    }
-
-    users[username] = { password: password, robux: 100, trades: [] };
-    saveUsers(users);
-    alert("Registro exitoso. Ahora puedes iniciar sesión.");
-    renderUsers();
-  }
-
-  function login() {
-    let username = document.getElementById("username").value.trim();
-    let password = document.getElementById("password").value.trim();
-
-    let users = getUsers();
-
-    if (!users[username]) {
-      alert("Usuario no encontrado.");
-      return;
-    }
-
-    if (users[username].password !== password) {
-      alert("Contraseña incorrecta.");
-      return;
-    }
-
-    localStorage.setItem("currentUser", username);
-    loadUser();
-    checkTrades();
-  }
-
-  function loadUser() {
-    let currentUser = localStorage.getItem("currentUser");
-    if (!currentUser) return;
-
-    let users = getUsers();
-    document.getElementById("authBox").style.display = "none";
-    document.getElementById("welcome").style.display = "block";
-    document.getElementById("welcomeMsg").innerText = "Bienvenido, " + currentUser;
-    document.getElementById("userRobux").innerText = users[currentUser].robux;
-
-    renderUsers();
-  }
-
-  function logout() {
-    localStorage.removeItem("currentUser");
-    document.getElementById("authBox").style.display = "block";
-    document.getElementById("welcome").style.display = "none";
-    renderUsers();
-  }
-
-  function renderUsers() {
-    let users = getUsers();
-    let currentUser = localStorage.getItem("currentUser");
-    let container = document.getElementById("usersList");
-    container.innerHTML = "";
-
-    Object.keys(users).forEach(user => {
-      let div = document.createElement("div");
-      div.className = "user-item";
-      if (user === currentUser) {
-        div.classList.add("current-user");
-        div.textContent = user;
-      } else {
-        div.innerHTML = `
-          <span>${user}</span>
-          <button class="trade-btn" onclick="sendTrade('${user}')">Trade</button>
-        `;
+    function register() {
+      let username = document.getElementById("username").value.trim();
+      let password = document.getElementById("password").value;
+      if (!username || !password) {
+        alert("Completa todos los campos");
+        return;
       }
-      container.appendChild(div);
-    });
-  }
-
-  function sendTrade(targetUser) {
-    let currentUser = localStorage.getItem("currentUser");
-    if (!currentUser) {
-      alert("Debes iniciar sesión para enviar tradeos.");
-      return;
+      let users = getUsers();
+      if (users[username]) {
+        alert("Usuario ya existe");
+        return;
+      }
+      users[username] = { password: password, robux: 100, pendingTrades: [] };
+      saveUsers(users);
+      alert("Usuario registrado con éxito");
     }
 
-    let users = getUsers();
-
-    if (!users[targetUser]) {
-      alert("Ese usuario no existe.");
-      return;
+    function login() {
+      let username = document.getElementById("username").value.trim();
+      let password = document.getElementById("password").value;
+      let users = getUsers();
+      if (!users[username] || users[username].password !== password) {
+        alert("Credenciales incorrectas");
+        return;
+      }
+      localStorage.setItem("currentUser", username);
+      loadGame();
     }
 
-    users[targetUser].trades.push({ from: currentUser, status: "pendiente" });
-    saveUsers(users);
+    function loadGame() {
+      let currentUser = localStorage.getItem("currentUser");
+      if (!currentUser) return;
+      let users = getUsers();
+      document.getElementById("auth").style.display = "none";
+      document.getElementById("game").style.display = "block";
+      document.getElementById("playerName").textContent = currentUser;
+      document.getElementById("playerRobux").textContent = users[currentUser].robux;
+      renderUsers();
+      checkTrades();
+    }
 
-    alert("Has enviado un trade a " + targetUser);
-  }
+    function renderUsers() {
+      let users = getUsers();
+      let currentUser = localStorage.getItem("currentUser");
+      let container = document.getElementById("usersList");
+      container.innerHTML = "";
 
-  function checkTrades() {
-    let currentUser = localStorage.getItem("currentUser");
-    if (!currentUser) return;
+      Object.keys(users).forEach(user => {
+        let div = document.createElement("div");
+        div.className = "user-item";
+        if (user === currentUser) {
+          div.classList.add("current-user");
+          div.textContent = user;
+        } else {
+          div.innerHTML = `
+            <span>${user}</span>
+            <button onclick="sendTrade('${user}', this)">Trade</button>
+          `;
+        }
+        container.appendChild(div);
+      });
+    }
 
-    let users = getUsers();
-    let trades = users[currentUser].trades || [];
+    function sendTrade(toUser, btn) {
+      btn.textContent = "Enviado";
+      btn.disabled = true;
+      document.getElementById("tradeTarget").textContent = toUser;
+      document.getElementById("tradeRobux").value = "";
+      document.getElementById("overlay").style.display = "block";
+      document.getElementById("tradeModal").style.display = "block";
+    }
 
-    trades.forEach((trade, index) => {
-      if (trade.status === "pendiente") {
-        let accept = confirm(trade.from + " te ha enviado un trade. ¿Aceptar?");
+    function closeTradeModal() {
+      document.getElementById("overlay").style.display = "none";
+      document.getElementById("tradeModal").style.display = "none";
+      renderUsers(); // reset botones
+    }
+
+    function confirmTradeOffer() {
+      let currentUser = localStorage.getItem("currentUser");
+      let toUser = document.getElementById("tradeTarget").textContent;
+      let offerRobux = parseInt(document.getElementById("tradeRobux").value) || 0;
+
+      let users = getUsers();
+      if (offerRobux <= 0 || users[currentUser].robux < offerRobux) {
+        alert("Cantidad inválida o robux insuficientes.");
+        return;
+      }
+
+      let trade = { from: currentUser, robux: offerRobux };
+      users[toUser].pendingTrades.push(trade);
+      saveUsers(users);
+
+      closeTradeModal();
+      alert("Trade enviado a " + toUser);
+    }
+
+    function checkTrades() {
+      let currentUser = localStorage.getItem("currentUser");
+      let users = getUsers();
+      let trades = users[currentUser].pendingTrades || [];
+      if (trades.length > 0) {
+        let t = trades[0];
+        let accept = confirm("Tienes un trade pendiente de " + t.from + " por " + t.robux + " robux. ¿Aceptar?");
         if (accept) {
-          trades[index].status = "aceptado";
+          users[t.from].robux -= t.robux;
+          users[currentUser].robux += t.robux;
+          trades.shift();
+          saveUsers(users);
+          document.getElementById("playerRobux").textContent = users[currentUser].robux;
           alert("Trade aceptado.");
         } else {
-          trades[index].status = "rechazado";
+          trades.shift();
+          saveUsers(users);
           alert("Trade rechazado.");
         }
       }
-    });
+    }
 
-    users[currentUser].trades = trades;
-    saveUsers(users);
-  }
-
-  window.onload = () => {
-    loadUser();
-    renderUsers();
-    checkTrades();
-  };
-</script>
-
+    window.onload = loadGame;
+  </script>
 </body>
 </html>
