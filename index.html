@@ -1,165 +1,18 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>ESPZZ</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 0; background: #f2f2f2; }
-    header { background: #333; color: white; padding: 10px; display: flex; justify-content: space-between; }
-    .section { padding: 20px; }
-    .item-card { display: inline-block; border: 1px solid #ccc; padding: 15px; margin: 10px; background: white; border-radius: 10px; text-align: center; width: 180px; }
-    .item-card img { border-radius: 8px; max-width: 100%; }
-    #adminPanel { display: none; background: #fff; padding: 20px; border: 2px solid #333; border-radius: 10px; margin: 20px; }
-  </style>
-</head>
-<body>
-  <header>
-    <div id="playerName">Invitado</div>
-    <div>Robux: <span id="playerRobux">100</span></div>
-  </header>
+function removeItem() {
+  const query = document.getElementById("removeItemId").value.trim().toLowerCase();
+  if (!query) { alert("Debes escribir el ID o nombre del ítem."); return; }
+  
+  let items = getItems();
+  const index = items.findIndex(it => it.id.toLowerCase() === query || it.name.toLowerCase() === query);
+  
+  if (index === -1) {
+    alert("No se encontró ningún ítem con ese ID o nombre.");
+    return;
+  }
 
-  <main>
-    <div id="marketplace" class="section">
-      <h2>Marketplace</h2>
-      <div id="marketContainer"></div>
-    </div>
-
-    <div id="inventory" class="section">
-      <h2>Inventario</h2>
-      <div id="inventoryContainer"></div>
-    </div>
-
-    <!-- Panel Admin -->
-    <div id="adminPanel">
-      <h2>Admin Panel</h2>
-      <h3>Agregar ítem al catálogo</h3>
-      <input id="itemName" placeholder="Nombre del ítem"><br>
-      <input id="itemImg" placeholder="URL de la imagen"><br>
-      <input type="number" id="itemPrice" placeholder="Precio en Robux"><br>
-      <input type="number" id="itemStock" placeholder="Stock inicial"><br>
-      <button onclick="addItem()">Agregar Ítem</button>
-    </div>
-  </main>
-
-  <script>
-    // --- Utilidades de almacenamiento ---
-    function getUsers(){
-      return JSON.parse(localStorage.getItem("users") || "{}");
-    }
-    function saveUsers(u){
-      localStorage.setItem("users", JSON.stringify(u));
-    }
-    function getItems(){
-      return JSON.parse(localStorage.getItem("items") || "[]");
-    }
-    function saveItems(i){
-      localStorage.setItem("items", JSON.stringify(i));
-    }
-
-    // --- Usuario actual ---
-    let currentUser = "Invitado";
-    let users = getUsers();
-    if(!users[currentUser]) users[currentUser] = { robux: 100, inventory: [] };
-    saveUsers(users);
-
-    // --- Items globales ---
-    let items = getItems();
-    if(items.length === 0){
-      // Item inicial
-      items = [{
-        id: "dominus_prefius",
-        name: "Dominus Prefius",
-        img: "https://tr.rbxcdn.com/180DAY-75378372edcd1f03ab46459b4e15038a/420/420/Hat/Webp/noFilter",
-        price: 45,
-        stock: 3
-      }];
-      saveItems(items);
-    }
-
-    // --- Renderizar marketplace ---
-    function renderMarketplace(){
-      const c=document.getElementById("marketContainer");
-      c.innerHTML="";
-      items.forEach(it=>{
-        const d=document.createElement("div");
-        d.className="item-card";
-        d.innerHTML=`
-          <img src="${it.img}" width="120"><br>
-          <h3>${it.name}</h3>
-          <p><b>${it.price}</b> Robux</p>
-          <p>Stock: ${it.stock}</p>
-          <button onclick="buyItem('${it.id}')">Comprar</button>
-        `;
-        c.appendChild(d);
-      });
-    }
-
-    // --- Renderizar inventario ---
-    function renderInventory(){
-      const c=document.getElementById("inventoryContainer");
-      c.innerHTML="";
-      let inv=users[currentUser].inventory;
-      if(inv.length===0){ c.innerHTML="<p>No tienes ítems.</p>"; return; }
-      inv.forEach(id=>{
-        const item=items.find(i=>i.id===id);
-        if(item){
-          const d=document.createElement("div");
-          d.className="item-card";
-          d.innerHTML=`<img src="${item.img}" width="100"><h4>${item.name}</h4>`;
-          c.appendChild(d);
-        } else {
-          const d=document.createElement("div");
-          d.className="item-card";
-          d.innerHTML=`<img src="https://via.placeholder.com/100?text=Retirado"><h4>Edición retirada</h4>`;
-          c.appendChild(d);
-        }
-      });
-    }
-
-    // --- Comprar item ---
-    function buyItem(id){
-      let item=items.find(i=>i.id===id);
-      if(!item||item.stock<=0){ alert("Este ítem ya no está disponible."); return; }
-      if(users[currentUser].robux<item.price){ alert("No tienes suficientes Robux."); return; }
-      users[currentUser].robux-=item.price;
-      users[currentUser].inventory.push(item.id);
-      item.stock--;
-      saveUsers(users);
-      saveItems(items);
-      document.getElementById("playerRobux").textContent=users[currentUser].robux;
-      alert(`Has comprado ${item.name}!`);
-      renderMarketplace();
-      renderInventory();
-    }
-
-    // --- Admin Panel: Agregar item ---
-    function addItem(){
-      const name=document.getElementById("itemName").value.trim();
-      const img=document.getElementById("itemImg").value.trim();
-      const price=parseInt(document.getElementById("itemPrice").value);
-      const stock=parseInt(document.getElementById("itemStock").value);
-      if(!name||!img||isNaN(price)||isNaN(stock)||price<=0||stock<=0){
-        alert("Completa todos los campos correctamente.");
-        return;
-      }
-      const newItem={id:"item_"+Date.now(),name,img,price,stock};
-      items.push(newItem);
-      saveItems(items);
-      alert("Ítem agregado al marketplace.");
-      renderMarketplace();
-    }
-
-    // --- Inicializar ---
-    window.onload=()=>{
-      document.getElementById("playerRobux").textContent=users[currentUser].robux;
-      renderMarketplace();
-      renderInventory();
-
-      // Solo mostrar panel admin si es ROBLOX
-      if(currentUser==="ROBLOX"){
-        document.getElementById("adminPanel").style.display="block";
-      }
-    };
-  </script>
-</body>
-</html>
+  const removed = items.splice(index, 1)[0];
+  saveItems(items);
+  renderMarketplace();
+  logAction(`Se eliminó el ítem '${removed.name}' (${removed.id}) del Marketplace`);
+  alert(`Ítem '${removed.name}' eliminado correctamente.`);
+}
