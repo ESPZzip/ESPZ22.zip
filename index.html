@@ -2,279 +2,141 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Roblox Revival</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESPZ REVIVAL</title>
   <style>
-    body {
-      margin:0;
-      font-family:Arial, sans-serif;
-      background:#111;
-      color:#fff;
+    body { margin: 0; font-family: Arial, sans-serif; background: #111; color: #fff; }
+    .hidden { display: none; }
+
+    /* Login/Register */
+    #auth {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: url('https://tr.rbxcdn.com/3dbd2f89a3f861a4f0d2d6d27498cb77/768/432/Image/Webp') center/cover no-repeat;
     }
-    /* Navbar */
-    .navbar {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      background:#181818;
-      padding:10px 20px;
-      border-bottom:1px solid #333;
-      position:sticky;
-      top:0;
+    #auth-box {
+      background: rgba(0,0,0,0.8);
+      padding: 20px;
+      border-radius: 10px;
+      width: 320px;
     }
-    .navbar-left, .navbar-right {
-      display:flex;
-      align-items:center;
-      gap:15px;
+    #auth-box h2 { text-align: center; margin-bottom: 20px; }
+    #auth-box input, #auth-box select, #auth-box button {
+      width: 100%; padding: 10px; margin: 8px 0; border: none; border-radius: 5px;
     }
-    .navbar a {
-      color:#fff;
-      text-decoration:none;
-      font-weight:bold;
+    #auth-box button { background: #00b06f; color: white; font-weight: bold; cursor: pointer; }
+    #auth-box button:hover { background: #00d47e; }
+
+    /* Main App */
+    #app { display: flex; height: 100vh; }
+    #sidebar {
+      width: 220px; background: #181a1b; padding: 15px; box-sizing: border-box;
     }
-    .navbar a:hover {
-      color:#4caf50;
+    #sidebar h2 { font-size: 20px; margin-bottom: 20px; }
+    #sidebar a { display: block; color: white; padding: 8px 0; text-decoration: none; }
+    #sidebar a:hover { color: #00d47e; }
+    #content { flex: 1; padding: 20px; overflow-y: auto; }
+    #topbar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 20px; background: #202224; position: sticky; top: 0;
     }
-    .search {
-      padding:5px;
-      border-radius:5px;
-      border:none;
-    }
-    .robux {
-      background:#222;
-      padding:5px 10px;
-      border-radius:8px;
-      font-weight:bold;
-      color:#4caf50;
-    }
-    /* Secciones */
-    section {
-      display:none;
-      padding:20px;
-    }
-    #home { display:block; }
-    .item-grid {
-      display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));
-      gap:15px;
-    }
-    .item {
-      background:#1a1a1a;
-      padding:10px;
-      border-radius:8px;
-      text-align:center;
-    }
-    .item img {
-      width:100%;
-      border-radius:5px;
-    }
-    .admin-panel {
-      background:#1a1a1a;
-      padding:15px;
-      border-radius:8px;
-      max-width:400px;
-    }
-    button {
-      background:#4caf50;
-      color:white;
-      border:none;
-      padding:8px 14px;
-      border-radius:5px;
-      cursor:pointer;
-    }
-    button:hover {
-      background:#45a049;
-    }
-    /* Perfil estilo Roblox */
-    .profile-header {
-      display:flex;
-      gap:15px;
-      align-items:center;
-      margin-bottom:20px;
-    }
-    .profile-avatar {
-      border-radius:50%;
-      width:100px;
-      height:100px;
-      background:#222;
-    }
-    .profile-stats, .profile-badges, .profile-games {
-      background:#1a1a1a;
-      padding:15px;
-      border-radius:8px;
-      margin-bottom:20px;
-    }
-    .badges {
-      display:flex;
-      gap:10px;
-    }
-    .badges img {
-      width:60px;
-      height:60px;
-    }
-    .games {
-      display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(200px,1fr));
-      gap:15px;
-    }
-    .game {
-      background:#222;
-      padding:10px;
-      border-radius:8px;
-    }
-    .game img {
-      width:100%;
-      border-radius:5px;
-    }
+    #robux { font-weight: bold; color: #00d47e; }
   </style>
 </head>
 <body>
 
-  <!-- Navbar -->
-  <div class="navbar">
-    <div class="navbar-left">
-      <a href="#" onclick="showSection('home')">Inicio</a>
-      <a href="#" onclick="showSection('catalogo')">Catálogo</a>
-      <a href="#" onclick="showSection('comunidad')">Comunidad</a>
-      <a href="#" onclick="showSection('profile')">Perfil</a>
-    </div>
-    <div>
-      <input type="text" class="search" placeholder="Buscar...">
-    </div>
-    <div class="navbar-right">
-      <div class="robux" id="robuxDisplay">Robux: 100</div>
-      <a href="#" id="adminBtn" style="display:none;" onclick="showSection('admin')">Admin</a>
-    </div>
-  </div>
-
-  <!-- Home -->
-  <section id="home">
-    <h2>Inicio</h2>
-    <p>Bienvenido a tu Revival de Roblox.</p>
-    <div class="item-grid">
-      <div class="item">
-        <img src="https://tr.rbxcdn.com/31dcd0ff8801c60d0b8dfc7db0c17f7e/420/420/Hat/Png" alt="Korblox">
-        <p>Korblox Deathspeaker</p>
-      </div>
-      <div class="item">
-        <img src="https://tr.rbxcdn.com/3cfe7c2b40f7e15ae8fc62075852d7f4/420/420/Hat/Png" alt="Valkyrie">
-        <p>Valkyrie Helm</p>
-      </div>
-      <div class="item">
-        <img src="https://tr.rbxcdn.com/7e4ed28cf6b17a6c1e3b7c64c95d9f60/420/420/Hat/Png" alt="Dominus">
-        <p>Dominus Aureus</p>
-      </div>
+  <!-- Login/Register -->
+  <section id="auth">
+    <div id="auth-box">
+      <h2>¡REGÍSTRATE Y DIVIÉRTETE!</h2>
+      <select id="day"><option>Día</option></select>
+      <select id="month"><option>Mes</option></select>
+      <select id="year"><option>Año</option></select>
+      <input type="text" id="username" placeholder="Usuario">
+      <input type="password" id="password" placeholder="Contraseña (mín. 8 caracteres)">
+      <button onclick="register()">Registrarse</button>
+      <p style="text-align:center; margin-top:10px;">¿Ya tienes cuenta? 
+        <a href="#" onclick="toggleLogin()">Inicia sesión</a>
+      </p>
     </div>
   </section>
 
-  <!-- Catálogo -->
-  <section id="catalogo">
-    <h2>Catálogo</h2>
-    <div class="item-grid">
-      <div class="item">
-        <img src="https://tr.rbxcdn.com/7e4ed28cf6b17a6c1e3b7c64c95d9f60/420/420/Hat/Png" alt="Dominus">
-        <p>Dominus Aureus - 1,000,000 R$</p>
-      </div>
-      <div class="item">
-        <img src="https://tr.rbxcdn.com/31dcd0ff8801c60d0b8dfc7db0c17f7e/420/420/Hat/Png" alt="Korblox">
-        <p>Korblox Deathspeaker - 17,000 R$</p>
-      </div>
-      <div class="item">
-        <img src="https://tr.rbxcdn.com/3cfe7c2b40f7e15ae8fc62075852d7f4/420/420/Hat/Png" alt="Valkyrie">
-        <p>Valkyrie Helm - 250,000 R$</p>
-      </div>
+  <!-- Main App -->
+  <section id="app" class="hidden">
+    <div id="sidebar">
+      <h2>ROBLOX</h2>
+      <a href="#" onclick="showSection('home')">Home</a>
+      <a href="#" onclick="showSection('profile')">Profile</a>
+      <a href="#" onclick="showSection('catalog')">Catalog</a>
+      <a href="#" onclick="logout()">Cerrar sesión</a>
     </div>
-  </section>
-
-  <!-- Comunidad -->
-  <section id="comunidad">
-    <h2>Comunidad</h2>
-    <p>Aquí puedes interactuar con otros jugadores.</p>
-  </section>
-
-  <!-- Perfil estilo Roblox -->
-  <section id="profile">
-    <div class="profile-header">
-      <img src="https://tr.rbxcdn.com/df36a32e232e85dbe2c6b3a0d1d81857/150/150/AvatarHeadshot/Png" class="profile-avatar" alt="Avatar">
-      <div>
-        <h2>ItsMat</h2>
-        <p style="color:#888;">@7wJ_xdpq</p>
-        <p><b>16</b> Connections · <b>121</b> Followers · <b>68</b> Following</p>
+    <div id="content">
+      <div id="topbar">
+        <span>Bienvenido, <b id="userDisplay"></b></span>
+        <span id="robux">Robux: 100</span>
       </div>
-    </div>
-
-    <div class="profile-stats">
-      <h3>Statistics</h3>
-      <p><b>Join Date:</b> 15/3/2023</p>
-      <p><b>Place Visits:</b> 311</p>
-    </div>
-
-    <div class="profile-badges">
-      <h3>Roblox Badges</h3>
-      <div class="badges">
-        <img src="https://images.rbxcdn.com/8a0d995af8ed1c09a6b203fe67964f02.png" alt="20 Friends">
-        <img src="https://images.rbxcdn.com/5be6ff567f43246ef2f3b38c4b4a8f92.png" alt="1 Year">
-        <img src="https://images.rbxcdn.com/74bce4ff84986bc9d3e7278f481b2a89.png" alt="100 Visits">
-      </div>
-    </div>
-
-    <div class="profile-games">
-      <h3>Experiences</h3>
-      <div class="games">
-        <div class="game">
-          <img src="https://tr.rbxcdn.com/0a4f8a3a5c331ba66e178b38eae5b43b/768/432/Image/Png" alt="Game">
-          <p><b>99 Nights In The Forest But Bad</b></p>
-          <p>Visits: 158</p>
-          <button>Play</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Admin -->
-  <section id="admin">
-    <h2>Admin Panel</h2>
-    <div class="admin-panel">
-      <label>Agregar Robux:</label><br>
-      <input type="number" id="robuxInput" placeholder="Cantidad"><br><br>
-      <button onclick="addRobux()">Agregar</button>
-      <hr>
-      <label>Banear usuario:</label><br>
-      <input type="text" id="banInput" placeholder="Nombre de usuario"><br><br>
-      <button onclick="banUser()">Banear</button>
+      <section id="homeSec">🏠 Aquí va el inicio</section>
+      <section id="profileSec" class="hidden">👤 Aquí va el perfil</section>
+      <section id="catalogSec" class="hidden">🛍️ Aquí va el catálogo</section>
     </div>
   </section>
 
   <script>
-    let robux = 100;
+    // Rellenar selects de fecha
+    for(let i=1;i<=31;i++) document.getElementById("day").innerHTML += `<option>${i}</option>`;
+    for(let i=1;i<=12;i++) document.getElementById("month").innerHTML += `<option>${i}</option>`;
+    for(let i=2023;i>=1900;i--) document.getElementById("year").innerHTML += `<option>${i}</option>`;
 
-    function showSection(id) {
-      document.querySelectorAll("section").forEach(sec => sec.style.display = "none");
-      document.getElementById(id).style.display = "block";
+    // Registrar/Login
+    function register() {
+      let user = document.getElementById("username").value;
+      let pass = document.getElementById("password").value;
+      if(user.length<3 || pass.length<8) {
+        alert("Usuario o contraseña inválidos");
+        return;
+      }
+      localStorage.setItem("robloxUser", user);
+      localStorage.setItem("robloxPass", pass);
+      login(user);
     }
 
-    function addRobux() {
-      let amount = parseInt(document.getElementById("robuxInput").value);
-      if (!isNaN(amount)) {
-        robux += amount;
-        document.getElementById("robuxDisplay").innerText = "Robux: " + robux;
-        alert("Se añadieron " + amount + " Robux.");
+    function login(user) {
+      document.getElementById("auth").classList.add("hidden");
+      document.getElementById("app").classList.remove("hidden");
+      document.getElementById("userDisplay").textContent = user;
+    }
+
+    function logout() {
+      localStorage.removeItem("robloxUser");
+      localStorage.removeItem("robloxPass");
+      location.reload();
+    }
+
+    function toggleLogin() {
+      let user = prompt("Usuario:");
+      let pass = prompt("Contraseña:");
+      if(user === localStorage.getItem("robloxUser") && pass === localStorage.getItem("robloxPass")) {
+        login(user);
+      } else {
+        alert("Datos incorrectos");
       }
     }
 
-    function banUser() {
-      let user = document.getElementById("banInput").value;
-      if (user) {
-        alert("El usuario " + user + " ha sido baneado.");
-      }
+    function showSection(sec) {
+      document.querySelectorAll("#content section").forEach(s=>s.classList.add("hidden"));
+      if(sec==="home") document.getElementById("homeSec").classList.remove("hidden");
+      if(sec==="profile") document.getElementById("profileSec").classList.remove("hidden");
+      if(sec==="catalog") document.getElementById("catalogSec").classList.remove("hidden");
     }
 
-    // Mostrar Admin con F8
-    document.addEventListener("keydown", function(e) {
-      if (e.key === "F8") {
-        document.getElementById("adminBtn").style.display = "inline-block";
+    // Mantener sesión si ya está logueado
+    window.onload = () => {
+      if(localStorage.getItem("robloxUser")) {
+        login(localStorage.getItem("robloxUser"));
       }
-    });
+    }
   </script>
-
 </body>
 </html>
