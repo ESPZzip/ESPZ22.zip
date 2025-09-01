@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESPZ REVIVAL</title>
+  <title>Roblox Revival</title>
   <style>
     body { margin: 0; font-family: Arial, sans-serif; background: #111; color: #fff; }
     .hidden { display: none; }
@@ -43,6 +43,11 @@
       padding: 10px 20px; background: #202224; position: sticky; top: 0;
     }
     #robux { font-weight: bold; color: #00d47e; }
+
+    /* Home */
+    #homeSec h1 { margin-bottom: 10px; }
+    .connections { display: flex; gap: 10px; margin: 15px 0; }
+    .connections img { width: 50px; height: 50px; border-radius: 50%; }
   </style>
 </head>
 <body>
@@ -77,7 +82,15 @@
         <span>Bienvenido, <b id="userDisplay"></b></span>
         <span id="robux">Robux: 100</span>
       </div>
-      <section id="homeSec">🏠 Aquí va el inicio</section>
+      <section id="homeSec">
+        <h1>Home</h1>
+        <h3 id="connectionsTitle"></h3>
+        <div class="connections">
+          <img src="https://tr.rbxcdn.com/30DAY-HEADSHOT" alt="Friend">
+          <img src="https://tr.rbxcdn.com/30DAY-HEADSHOT" alt="Friend">
+          <img src="https://tr.rbxcdn.com/30DAY-HEADSHOT" alt="Friend">
+        </div>
+      </section>
       <section id="profileSec" class="hidden">👤 Aquí va el perfil</section>
       <section id="catalogSec" class="hidden">🛍️ Aquí va el catálogo</section>
     </div>
@@ -89,7 +102,6 @@
     for(let i=1;i<=12;i++) document.getElementById("month").innerHTML += `<option>${i}</option>`;
     for(let i=2023;i>=1900;i--) document.getElementById("year").innerHTML += `<option>${i}</option>`;
 
-    // Registrar/Login
     function register() {
       let user = document.getElementById("username").value;
       let pass = document.getElementById("password").value;
@@ -99,13 +111,14 @@
       }
       localStorage.setItem("robloxUser", user);
       localStorage.setItem("robloxPass", pass);
-      login(user);
+      location.reload(); // 🔥 reinicia la página después de registrarse
     }
 
     function login(user) {
       document.getElementById("auth").classList.add("hidden");
       document.getElementById("app").classList.remove("hidden");
       document.getElementById("userDisplay").textContent = user;
+      document.getElementById("connectionsTitle").textContent = `${user}'s Connections (16)`;
     }
 
     function logout() {
@@ -133,9 +146,8 @@
 
     // Mantener sesión si ya está logueado
     window.onload = () => {
-      if(localStorage.getItem("robloxUser")) {
-        login(localStorage.getItem("robloxUser"));
-      }
+      let user = localStorage.getItem("robloxUser");
+      if(user) login(user);
     }
   </script>
 </body>
