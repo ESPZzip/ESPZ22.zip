@@ -2,347 +2,104 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>ESP:Z</title>
+  <title>Registro e Inicio de Sesión</title>
   <style>
-    body { font-family: Arial, sans-serif; margin:0; padding:0; background:#777; color:black; }
-    header { background:#222; color:white; padding:10px; display:flex; justify-content:space-between; align-items:center; }
-    nav button { margin:0 5px; padding:6px 12px; border:none; border-radius:6px; background:#006644; color:white; cursor:pointer; }
-    nav button:hover { background:#009966; }
-    .section { display:none; padding:20px; }
-    .active { display:block; }
-    .item-card {
-      border:1px solid #ccc; padding:10px; margin:5px;
-      display:inline-block; width:150px; text-align:center;
-      background:white; border-radius:8px; position:relative;
-    }
-    .exclusive {
-      position:absolute; top:5px; left:5px;
-      background:gold; color:black; font-size:12px;
-      font-weight:bold; padding:2px 5px; border-radius:4px;
-    }
-    .login-container { padding:20px; text-align:center; }
-    .login-container input { display:block; margin:10px auto; padding:5px; }
-    .login-container button { padding:6px 12px; margin:5px; background:#006644; color:white; border:none; border-radius:6px; cursor:pointer; }
-    #adminPanel {
-      display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%);
-      background:white; padding:20px; border:2px solid black; border-radius:8px; z-index:1000; width:380px; max-height:80%; overflow-y:auto;
-    }
-    #adminPanel h3 { margin-top:0; }
-    #adminPanel input { margin:5px 0; padding:4px; width:90%; }
-    #adminPanel button { background:#222; color:white; border:none; padding:5px 10px; margin-top:5px; cursor:pointer; }
-    .market-section { margin-bottom:30px; }
-    .market-section h3 { margin-bottom:10px; border-bottom:1px solid #444; padding-bottom:5px; }
-    #adminHistory { background:#f5f5f5; padding:10px; border:1px solid #ccc; border-radius:6px; font-size:14px; max-height:200px; overflow-y:auto; }
-    #adminHistory p { margin:5px 0; }
+    body { font-family: Arial, sans-serif; background: #f2f2f2; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    .container { background: white; padding: 20px; border-radius: 10px; width: 300px; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
+    h2 { text-align: center; }
+    input { width: 100%; padding: 10px; margin: 5px 0; }
+    button { width: 100%; padding: 10px; margin: 5px 0; cursor: pointer; border: none; border-radius: 5px; }
+    .btn-register { background: #4CAF50; color: white; }
+    .btn-login { background: #2196F3; color: white; }
+    #welcome { display: none; text-align: center; }
   </style>
 </head>
 <body>
-  <div id="loginSection" class="login-container">
-    <h2>ESP:Z</h2>
-    <input id="username" placeholder="Usuario">
-    <input id="password" type="password" placeholder="Contraseña">
-    <button onclick="register()">Registrarse</button>
-    <button onclick="login()">Iniciar Sesión</button>
-  </div>
 
-  <div id="mainSection" style="display:none;">
-    <header>
-      <div id="playerName"></div>
-      <div>Robux: <span id="playerRobux"></span></div>
-    </header>
-    <nav>
-      <button onclick="showSection('trades')">Trades</button>
-      <button onclick="showSection('inventory')">Inventory</button>
-      <button onclick="showSection('marketplace')">Marketplace</button>
-      <button onclick="showSection('profile')">Profile</button>
-      <button onclick="showSection('friends')">Friends</button>
-    </nav>
+<div class="container" id="authBox">
+  <h2>Registro / Login</h2>
+  <input type="text" id="username" placeholder="Usuario">
+  <input type="password" id="password" placeholder="Contraseña">
+  <button class="btn-register" onclick="register()">Registrarse</button>
+  <button class="btn-login" onclick="login()">Iniciar Sesión</button>
+</div>
 
-    <div id="trades" class="section">
-      <h2>Trades</h2>
-      <p>Próximamente...</p>
-    </div>
-
-    <div id="inventory" class="section">
-      <h2>Inventario</h2>
-      <div id="inventoryContainer"></div>
-    </div>
-
-    <div id="marketplace" class="section">
-      <h2>Marketplace</h2>
-      <div class="market-section">
-        <h3>Ítems Normales</h3>
-        <div id="normalMarket"></div>
-      </div>
-      <div class="market-section">
-        <h3>Ítems Exclusivos</h3>
-        <div id="exclusiveMarket"></div>
-      </div>
-    </div>
-
-    <div id="profile" class="section">
-      <h2>Perfil</h2>
-      <div id="profileContent"></div>
-    </div>
-
-    <div id="friends" class="section">
-      <h2>Amigos</h2>
-      <input id="searchFriend" placeholder="Buscar usuario">
-      <button onclick="searchUser()">Buscar</button>
-      <div id="friendSearchResult"></div>
-    </div>
-  </div>
-
-  <!-- Panel Admin -->
-  <div id="adminPanel">
-    <h3>Panel Admin</h3>
-
-    <h4>Añadir Robux a ti mismo</h4>
-    <input id="robuxAmount" type="number" placeholder="Cantidad">
-    <button onclick="addRobuxSelf()">Añadir</button>
-
-    <hr>
-    <h4>Añadir Robux a otro usuario</h4>
-    <input id="targetUser" placeholder="Usuario destino">
-    <input id="robuxAmountUser" type="number" placeholder="Cantidad">
-    <button onclick="addRobuxToUser()">Añadir a usuario</button>
-
-    <hr>
-    <h4>Agregar ítem al Marketplace</h4>
-    <input id="itemName" placeholder="Nombre del ítem">
-    <input id="itemImg" placeholder="URL de la imagen">
-    <input id="itemPrice" type="number" placeholder="Precio en Robux">
-    <input id="itemStock" type="number" placeholder="Stock">
-    <button onclick="addItem()">Agregar ítem</button>
-
-    <hr>
-    <h4>Historial de Acciones</h4>
-    <div id="adminHistory"></div>
-
-    <hr>
-    <button onclick="closeAdmin()">Cerrar</button>
-  </div>
+<div class="container" id="welcome">
+  <h2 id="welcomeMsg"></h2>
+  <p>Robux: <span id="userRobux"></span></p>
+  <button onclick="logout()">Cerrar Sesión</button>
+</div>
 
 <script>
-  // ---- STORAGE HELPERS ----
-  function getUsers() { return JSON.parse(localStorage.getItem("users") || "{}"); }
-  function saveUsers(users) { localStorage.setItem("users", JSON.stringify(users)); }
-  function getItems() { return JSON.parse(localStorage.getItem("items") || "[]"); }
-  function saveItems(items) { localStorage.setItem("items", JSON.stringify(items)); }
-  function getHistory() { return JSON.parse(localStorage.getItem("adminHistory") || "[]"); }
-  function saveHistory(history) { localStorage.setItem("adminHistory", JSON.stringify(history)); }
+  function getUsers() {
+    return JSON.parse(localStorage.getItem("users") || "{}");
+  }
 
-  // ---- REGISTRO / LOGIN ----
+  function saveUsers(users) {
+    localStorage.setItem("users", JSON.stringify(users));
+  }
+
   function register() {
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
-    if (!username || !password) { alert("Completa todos los campos"); return; }
+    let username = document.getElementById("username").value.trim();
+    let password = document.getElementById("password").value.trim();
+
+    if (!username || !password) {
+      alert("Por favor completa todos los campos.");
+      return;
+    }
+
     let users = getUsers();
-    if (users[username]) { alert("Ese usuario ya existe"); return; }
-    users[username] = { password, robux: 100, friends: [], requests: [], inventory: [] };
+
+    if (users[username]) {
+      alert("Ese usuario ya está registrado.");
+      return;
+    }
+
+    users[username] = { password: password, robux: 100 }; // cada nuevo usuario empieza con 100 robux
     saveUsers(users);
-    alert("Usuario registrado. Ahora inicia sesión.");
+    alert("Registro exitoso. Ahora puedes iniciar sesión.");
   }
+
   function login() {
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
+    let username = document.getElementById("username").value.trim();
+    let password = document.getElementById("password").value.trim();
+
     let users = getUsers();
-    if (!users[username] || users[username].password !== password) {
-      alert("Usuario o contraseña incorrectos"); return;
+
+    if (!users[username]) {
+      alert("Usuario no encontrado.");
+      return;
     }
+
+    if (users[username].password !== password) {
+      alert("Contraseña incorrecta.");
+      return;
+    }
+
     localStorage.setItem("currentUser", username);
-    loadMain(username);
+    loadUser();
   }
-  function loadMain(username) {
-    document.getElementById("loginSection").style.display = "none";
-    document.getElementById("mainSection").style.display = "block";
+
+  function loadUser() {
+    let currentUser = localStorage.getItem("currentUser");
+    if (!currentUser) return;
+
     let users = getUsers();
-    document.getElementById("playerName").textContent = username;
-    document.getElementById("playerRobux").textContent = users[username].robux;
-    renderMarketplace(); renderInventory(); showSection("profile");
+    document.getElementById("authBox").style.display = "none";
+    document.getElementById("welcome").style.display = "block";
+    document.getElementById("welcomeMsg").innerText = "Bienvenido, " + currentUser;
+    document.getElementById("userRobux").innerText = users[currentUser].robux;
   }
 
-  // ---- SECCIONES ----
-  function showSection(id) {
-    document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
-    if (id === "inventory") renderInventory();
-    if (id === "marketplace") renderMarketplace();
-    if (id === "profile") renderProfile();
+  function logout() {
+    localStorage.removeItem("currentUser");
+    document.getElementById("authBox").style.display = "block";
+    document.getElementById("welcome").style.display = "none";
   }
 
-  // ---- INVENTARIO ----
-  function renderInventory() {
-    const container = document.getElementById("inventoryContainer");
-    container.innerHTML = "";
-    const username = localStorage.getItem("currentUser");
-    const users = getUsers();
-    const items = getItems();
-    const inv = users[username].inventory || [];
-    if (inv.length === 0) { container.innerHTML = "<p>No tienes ítems.</p>"; return; }
-    inv.forEach(it => {
-      const item = items.find(i => i.id === it);
-      if (item) {
-        const div = document.createElement("div");
-        div.className = "item-card";
-        div.innerHTML = `
-          ${item.exclusive ? '<div class="exclusive">Exclusivo</div>' : ''}
-          <img src="${item.img}" width="80" onerror="this.src='https://via.placeholder.com/80'">
-          <h4>${item.name}</h4>
-        `;
-        container.appendChild(div);
-      }
-    });
-  }
-
-  // ---- MARKETPLACE ----
-  function initItems() {
-    if (getItems().length === 0) {
-      saveItems([
-        { id:"hat1", name:"Classic Fedora", price:50, stock:5, img:"https://tr.rbxcdn.com/2b4fbd5a198f5c6ea4a1d38d2e8cf61b/150/150/Hat/Png", exclusive:false },
-        { id:"sword1", name:"Epic Sword", price:70, stock:3, img:"https://tr.rbxcdn.com/1a3b983d5d06c63a7a9b7e4e99d6d8d1/150/150/Gear/Png", exclusive:false },
-        { id:"shirt1", name:"Cool Shirt", price:20, stock:10, img:"https://tr.rbxcdn.com/5af74ab58a73f36f79e2fdb8a7346f4a/150/150/Shirt/Png", exclusive:false }
-      ]);
-    }
-  }
-  function renderMarketplace() {
-    initItems();
-    const normalContainer = document.getElementById("normalMarket");
-    const exclusiveContainer = document.getElementById("exclusiveMarket");
-    normalContainer.innerHTML = "";
-    exclusiveContainer.innerHTML = "";
-    const items = getItems();
-    items.forEach(it => {
-      const div = document.createElement("div");
-      div.className = "item-card";
-      div.innerHTML = `
-        ${it.exclusive ? '<div class="exclusive">Exclusivo</div>' : ''}
-        <img src="${it.img}" width="80" onerror="this.src='https://via.placeholder.com/80'">
-        <h4>${it.name}</h4>
-        <p>Precio: ${it.price} R$</p>
-        <p>Stock: ${it.stock}</p>
-        <button onclick="buyItem('${it.id}')">Comprar</button>
-      `;
-      if (it.exclusive) {
-        exclusiveContainer.appendChild(div);
-      } else {
-        normalContainer.appendChild(div);
-      }
-    });
-  }
-  function buyItem(itemId) {
-    const username = localStorage.getItem("currentUser");
-    let users = getUsers();
-    let user = users[username];
-    let items = getItems();
-    const itemIndex = items.findIndex(i => i.id === itemId);
-    const item = items[itemIndex];
-    if (!item) { alert("El ítem no existe."); return; }
-    if (user.robux < item.price) { alert("Robux insuficientes"); return; }
-    if (item.stock <= 0) { alert("Este ítem está agotado"); return; }
-    user.robux -= item.price;
-    user.inventory.push(itemId);
-    items[itemIndex].stock -= 1;
-    saveUsers(users); saveItems(items);
-    document.getElementById("playerRobux").textContent = user.robux;
-    renderMarketplace(); renderInventory();
-    alert("Has comprado " + item.name + "!");
-  }
-
-  // ---- PROFILE ----
-  function renderProfile() {
-    const container = document.getElementById("profileContent");
-    const username = localStorage.getItem("currentUser");
-    container.innerHTML = `<p>Bienvenido, ${username}</p>`;
-  }
-
-  // ---- FRIENDS ----
-  function searchUser() {
-    const search = document.getElementById("searchFriend").value.trim();
-    const users = getUsers();
-    if (users[search]) {
-      document.getElementById("friendSearchResult").innerHTML = `<p>Encontrado: ${search}</p>`;
-    } else {
-      document.getElementById("friendSearchResult").innerHTML = "<p>Usuario no encontrado</p>";
-    }
-  }
-
-  // ---- ADMIN PANEL ----
-  function openAdmin() { 
-    document.getElementById("adminPanel").style.display = "block"; 
-    renderHistory();
-  }
-  function closeAdmin() { document.getElementById("adminPanel").style.display = "none"; }
-
-  function logAction(action) {
-    let history = getHistory();
-    const now = new Date().toLocaleString();
-    history.unshift(`[${now}] ${action}`);
-    saveHistory(history);
-    renderHistory();
-  }
-  function renderHistory() {
-    const container = document.getElementById("adminHistory");
-    const history = getHistory();
-    container.innerHTML = history.length ? history.map(h => `<p>${h}</p>`).join("") : "<p>No hay acciones registradas.</p>";
-  }
-
-  function addRobuxSelf() {
-    const amount = parseInt(document.getElementById("robuxAmount").value);
-    if (isNaN(amount) || amount <= 0) { alert("Cantidad inválida"); return; }
-    const username = localStorage.getItem("currentUser");
-    let users = getUsers();
-    users[username].robux += amount;
-    saveUsers(users);
-    document.getElementById("playerRobux").textContent = users[username].robux;
-    logAction(`${username} se dio ${amount} Robux`);
-    alert("Has añadido " + amount + " Robux a tu cuenta.");
-  }
-
-  function addRobuxToUser() {
-    const target = document.getElementById("targetUser").value.trim();
-    const amount = parseInt(document.getElementById("robuxAmountUser").value);
-    if (!target || isNaN(amount) || amount <= 0) { alert("Datos inválidos."); return; }
-    let users = getUsers();
-    if (!users[target]) { alert("El usuario no existe."); return; }
-    users[target].robux += amount;
-    saveUsers(users);
-    logAction(`Se añadieron ${amount} Robux a ${target}`);
-    alert("Has añadido " + amount + " Robux a " + target);
-  }
-
-  function addItem() {
-    const name = document.getElementById("itemName").value.trim();
-    const img = document.getElementById("itemImg").value.trim();
-    const price = parseInt(document.getElementById("itemPrice").value);
-    const stock = parseInt(document.getElementById("itemStock").value);
-    if (!name || isNaN(price) || isNaN(stock) || price <= 0 || stock <= 0) {
-      alert("Completa todos los campos correctamente."); return;
-    }
-    let items = getItems();
-    const newItem = {
-      id: "custom_" + Date.now(),
-      name, img: img || "https://via.placeholder.com/80",
-      price, stock, exclusive: true
-    };
-    items.push(newItem);
-    saveItems(items); renderMarketplace();
-    logAction(`Se agregó ítem '${name}' con precio ${price} R$ y stock ${stock}`);
-    alert("Nuevo ítem exclusivo agregado al Marketplace.");
-  }
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "F9") {
-      const username = localStorage.getItem("currentUser");
-      if (username === "ROBLOX") { openAdmin(); }
-    }
-  });
-
-  // ---- AUTOLOGIN ----
-  window.onload = () => {
-    const current = localStorage.getItem("currentUser");
-    if (current) loadMain(current);
-  };
+  // cargar usuario si ya estaba logueado
+  window.onload = loadUser;
 </script>
+
 </body>
 </html>
