@@ -8,7 +8,7 @@
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background: #777;
+      background: #eee;
       color: black;
     }
     .login-container {
@@ -31,15 +31,84 @@
     button:hover {
       background: #009966;
     }
+
+    /* Menú principal */
+    .app {
+      display: none;
+    }
+    .header {
+      background: #222;
+      color: white;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .sidebar {
+      width: 200px;
+      background: #333;
+      color: white;
+      height: calc(100vh - 40px);
+      float: left;
+      padding: 10px;
+    }
+    .sidebar button {
+      display: block;
+      width: 100%;
+      margin: 5px 0;
+      background: #444;
+    }
+    .content {
+      margin-left: 210px;
+      padding: 20px;
+    }
   </style>
 </head>
 <body>
-  <div class="login-container">
+  <!-- LOGIN -->
+  <div class="login-container" id="loginPage">
     <h2>ESP:Z</h2>
     <input id="username" placeholder="Usuario">
     <input id="password" type="password" placeholder="Contraseña">
     <button onclick="register()">Registrarse</button>
     <button onclick="login()">Iniciar Sesión</button>
+  </div>
+
+  <!-- APP PRINCIPAL -->
+  <div class="app" id="app">
+    <div class="header">
+      <div id="playerName"></div>
+      <div>💰 Robux: <span id="playerRobux">0</span></div>
+    </div>
+    <div class="sidebar">
+      <button onclick="showSection('marketplace')">Marketplace</button>
+      <button onclick="showSection('inventory')">Inventory</button>
+      <button onclick="showSection('trades')">Trades</button>
+      <button onclick="showSection('profile')">Profile</button>
+      <button onclick="showSection('friends')">Friends</button>
+      <button onclick="logout()">Cerrar Sesión</button>
+    </div>
+    <div class="content">
+      <div id="marketplace" class="section">
+        <h2>Marketplace</h2>
+        <p>Aquí aparecerán los ítems...</p>
+      </div>
+      <div id="inventory" class="section" style="display:none;">
+        <h2>Inventory</h2>
+        <p>Tus objetos aparecerán aquí.</p>
+      </div>
+      <div id="trades" class="section" style="display:none;">
+        <h2>Trades</h2>
+        <p>Aquí estarán tus intercambios.</p>
+      </div>
+      <div id="profile" class="section" style="display:none;">
+        <h2>Perfil</h2>
+        <p>Información del jugador.</p>
+      </div>
+      <div id="friends" class="section" style="display:none;">
+        <h2>Amigos</h2>
+        <p>Lista de amigos y buscador aquí.</p>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -65,7 +134,8 @@
       }
       users[username] = { password, robux: 100, friends: [], requests: [] };
       saveUsers(users);
-      alert("Usuario registrado con éxito. Ahora puedes iniciar sesión.");
+      localStorage.setItem("currentUser", username);
+      loadApp();
     }
 
     function login() {
@@ -77,9 +147,38 @@
         return;
       }
       localStorage.setItem("currentUser", username);
-      alert("Bienvenido " + username);
-      // Aquí luego puedes redirigir a la página principal
+      loadApp();
     }
+
+    function logout() {
+      localStorage.removeItem("currentUser");
+      document.getElementById("app").style.display = "none";
+      document.getElementById("loginPage").style.display = "block";
+    }
+
+    function loadApp() {
+      const username = localStorage.getItem("currentUser");
+      if (!username) return;
+      let users = getUsers();
+      const user = users[username];
+
+      document.getElementById("loginPage").style.display = "none";
+      document.getElementById("app").style.display = "block";
+      document.getElementById("playerName").textContent = "Jugador: " + username;
+      document.getElementById("playerRobux").textContent = user.robux;
+    }
+
+    function showSection(sectionId) {
+      document.querySelectorAll(".section").forEach(s => s.style.display = "none");
+      document.getElementById(sectionId).style.display = "block";
+    }
+
+    // Si ya estaba logueado, cargar directo
+    window.onload = () => {
+      if (localStorage.getItem("currentUser")) {
+        loadApp();
+      }
+    };
   </script>
 </body>
 </html>
