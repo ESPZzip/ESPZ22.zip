@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>ESP:Z UPDATE LOL</title>
+  <title>ESP:Z UPD!</title>
   <style>
     body { font-family: Arial, sans-serif; margin:0; background:#f2f2f2; }
     header { background:#fff; padding:10px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 4px rgba(0,0,0,0.1);}
@@ -14,14 +14,15 @@
     nav button:hover { background:#bbb; }
     .content { padding:20px; }
     .card { background:#fff; border-radius:10px; padding:15px; box-shadow:0 2px 6px rgba(0,0,0,0.1); margin:10px 0; display:flex; align-items:center; justify-content:space-between; }
-    .avatar { width:40px; height:40px; border-radius:50%; background:#00945c; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:bold; margin-right:10px; }
-    .flex { display:flex; align-items:center; }
+    .flex { display:flex; align-items:center; gap:10px; }
+    .avatar { width:40px; height:40px; border-radius:50%; object-fit:cover; }
     .modal { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; }
     .modal-content { background:#fff; padding:20px; border-radius:10px; text-align:center; max-width:300px; }
   </style>
 </head>
 <body>
 
+<!-- Pantalla login -->
 <div id="login-screen">
   <div class="content">
     <h2>ESP:Z</h2>
@@ -32,6 +33,7 @@
   </div>
 </div>
 
+<!-- App principal -->
 <div id="app" class="hidden">
   <header>
     <span id="username-display"></span>
@@ -54,6 +56,7 @@
   </div>
 </div>
 
+<!-- Modal -->
 <div id="modal" class="modal hidden">
   <div class="modal-content" id="modal-content"></div>
 </div>
@@ -61,6 +64,7 @@
 <script>
   let currentUser = null;
   let users = JSON.parse(localStorage.getItem("users") || "{}");
+  const defaultAvatar = "https://i.ibb.co/7WBNZ9x/avatar.png"; // avatar por defecto
 
   function saveUsers(){ localStorage.setItem("users", JSON.stringify(users)); }
 
@@ -69,7 +73,7 @@
     let p = document.getElementById("reg-password").value;
     if(!u || !p) return alert("Completa los campos");
     if(users[u]) return alert("Usuario ya existe");
-    users[u] = {password:p, robux:1000, inventory:[], friends:[], friendRequests:[]};
+    users[u] = {password:p, robux:1000, inventory:[], friends:[], friendRequests:[], avatar:defaultAvatar};
     saveUsers();
     currentUser = u;
     localStorage.setItem("session",u);
@@ -105,7 +109,10 @@
     checkFriendRequests();
   }
 
-  function updateRobux(){ document.getElementById("robux-display").innerText="Robux: "+users[currentUser].robux; saveUsers(); }
+  function updateRobux(){ 
+    document.getElementById("robux-display").innerText="Robux: "+users[currentUser].robux; 
+    saveUsers(); 
+  }
 
   // Tabs
   function showTab(id){
@@ -126,17 +133,22 @@
     items.forEach((it,i)=>{
       let div=document.createElement("div");
       div.className="card";
-      div.innerHTML=`<div class="flex"><img src="${it.img}" width="50"><div>${it.name} - ${it.price}R$</div></div>
+      div.innerHTML=`<div class="flex">
+        <img src="${it.img}" width="50" onerror="this.src='https://via.placeholder.com/50?text=Item'">
+        <div>${it.name} - ${it.price}R$</div>
+      </div>
       <button class="btn" onclick="buyItem(${i})">Comprar</button>`;
       c.appendChild(div);
     });
   }
+
   function buyItem(i){
     let it=items[i];
     showModal(`¿Comprar ${it.name} por ${it.price}R$?<br>
       <button class='btn' onclick='confirmBuy(${i})'>Sí</button>
       <button class='btn' onclick='closeModal()'>No</button>`);
   }
+
   function confirmBuy(i){
     let it=items[i];
     if(users[currentUser].robux>=it.price){
@@ -154,7 +166,7 @@
     users[currentUser].inventory.forEach(it=>{
       let div=document.createElement("div");
       div.className="card";
-      div.innerHTML=`<img src="${it.img}" width="50"> ${it.name}`;
+      div.innerHTML=`<img src="${it.img}" width="50" onerror="this.src='https://via.placeholder.com/50?text=Item'"> ${it.name}`;
       c.appendChild(div);
     });
   }
@@ -166,16 +178,20 @@
     users[currentUser].friends.forEach(f=>{
       let div=document.createElement("div");
       div.className="card";
-      div.innerHTML=`<div class="flex"><div class="avatar">${f[0]}</div>${f}</div>
+      div.innerHTML=`<div class="flex">
+        <img src="${users[f].avatar || defaultAvatar}" class="avatar">
+        ${f}</div>
       <button class="btn" onclick="removeFriend('${f}')">Eliminar</button>`;
       c.appendChild(div);
     });
   }
+
   function removeFriend(f){
     showModal(`¿Eliminar a ${f}?<br>
       <button class='btn' onclick="confirmRemoveFriend('${f}')">Confirmar</button>
       <button class='btn' onclick="closeModal()">Cancelar</button>`);
   }
+
   function confirmRemoveFriend(f){
     users[currentUser].friends=users[currentUser].friends.filter(x=>x!==f);
     users[f].friends=users[f].friends.filter(x=>x!==currentUser);
@@ -194,6 +210,7 @@
       <div id="pendingRequests"></div>`;
     renderPendingRequests();
   }
+
   function searchUser(){
     let name=document.getElementById("searchUser").value.trim().toLowerCase();
     let res=document.getElementById("searchResult");
@@ -207,10 +224,12 @@
     else if(users[found].friendRequests.includes(currentUser)) status="Solicitud enviada";
     let div=document.createElement("div");
     div.className="card";
-    div.innerHTML=`<div class="flex"><div class="avatar">${found[0]}</div>${found}</div>
+    div.innerHTML=`<div class="flex">
+      <img src="${users[found].avatar || defaultAvatar}" class="avatar"> ${found}</div>
       ${status?status:`<button class='btn' onclick="sendRequest('${found}')">Enviar solicitud</button>`}`;
     res.appendChild(div);
   }
+
   function sendRequest(to){
     if(!users[to].friendRequests.includes(currentUser)){
       users[to].friendRequests.push(currentUser);
@@ -218,30 +237,37 @@
       alert("Solicitud enviada a "+to);
     }
   }
+
   function renderPendingRequests(){
     let c=document.getElementById("pendingRequests"); c.innerHTML="";
     users[currentUser].friendRequests.forEach(req=>{
       let div=document.createElement("div");
       div.className="card";
-      div.innerHTML=`<div class="flex"><div class="avatar">${req[0]}</div>${req}</div>
+      div.innerHTML=`<div class="flex">
+        <img src="${users[req].avatar || defaultAvatar}" class="avatar"> ${req}</div>
       <button class="btn" onclick="acceptRequest('${req}')">Aceptar</button>
       <button class="btn" onclick="rejectRequest('${req}')">Rechazar</button>`;
       c.appendChild(div);
     });
   }
+
   function acceptRequest(from){
     if(!users[currentUser].friends.includes(from)) users[currentUser].friends.push(from);
     if(!users[from].friends.includes(currentUser)) users[from].friends.push(currentUser);
     users[currentUser].friendRequests=users[currentUser].friendRequests.filter(x=>x!==from);
     saveUsers(); renderProfile(); renderPendingRequests();
   }
+
   function rejectRequest(from){
     users[currentUser].friendRequests=users[currentUser].friendRequests.filter(x=>x!==from);
     saveUsers(); renderPendingRequests();
   }
 
   // Modal
-  function showModal(html){ document.getElementById("modal").classList.remove("hidden"); document.getElementById("modal-content").innerHTML=html; }
+  function showModal(html){ 
+    document.getElementById("modal").classList.remove("hidden"); 
+    document.getElementById("modal-content").innerHTML=html; 
+  }
   function closeModal(){ document.getElementById("modal").classList.add("hidden"); }
 
   function checkFriendRequests(){
