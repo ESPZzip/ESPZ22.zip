@@ -2,11 +2,17 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Registro - Roblox Revival</title>
+  <title>ESPZ</title>
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
+      background: #1c1c1c;
+      color: white;
+    }
+
+    /* Fondo tipo Roblox en login */
+    .login-bg {
       background: url("https://tr.rbxcdn.com/6be7dbd6cf4d3945e0a73f8a8c92a59b/768/432/Image/Png") repeat;
       background-size: cover;
       height: 100vh;
@@ -28,26 +34,22 @@
       padding: 30px;
       border-radius: 8px;
       box-shadow: 0 0 20px rgba(0,0,0,0.8);
-      color: white;
       width: 350px;
       text-align: center;
     }
 
     h1 {
       margin-bottom: 20px;
-      font-size: 24px;
+      font-size: 22px;
     }
 
-    input, select {
+    input {
       width: 100%;
       padding: 10px;
       margin: 8px 0;
       border: none;
       border-radius: 4px;
       font-size: 14px;
-    }
-
-    input[type="text"], input[type="password"], select {
       background: #2a2a2a;
       color: white;
     }
@@ -77,46 +79,100 @@
       color: #00a2ff;
       cursor: pointer;
     }
+
+    /* Barra superior en Home */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #111;
+      padding: 10px 20px;
+    }
+
+    .navbar .logo {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .navbar .user-info {
+      font-size: 14px;
+    }
+
+    .navbar .user-info span {
+      margin-left: 20px;
+    }
+
+    /* Contenido del Home */
+    .home {
+      padding: 20px;
+    }
+
+    .stats {
+      margin-top: 20px;
+      background: #222;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    .friends-btn {
+      margin-top: 10px;
+      padding: 10px;
+      background: #28a745;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      color: white;
+    }
+
+    .friends-btn:hover {
+      background: #218838;
+    }
   </style>
 </head>
 <body>
-  <div class="overlay"></div>
-  <div class="form-container" id="authForm">
-    <h1 id="formTitle">¡Regístrate y diviértete!</h1>
-
-    <div id="registerForm">
-      <select>
-        <option>Día</option>
-        <option>1</option>
-        <option>2</option>
-        <!-- etc... -->
-      </select>
-      <select>
-        <option>Mes</option>
-        <option>Enero</option>
-        <option>Febrero</option>
-      </select>
-      <select>
-        <option>Año</option>
-        <option>2000</option>
-        <option>2001</option>
-      </select>
-
-      <input type="text" placeholder="Usuario">
-      <input type="password" placeholder="Contraseña">
-      <button>Registrarse</button>
-      <div class="switch">¿Ya tienes cuenta? <a onclick="toggleForm()">Inicia sesión</a></div>
+  <!-- LOGIN -->
+  <div class="login-bg" id="loginPage">
+    <div class="overlay"></div>
+    <div class="form-container" id="authForm">
+      <h1 id="formTitle">¡Regístrate y diviértete!</h1>
+      <div id="registerForm">
+        <input type="text" id="regUser" placeholder="Usuario">
+        <input type="password" id="regPass" placeholder="Contraseña">
+        <button onclick="register()">Registrarse</button>
+        <div class="switch">¿Ya tienes cuenta? <a onclick="toggleForm()">Inicia sesión</a></div>
+      </div>
+      <div id="loginForm" style="display:none;">
+        <input type="text" id="logUser" placeholder="Usuario">
+        <input type="password" id="logPass" placeholder="Contraseña">
+        <button onclick="login()">Entrar</button>
+        <div class="switch">¿No tienes cuenta? <a onclick="toggleForm()">Regístrate</a></div>
+      </div>
     </div>
+  </div>
 
-    <div id="loginForm" style="display:none;">
-      <input type="text" placeholder="Usuario">
-      <input type="password" placeholder="Contraseña">
-      <button>Entrar</button>
-      <div class="switch">¿No tienes cuenta? <a onclick="toggleForm()">Regístrate</a></div>
+  <!-- HOME -->
+  <div id="homePage" style="display:none;">
+    <div class="navbar">
+      <div class="logo">ESPZ</div>
+      <div class="user-info">
+        Bienvenido, <span id="playerName"></span> |
+        Amigos: <span id="friendCount">0</span>
+      </div>
+    </div>
+    <div class="home">
+      <h2>Inicio</h2>
+      <div class="stats">
+        <p>Amigos actuales: <span id="friendCount2">0</span></p>
+        <button class="friends-btn" onclick="addFriend()">Agregar amigo</button>
+      </div>
     </div>
   </div>
 
   <script>
+    let currentUser = null;
+    let users = JSON.parse(localStorage.getItem("users")) || {};
+    let friends = 0;
+
     function toggleForm() {
       const reg = document.getElementById("registerForm");
       const log = document.getElementById("loginForm");
@@ -130,6 +186,47 @@
         log.style.display = "block";
         title.innerText = "Iniciar sesión";
       }
+    }
+
+    function register() {
+      const user = document.getElementById("regUser").value;
+      const pass = document.getElementById("regPass").value;
+      if (!user || !pass) {
+        alert("Completa todos los campos");
+        return;
+      }
+      if (users[user]) {
+        alert("Ese usuario ya existe");
+        return;
+      }
+      users[user] = { password: pass, friends: 0 };
+      localStorage.setItem("users", JSON.stringify(users));
+      alert("Registrado con éxito. Ahora inicia sesión.");
+      toggleForm();
+    }
+
+    function login() {
+      const user = document.getElementById("logUser").value;
+      const pass = document.getElementById("logPass").value;
+      if (users[user] && users[user].password === pass) {
+        currentUser = user;
+        friends = users[user].friends;
+        document.getElementById("playerName").innerText = currentUser;
+        document.getElementById("friendCount").innerText = friends;
+        document.getElementById("friendCount2").innerText = friends;
+        document.getElementById("loginPage").style.display = "none";
+        document.getElementById("homePage").style.display = "block";
+      } else {
+        alert("Usuario o contraseña incorrectos");
+      }
+    }
+
+    function addFriend() {
+      friends++;
+      users[currentUser].friends = friends;
+      localStorage.setItem("users", JSON.stringify(users));
+      document.getElementById("friendCount").innerText = friends;
+      document.getElementById("friendCount2").innerText = friends;
     }
   </script>
 </body>
