@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>ESP:Z UPDATE</title>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; }
+    header {
+      display: flex; justify-content: space-between;
+      background: #232527; color: white; padding: 10px;
+    }
+    #menu { display: flex; gap: 15px; background: #eee; padding: 10px; }
+    #menu button { padding: 5px 10px; }
+    #content { padding: 20px; }
+    .card {
+      border: 1px solid #ccc; border-radius: 8px;
+      padding: 10px; margin: 10px 0; background: #f9f9f9;
+    }
+    .market-item {
+      display: inline-block; width: 150px; margin: 10px;
+      border: 1px solid #ccc; padding: 10px; border-radius: 8px;
+      text-align: center;
+    }
+    .market-item img { width: 100%; height: 100px; object-fit: contain; }
+    #tradeModal, #overlay, #adminPanel {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    }
+    #overlay { background: rgba(0,0,0,0.5); z-index: 500; }
+    #tradeModal, #adminPanel {
+      background: white; width: 350px; padding: 20px; border-radius: 8px;
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      position: absolute; z-index: 1000;
+    }
+    #usersList .user-item {
+      display: flex; justify-content: space-between; align-items: center;
+      border: 1px solid #ccc; border-radius: 5px; padding: 5px; margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div id="playerName">Invitado</div>
+    <div>Robux: <span id="playerRobux">0</span></div>
+  </header>
+
+  <div id="menu">
+    <button onclick="showSection('profile')">Profile</button>
+    <button onclick="showSection('friends')">Friends</button>
+    <button onclick="showSection('marketplace')">Marketplace</button>
+    <button onclick="showSection('inventory')">Inventory</button>
+    <button onclick="showSection('trades')">Trades</button>
+  </div>
+
+  <div id="content">
+    <div id="auth">
+      <h2>Inicia Sesión o Regístrate</h2>
+      <input id="username" placeholder="Usuario"><br>
+      <input id="password" type="password" placeholder="Contraseña"><br>
+      <button onclick="register()">Registrar</button>
+      <button onclick="login()">Iniciar Sesión</button>
+    </div>
+
+    <div id="profile" style="display:none;">
+      <h2>Perfil</h2>
+      <div class="card">
+        <p><strong>Usuario:</strong> <span id="profileName"></span></p>
+        <p><strong>Robux:</strong> <span id="profileRobux"></span></p>
+      </div>
+    </div>
+
+    <div id="friends" style="display:none;">
+      <h2>Amigos</h2>
+      <div id="usersList"></div>
+    </div>
+
+    <div id="marketplace" style="display:none;">
+      <h2>Marketplace</h2>
+      <div id="marketItems"></div>
+    </div>
+
+    <div id="inventory" style="display:none;">
+      <h2>Inventario</h2>
+      <div id="inventoryItems"></div>
+    </div>
+
+    <div id="trades" style="display:none;">
+      <h2>Trades Pendientes</h2>
+      <div id="tradeList"></div>
+    </div>
+  </div>
+
+  <!-- Modal Trade -->
+  <div id="overlay"></div>
+  <div id="tradeModal">
+    <h3>Trade con <span id="tradeTarget"></span></h3>
+    <label>Robux:</label>
+    <input type="number" id="tradeRobux"><br>
+    <label>Selecciona ítems:</label>
+    <div id="tradeItems"></div>
+    <button onclick="confirmTradeOffer()">Enviar Trade</button>
+    <button onclick="closeTradeModal()">Cancelar</button>
+  </div>
+
+  <!-- Admin Panel -->
+  <div id="adminPanel">
+    <h2>Admin Panel</h2>
+    <h3>Agregar Item</h3>
+    <input id="adminItemName" placeholder="Nombre"><br>
+    <input id="adminItemImg" placeholder="URL de Imagen"><br>
+    <input id="adminItemPrice" type="number" placeholder="Precio"><br>
+    <input id="adminItemStock" type="number" placeholder="Stock"><br>
+    <button onclick="adminAddItem()">Agregar</button>
+    <h3>Eliminar Item</h3>
+    <select id="adminRemoveItem"></select>
+    <button onclick="adminRemoveSelected()">Eliminar</button><br><br>
+    <button onclick="closeAdmin()">Cerrar</button>
+  </div>
+
+<script>
+  // ---------------- BASE ----------------
+  function getUsers(){ return JSON.parse(localStorage.getItem("users")||"{}"); }
+  function saveUsers(u){ localStorage.setItem("users",JSON.stringify(u)); }
+  function getMarket(){ return JSON.parse(localStorage.getItem("market")||"[]"); }
+  function saveMarket(m){ localStorage.setItem("market",JSON.stringify(m)); }
+
+  // ---------------- AUTH ----------------
+  function register(){
+    let u=document.getElementById("username").value.trim();
+    let p=document.getElementById("password").value;
+    if(!u||!p){alert("Completa todo");return;}
+    let users=getUsers();
+    if(users[u]){alert("Ya existe");return;}
+    users[u]={password:p,robux:100,inventory:[],friends:[],trades:[]};
+    saveUsers(users);
+    alert("Registrado");
+  }
+  function login(){
+    let u=document.getElementById("username").value.trim();
+    let p=document.getElementById("password").value;
+    let users=getUsers();
+    if(!users[u]||users[u].password!==p){alert("Credenciales incorrectas");return;}
+    localStorage.setItem("currentUser",u);
+    loadGame();
+  }
+
+  // ---------------- GAME ----------------
+  function loadGame(){
+    let u=localStorage.getItem("currentUser");
+    if(!u)return;
+    let users=getUsers();
+    document.getElementById("auth").style.display="none";
+    document.getElementById("playerName").textContent=u;
+    document.getElementById("playerRobux").textContent=users[u].robux;
+    renderProfile(); renderMarketplace(); renderInventory(); renderFriends(); renderTrades();
+  }
+
+  // ---------------- SECCIONES ----------------
+  function showSection(id){
+    ["profile","friends","marketplace","inventory","trades"].forEach(s=>document.getElementById(s).style.display="none");
+    document.getElementById(id).style.display="block";
+    if(id==="inventory")renderInventory();
+    if(id==="friends")renderFriends();
+    if(id==="marketplace")renderMarketplace();
+    if(id==="trades")renderTrades();
+  }
+
+  // ---------------- PROFILE ----------------
+  function renderProfile(){
+    let u=localStorage.getItem("currentUser");
+    let users=getUsers();
+    document.getElementById("profileName").textContent=u;
+    document.getElementById("profileRobux").textContent=users[u].robux;
+  }
+
+  // ---------------- MARKETPLACE ----------------
+  function renderMarketplace(){
+    let m=getMarket();
+    let div=document.getElementById("marketItems"); div.innerHTML="";
+    m.forEach((item,i)=>{
+      if(item.stock>0){
+        let el=document.createElement("div");
+        el.className="market-item";
+        el.innerHTML=`<img src="${item.img}"><p>${item.name}</p><p>${item.price} R$</p>
+          <p>Stock: ${item.stock}</p>
+          <button onclick="buyItem(${i})">Comprar</button>`;
+        div.appendChild(el);
+      }
+    });
+    // actualizar admin remover lista
+    let sel=document.getElementById("adminRemoveItem");
+    sel.innerHTML=""; 
+    m.forEach((item,i)=>{ sel.innerHTML+=`<option value="${i}">${item.name}</option>`; });
+  }
+  function buyItem(i){
+    let m=getMarket(); let u=localStorage.getItem("currentUser");
+    let users=getUsers(); let item=m[i];
+    if(users[u].robux<item.price){alert("Robux insuficientes");return;}
+    if(item.stock<=0){alert("Sin stock");return;}
+    users[u].robux-=item.price;
+    users[u].inventory.push(item.name);
+    item.stock--; saveUsers(users); saveMarket(m);
+    document.getElementById("playerRobux").textContent=users[u].robux;
+    renderMarketplace(); renderInventory();
+    alert("Comprado!");
+  }
+
+  // ---------------- INVENTORY ----------------
+  function renderInventory(){
+    let u=localStorage.getItem("currentUser"); let users=getUsers();
+    let div=document.getElementById("inventoryItems"); div.innerHTML="";
+    users[u].inventory.forEach(it=>{
+      let el=document.createElement("div"); el.className="card"; el.textContent=it;
+      div.appendChild(el);
+    });
+  }
+
+  // ---------------- FRIENDS ----------------
+  function renderFriends(){
+    let users=getUsers(); let cu=localStorage.getItem("currentUser");
+    let div=document.getElementById("usersList"); div.innerHTML="";
+    Object.keys(users).forEach(user=>{
+      if(user!==cu){
+        let el=document.createElement("div"); el.className="user-item";
+        el.innerHTML=`<span>${user}</span> <button onclick="openTrade('${user}')">Trade</button>`;
+        div.appendChild(el);
+      }
+    });
+  }
+
+  // ---------------- TRADES ----------------
+  function openTrade(toUser){
+    document.getElementById("overlay").style.display="block";
+    document.getElementById("tradeModal").style.display="block";
+    document.getElementById("tradeTarget").textContent=toUser;
+    document.getElementById("tradeRobux").value="";
+    renderTradeItems();
+  }
+  function closeTradeModal(){
+    document.getElementById("overlay").style.display="none";
+    document.getElementById("tradeModal").style.display="none";
+  }
+  function renderTradeItems(){
+    let u=localStorage.getItem("currentUser"); let users=getUsers();
+    let div=document.getElementById("tradeItems"); div.innerHTML="";
+    users[u].inventory.forEach(it=>{
+      div.innerHTML+=`<label><input type="checkbox" value="${it}">${it}</label><br>`;
+    });
+  }
+  function confirmTradeOffer(){
+    let cu=localStorage.getItem("currentUser"); let users=getUsers();
+    let toUser=document.getElementById("tradeTarget").textContent;
+    let robux=parseInt(document.getElementById("tradeRobux").value)||0;
+    if(users[cu].robux<robux){alert("Robux insuficientes");return;}
+    let items=[...document.querySelectorAll("#tradeItems input:checked")].map(x=>x.value);
+    users[toUser].trades.push({from:cu,robux:robux,items:items});
+    saveUsers(users); closeTradeModal();
+    alert("Trade enviado");
+  }
+  function renderTrades(){
+    let cu=localStorage.getItem("currentUser"); let users=getUsers();
+    let div=document.getElementById("tradeList"); div.innerHTML="";
+    users[cu].trades.forEach((t,i)=>{
+      let el=document.createElement("div"); el.className="card";
+      el.innerHTML=`<p>De: ${t.from}</p><p>Robux: ${t.robux}</p>
+      <p>Items: ${t.items.join(", ")||"Ninguno"}</p>
+      <button onclick="acceptTrade(${i})">Aceptar</button>
+      <button onclick="rejectTrade(${i})">Rechazar</button>`;
+      div.appendChild(el);
+    });
+  }
+  function acceptTrade(i){
+    let cu=localStorage.getItem("currentUser"); let users=getUsers();
+    let t=users[cu].trades[i]; let from=t.from;
+    if(users[from].robux<t.robux){alert("El usuario no tiene suficiente robux");return;}
+    users[from].robux-=t.robux; users[cu].robux+=t.robux;
+    t.items.forEach(it=>{
+      let idx=users[from].inventory.indexOf(it);
+      if(idx>-1){users[from].inventory.splice(idx,1); users[cu].inventory.push(it);}
+    });
+    users[cu].trades.splice(i,1);
+    saveUsers(users);
+    renderProfile(); renderInventory(); renderTrades();
+    alert("Trade aceptado!");
+  }
+  function rejectTrade(i){
+    let cu=localStorage.getItem("currentUser"); let users=getUsers();
+    users[cu].trades.splice(i,1); saveUsers(users); renderTrades(); alert("Trade rechazado");
+  }
+
+  // ---------------- ADMIN PANEL ----------------
+  document.addEventListener("keydown",e=>{
+    if(e.key==="F9"){
+      let cu=localStorage.getItem("currentUser");
+      if(cu==="ROBLOX"){
+        document.getElementById("overlay").style.display="block";
+        document.getElementById("adminPanel").style.display="block";
+        renderMarketplace();
+      } else { alert("No eres admin"); }
+    }
+  });
+  function closeAdmin(){
+    document.getElementById("overlay").style.display="none";
+    document.getElementById("adminPanel").style.display="none";
+  }
+  function adminAddItem(){
+    let name=document.getElementById("adminItemName").value;
+    let img=document.getElementById("adminItemImg").value;
+    let price=parseInt(document.getElementById("adminItemPrice").value)||0;
+    let stock=parseInt(document.getElementById("adminItemStock").value)||0;
+    if(!name||!img||price<=0||stock<=0){alert("Datos inválidos");return;}
+    let m=getMarket(); m.push({name:name,img:img,price:price,stock:stock});
+    saveMarket(m); renderMarketplace(); alert("Item agregado!");
+  }
+  function adminRemoveSelected(){
+    let i=parseInt(document.getElementById("adminRemoveItem").value);
+    let m=getMarket();
+    if(m[i]){ m[i].stock=0; saveMarket(m); renderMarketplace(); alert("Item retirado!"); }
+  }
+
+  // ---------------- INIT ----------------
+  if(!localStorage.getItem("market")){
+    saveMarket([
+      {name:"Dominus Prefius",img:"https://tr.rbxcdn.com/180DAY-75378372edcd1f03ab46459b4e15038a/420/420/Hat/Webp/noFilter",price:45,stock:3}
+    ]);
+  }
+  window.onload=loadGame;
+</script>
+</body>
+</html>
