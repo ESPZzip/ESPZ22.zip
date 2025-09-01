@@ -5,18 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ESPZ</title>
   <style>
-    body{
-      margin:0;font-family:Arial,Helvetica,sans-serif;background:#f4f4f4;color:#222;
-    }
-    header{
-      background:#202020;color:#fff;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;
-    }
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f4f4f4;color:#222;}
+    header{background:#202020;color:#fff;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;}
     .brand{font-weight:bold;}
     .pill{background:#444;color:#fff;padding:5px 10px;border-radius:20px;}
     main{display:flex;}
-    aside{
-      width:200px;background:#eee;padding:10px;
-    }
+    aside{width:200px;background:#eee;padding:10px;}
     .menu button{display:block;width:100%;padding:10px;margin:5px 0;border:none;background:#ddd;cursor:pointer;border-radius:6px;}
     .menu button.active{background:#bbb;}
     .content{flex:1;padding:20px;}
@@ -31,20 +25,32 @@
     .btn.danger{background:#dc3545;color:#fff;}
     .btn:disabled{opacity:.6;cursor:not-allowed;}
     .hidden{display:none;}
-    /* Modal */
     .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;}
     .modal .box{background:#fff;padding:20px;border-radius:8px;max-width:400px;width:100%;}
     .modal h3{margin-top:0;}
     .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:6px;display:none;}
+    #authScreen{position:fixed;top:0;left:0;width:100%;height:100%;background:#202020;color:#fff;display:flex;align-items:center;justify-content:center;}
+    #authScreen .box{background:#fff;color:#000;padding:20px;border-radius:8px;width:300px;}
+    #authScreen input{width:100%;padding:8px;margin:5px 0;}
   </style>
 </head>
 <body>
+  <div id="authScreen">
+    <div class="box">
+      <h2>Registro / Login</h2>
+      <input type="text" id="authUser" placeholder="Usuario" />
+      <input type="password" id="authPass" placeholder="Contraseña" />
+      <button id="btnRegister" class="btn success">Registrar</button>
+      <button id="btnLoginAuth" class="btn primary">Login</button>
+      <p id="authMsg" style="color:red"></p>
+    </div>
+  </div>
+
   <header>
-    <div class="brand">ESPZ DEMO</div>
+    <div class="brand">ESPZ Demo</div>
     <div>
       <span id="playerName">Invitado</span>
       <span class="pill">Robux: <span id="robuxBalance">0</span></span>
-      <button id="btnLogin" class="btn primary">Login/Registro</button>
       <button id="btnLogout" class="btn danger hidden">Salir</button>
     </div>
   </header>
@@ -88,7 +94,6 @@
     </section>
   </main>
 
-  <!-- Modal Confirm -->
   <div id="confirmModal" class="modal hidden">
     <div class="box">
       <h3>Confirmar compra</h3>
@@ -125,18 +130,14 @@
     const marketGrid=document.getElementById('marketGrid');
     const inventoryGrid=document.getElementById('inventoryGrid');
     const emptyInventory=document.getElementById('emptyInventory');
-
     const playerName=document.getElementById('playerName');
     const robuxBalance=document.getElementById('robuxBalance');
-
-    const btnLogin=document.getElementById('btnLogin');
     const btnLogout=document.getElementById('btnLogout');
 
     const confirmModal=document.getElementById('confirmModal');
     const confirmText=document.getElementById('confirmText');
     const confirmYes=document.getElementById('confirmYes');
     const confirmNo=document.getElementById('confirmNo');
-
     const toast=document.getElementById('toast');
 
     let pendingItem=null;
@@ -145,9 +146,9 @@
 
     document.querySelector('.menu').addEventListener('click',e=>{if(e.target.tagName==='BUTTON'){showView(e.target.dataset.view);if(e.target.dataset.view==='inventory')renderInventory();if(e.target.dataset.view==='profile')renderProfile();}});
 
-    function renderMarketplace(){marketGrid.innerHTML='';defaultItems.forEach(it=>{const owned=getCurrentUser()?.inventory?.some(x=>x.id===it.id);const div=document.createElement('div');div.className='card';div.innerHTML=`<img src="${it.img}" alt="${it.name}"><h4>${it.name}</h4><div class="meta"><span>${it.price} R$</span><button class="btn primary" data-buy="${it.id}" ${owned? 'disabled':''}>${owned?'Comprado':'Comprar'}</button></div>`;marketGrid.appendChild(div);});}
+    function renderMarketplace(){marketGrid.innerHTML='';defaultItems.forEach(it=>{const owned=getCurrentUser()?.inventory?.some(x=>x.id===it.id);const div=document.createElement('div');div.className='card';div.innerHTML=`<img src="${it.img}" alt="${it.name}"><h4>${it.name}</h4><div class=\"meta\"><span>${it.price} R$</span><button class=\"btn primary\" data-buy=\"${it.id}\" ${owned? 'disabled':''}>${owned?'Comprado':'Comprar'}</button></div>`;marketGrid.appendChild(div);});}
 
-    function renderInventory(){const user=getCurrentUser();inventoryGrid.innerHTML='';if(!user||user.inventory.length===0){emptyInventory.style.display='block';return;}emptyInventory.style.display='none';user.inventory.forEach(it=>{const div=document.createElement('div');div.className='card';div.innerHTML=`<img src="${it.img}" alt="${it.name}"><h4>${it.name}</h4><div class="meta"><span>${it.price} R$</span><span>En propiedad</span></div>`;inventoryGrid.appendChild(div);});}
+    function renderInventory(){const user=getCurrentUser();inventoryGrid.innerHTML='';if(!user||user.inventory.length===0){emptyInventory.style.display='block';return;}emptyInventory.style.display='none';user.inventory.forEach(it=>{const div=document.createElement('div');div.className='card';div.innerHTML=`<img src=\"${it.img}\" alt=\"${it.name}\"><h4>${it.name}</h4><div class=\"meta\"><span>${it.price} R$</span><span>En propiedad</span></div>`;inventoryGrid.appendChild(div);});}
 
     function renderProfile(){const u=getCurrentUser();document.getElementById('profileUsername').textContent=u?.username||'';document.getElementById('profileRobux').textContent=u?.robux||0;}
 
@@ -161,13 +162,40 @@
     function getCurrentUser(){const s=getSession();if(!s)return null;return getUsers().find(u=>u.username===s.username)||null;}
     function updateUser(u){const arr=getUsers();const idx=arr.findIndex(x=>x.username===u.username);if(idx>=0){arr[idx]=u;setUsers(arr);}}
 
-    function applySession(u){if(u){playerName.textContent=u.username;robuxBalance.textContent=u.robux;btnLogin.classList.add('hidden');btnLogout.classList.remove('hidden');}else{playerName.textContent='Invitado';robuxBalance.textContent=0;btnLogin.classList.remove('hidden');btnLogout.classList.add('hidden');}renderMarketplace();}
+    function applySession(u){if(u){playerName.textContent=u.username;robuxBalance.textContent=u.robux;btnLogout.classList.remove('hidden');document.getElementById('authScreen').style.display='none';}else{playerName.textContent='Invitado';robuxBalance.textContent=0;btnLogout.classList.add('hidden');document.getElementById('authScreen').style.display='flex';}renderMarketplace();}
 
     btnLogout.addEventListener('click',()=>{localStorage.removeItem(LS_SESSION);applySession(null);showToast('Sesión cerrada');});
 
     document.getElementById('grantRobux').addEventListener('click',()=>{const u=getCurrentUser();if(!u)return;u.robux+=100;updateUser(u);applySession(u);renderProfile();showToast('+100 Robux');});
 
-    renderMarketplace();if(getSession())applySession(getCurrentUser());
+    // Auth
+    const authUser=document.getElementById('authUser');
+    const authPass=document.getElementById('authPass');
+    const authMsg=document.getElementById('authMsg');
+
+    document.getElementById('btnRegister').addEventListener('click',()=>{
+      const u=authUser.value.trim();
+      const p=authPass.value.trim();
+      if(!u||!p){authMsg.textContent='Completa todos los campos';return;}
+      let users=getUsers();
+      if(users.some(x=>x.username===u)){authMsg.textContent='Usuario en uso';return;}
+      const newUser={username:u,password:p,robux:500,inventory:[],friends:[]};
+      users.push(newUser);setUsers(users);setSession({username:u});applySession(newUser);
+    });
+
+    document.getElementById('btnLoginAuth').addEventListener('click',()=>{
+      const u=authUser.value.trim();
+      const p=authPass.value.trim();
+      if(!u||!p){authMsg.textContent='Completa todos los campos';return;}
+      const users=getUsers();
+      const user=users.find(x=>x.username===u&&x.password===p);
+      if(!user){authMsg.textContent='Datos incorrectos';return;}
+      setSession({username:u});applySession(user);
+    });
+
+    renderMarketplace();
+    const session=getSession();
+    if(session){applySession(getCurrentUser());}else{applySession(null);}
   </script>
 </body>
 </html>
