@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Mini Roblox - Marketplace Global</title>
+  <title>Mini Roblox - Registro/Login + Marketplace</title>
   <style>
     body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f0f2f5; }
     header { background:#24292e; color:#fff; padding:10px; display:flex; justify-content:space-between; }
@@ -12,8 +12,9 @@
     .tab { display:none; padding:20px; }
     .item { background:#fff; padding:10px; margin:10px; border-radius:8px; display:inline-block; width:150px; text-align:center; box-shadow:0 2px 5px rgba(0,0,0,0.2);}
     .item img { max-width:100%; border-radius:5px; }
-    #login, #register { background:#fff; padding:20px; max-width:300px; margin:50px auto; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.2);}
+    #loginBox, #registerBox { background:#fff; padding:20px; max-width:300px; margin:50px auto; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.2);}
     input, button { margin:5px 0; padding:8px; width:100%; }
+    #adminPanel { background:#fff; padding:15px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.2); margin-top:20px; }
   </style>
 </head>
 <body>
@@ -23,14 +24,15 @@
   <div id="robuxInfo">R$: 0</div>
 </header>
 
+<!-- Registro / Login -->
 <div id="auth">
-  <div id="register">
+  <div id="registerBox">
     <h2>Registrarse</h2>
     <input type="text" id="regUser" placeholder="Usuario">
     <input type="password" id="regPass" placeholder="Contraseña">
     <button onclick="register()">Registrarse</button>
   </div>
-  <div id="login">
+  <div id="loginBox">
     <h2>Iniciar Sesión</h2>
     <input type="text" id="logUser" placeholder="Usuario">
     <input type="password" id="logPass" placeholder="Contraseña">
@@ -38,10 +40,12 @@
   </div>
 </div>
 
+<!-- App -->
 <div id="app" style="display:none;">
   <nav>
     <button onclick="showTab('market')">Marketplace</button>
     <button onclick="showTab('inventory')">Inventario</button>
+    <button id="adminBtn" style="display:none;" onclick="showTab('admin')">Admin Panel</button>
   </nav>
 
   <div id="market" class="tab">
@@ -53,151 +57,163 @@
     <h2>Mi Inventario</h2>
     <div id="myItems"></div>
   </div>
+
+  <div id="admin" class="tab">
+    <h2>Admin Panel (solo ROBLOX)</h2>
+    <div id="adminPanel">
+      <h3>Añadir Item</h3>
+      <input type="text" id="itemName" placeholder="Nombre del Item">
+      <input type="text" id="itemImg" placeholder="URL de Imagen">
+      <input type="number" id="itemPrice" placeholder="Precio en Robux">
+      <input type="number" id="itemStock" placeholder="Stock">
+      <button onclick="addItem()">Añadir al Marketplace</button>
+
+      <h3>Eliminar Item</h3>
+      <input type="text" id="deleteItemId" placeholder="ID del Item">
+      <button onclick="deleteItem()">Eliminar del Marketplace</button>
+    </div>
+  </div>
 </div>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js"></script>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-  import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-
-  // 🚨 PON AQUÍ TU CONFIG DE FIREBASE 🚨
-  const firebaseConfig = {
-    apiKey: "TU_API_KEY",
-    authDomain: "TU_PROYECTO.firebaseapp.com",
-    projectId: "TU_PROYECTO",
-    storageBucket: "TU_PROYECTO.appspot.com",
-    messagingSenderId: "ID",
-    appId: "APP_ID"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
+<script>
   let currentUser = null;
 
-  // ---------- Registro ----------
-  async function register() {
+  // -------- Registro --------
+  function register() {
     let user = document.getElementById("regUser").value;
     let pass = document.getElementById("regPass").value;
 
-    let userRef = doc(db, "users", user);
-    let docSnap = await getDoc(userRef);
-    if (docSnap.exists()) {
+    if (!user || !pass) { alert("Completa todos los campos"); return; }
+
+    let users = JSON.parse(localStorage.getItem("users")) || {};
+    if (users[user]) {
       alert("Usuario ya existe");
       return;
     }
 
-    await setDoc(userRef, {
-      password: pass,
-      robux: 100,
-      inventory: []
-    });
-
-    alert("Registrado, ahora inicia sesión");
+    users[user] = { password: pass, robux: 100, inventory: [] };
+    localStorage.setItem("users", JSON.stringify(users));
+    alert("Registrado con éxito, ahora inicia sesión");
   }
 
-  // ---------- Login ----------
-  async function login() {
+  // -------- Login --------
+  function login() {
     let user = document.getElementById("logUser").value;
     let pass = document.getElementById("logPass").value;
 
-    let userRef = doc(db, "users", user);
-    let docSnap = await getDoc(userRef);
-    if (!docSnap.exists()) {
-      alert("No existe usuario");
-      return;
-    }
-    if (docSnap.data().password !== pass) {
-      alert("Contraseña incorrecta");
-      return;
-    }
+    let users = JSON.parse(localStorage.getItem("users")) || {};
+    if (!users[user]) { alert("No existe usuario"); return; }
+    if (users[user].password !== pass) { alert("Contraseña incorrecta"); return; }
 
     currentUser = user;
     document.getElementById("auth").style.display = "none";
     document.getElementById("app").style.display = "block";
     document.getElementById("userInfo").innerText = "Usuario: " + currentUser;
     updateRobux();
-    showTab("market");
     loadInventory();
+    showTab("market");
+
+    if (currentUser === "ROBLOX") {
+      document.getElementById("adminBtn").style.display = "inline-block";
+    }
   }
 
-  // ---------- Marketplace Global ----------
-  const marketDiv = document.getElementById("marketItems");
-  onSnapshot(collection(db, "marketplace"), snapshot => {
+  // -------- Tabs --------
+  function showTab(tab) {
+    document.querySelectorAll(".tab").forEach(t => t.style.display = "none");
+    document.getElementById(tab).style.display = "block";
+    if (tab === "market") loadMarket();
+    if (tab === "inventory") loadInventory();
+  }
+
+  // -------- Robux --------
+  function updateRobux() {
+    let users = JSON.parse(localStorage.getItem("users")) || {};
+    document.getElementById("robuxInfo").innerText = "R$: " + users[currentUser].robux;
+  }
+
+  // -------- Inventario --------
+  function loadInventory() {
+    let users = JSON.parse(localStorage.getItem("users")) || {};
+    let items = users[currentUser].inventory || [];
+    let invDiv = document.getElementById("myItems");
+    invDiv.innerHTML = items.map(i => `<div class="item"><h4>${i}</h4></div>`).join("");
+  }
+
+  // -------- Marketplace --------
+  function loadMarket() {
+    let market = JSON.parse(localStorage.getItem("marketplace")) || [];
+    let marketDiv = document.getElementById("marketItems");
     marketDiv.innerHTML = "";
-    snapshot.forEach(docSnap => {
-      let item = docSnap.data();
+    market.forEach((item, idx) => {
       marketDiv.innerHTML += `
         <div class="item">
           <img src="${item.img}">
           <h3>${item.name}</h3>
           <p>Precio: ${item.price} R$</p>
           <p>Stock: ${item.stock}</p>
-          <button onclick="buyItem('${docSnap.id}', ${item.price})">Comprar</button>
+          <p><small>ID: ${idx}</small></p>
+          <button onclick="buyItem(${idx})">Comprar</button>
         </div>
       `;
     });
-  });
+  }
 
-  // ---------- Comprar Item ----------
-  async function buyItem(itemId, price) {
-    if (!currentUser) { alert("Inicia sesión"); return; }
+  // -------- Comprar Item --------
+  function buyItem(itemId) {
+    let users = JSON.parse(localStorage.getItem("users")) || {};
+    let market = JSON.parse(localStorage.getItem("marketplace")) || [];
 
-    let userRef = doc(db, "users", currentUser);
-    let userSnap = await getDoc(userRef);
-    let userData = userSnap.data();
+    let userData = users[currentUser];
+    let item = market[itemId];
 
-    if (userData.robux < price) {
-      alert("Robux insuficientes");
-      return;
-    }
+    if (userData.robux < item.price) { alert("Robux insuficientes"); return; }
+    if (item.stock <= 0) { alert("Sin stock"); return; }
 
-    let itemRef = doc(db, "marketplace", itemId);
-    let itemSnap = await getDoc(itemRef);
-    let item = itemSnap.data();
+    userData.robux -= item.price;
+    userData.inventory.push(item.name);
+    item.stock--;
 
-    if (item.stock <= 0) {
-      alert("Sin stock");
-      return;
-    }
-
-    // Actualizar stock e inventario
-    await updateDoc(itemRef, { stock: item.stock - 1 });
-    await updateDoc(userRef, {
-      robux: userData.robux - price,
-      inventory: [...userData.inventory, item.name]
-    });
+    users[currentUser] = userData;
+    market[itemId] = item;
+    localStorage.setItem("users", JSON.stringify(users));
+    localStorage.setItem("marketplace", JSON.stringify(market));
 
     updateRobux();
     loadInventory();
-    alert("¡Comprado y añadido a tu inventario!");
+    loadMarket();
+    alert("¡Comprado!");
   }
 
-  // ---------- Mostrar Robux ----------
-  async function updateRobux() {
-    if (!currentUser) return;
-    let userRef = doc(db, "users", currentUser);
-    let snap = await getDoc(userRef);
-    document.getElementById("robuxInfo").innerText = "R$: " + snap.data().robux;
+  // -------- Admin: Añadir Item --------
+  function addItem() {
+    let name = document.getElementById("itemName").value;
+    let img = document.getElementById("itemImg").value;
+    let price = parseInt(document.getElementById("itemPrice").value);
+    let stock = parseInt(document.getElementById("itemStock").value);
+
+    let market = JSON.parse(localStorage.getItem("marketplace")) || [];
+    market.push({ name, img, price, stock });
+    localStorage.setItem("marketplace", JSON.stringify(market));
+
+    alert("Item añadido");
+    loadMarket();
   }
 
-  // ---------- Inventario ----------
-  async function loadInventory() {
-    let userRef = doc(db, "users", currentUser);
-    let snap = await getDoc(userRef);
-    let items = snap.data().inventory || [];
-    let invDiv = document.getElementById("myItems");
-    invDiv.innerHTML = items.map(i => `<div class="item"><h4>${i}</h4></div>`).join("");
+  // -------- Admin: Eliminar Item --------
+  function deleteItem() {
+    let id = parseInt(document.getElementById("deleteItemId").value);
+    let market = JSON.parse(localStorage.getItem("marketplace")) || [];
+    if (market[id]) {
+      market.splice(id, 1);
+      localStorage.setItem("marketplace", JSON.stringify(market));
+      alert("Item eliminado");
+      loadMarket();
+    } else {
+      alert("No existe ese ID");
+    }
   }
 
-  // ---------- Tabs ----------
-  function showTab(tab) {
-    document.querySelectorAll(".tab").forEach(t => t.style.display = "none");
-    document.getElementById(tab).style.display = "block";
-  }
 </script>
 </body>
 </html>
