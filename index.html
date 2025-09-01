@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ESPZ • Tienda de Ítems</title>
+  <title>ESPZ Shop • Tienda de Ítems</title>
   <style>
     :root{
       --bg:#0f1220; --card:#161a2f; --muted:#8a93b2; --text:#eef2ff; --accent:#7c5cff; --accent-2:#00e0b8; --danger:#ff5c7a;
@@ -30,13 +30,15 @@
     @media (min-width:640px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media (min-width:950px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
-    .card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);overflow:hidden}
+    .card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);overflow:hidden;position:relative}
     .card .media{height:160px;background:radial-gradient(90px 90px at 20% 20%,rgba(124,92,255,.22),transparent),radial-gradient(120px 120px at 80% 0%,rgba(0,224,184,.18),transparent);display:grid;place-items:center}
     .card .media span{font-size:54px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.35))}
     .card .body{padding:14px 14px 16px}
     .title{margin:0 0 4px;font-size:18px}
     .muted{color:var(--muted);font-size:14px}
     .row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px}
+
+    .label-limitado{position:absolute;top:10px;left:10px;background:var(--danger);color:white;padding:4px 8px;border-radius:8px;font-size:12px;font-weight:700}
 
     .panel{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:14px}
     .stack{display:flex;flex-direction:column;gap:10px}
@@ -66,13 +68,13 @@
   <div class="nav container">
     <div class="brand">
       <div class="logo" aria-hidden="true"></div>
-      <h1>ESPZ farm</h1>
+      <h1>ESPZ</h1>
     </div>
     <div class="inline">
       <div class="pill" title="Tu saldo actual">
         <span>💰</span>
-        <span class="coin" id="balance">250</span>
-        <span class="muted">Robux</span>
+        <span class="coin" id="balance">0</span>
+        <span class="muted">ROBUKZ</span>
       </div>
       <button class="btn" id="btnAddCoins">Recargar</button>
       <button class="btn ghost" id="btnInventory">Inventario</button>
@@ -97,16 +99,6 @@
       <div class="grid" id="itemsGrid"></div>
     </div>
   </section>
-
-  <section class="panel">
-    <h3 style="margin:0 0 8px">Guía rápida</h3>
-    <ul class="list" style="list-style:none;padding:0;margin:0">
-      <li>Usa “Recargar” para sumar Coins (simulado para pruebas).</li>
-      <li>Agrega ítems al carrito y finaliza la compra con “Carrito”.</li>
-      <li>Todo se guarda en tu navegador con <code>localStorage</code>.</li>
-      <li>Renombra la marca, cambia colores e imágenes a tu estilo.</li>
-    </ul>
-  </section>
 </main>
 
 <div class="cart">
@@ -118,9 +110,10 @@
   </div>
 </div>
 
-<dialog id="modalCheckout" aria-labelledby="checkoutTitle">
+<!-- Diálogo de Checkout -->
+<dialog id="modalCheckout">
   <div class="modal-head">
-    <h3 id="checkoutTitle" style="margin:0">Finalizar compra</h3>
+    <h3>Finalizar compra</h3>
     <button class="btn ghost" id="closeCheckout">Cerrar</button>
   </div>
   <div class="modal-body">
@@ -134,13 +127,13 @@
       <button class="btn danger" id="btnClearCart">Vaciar</button>
       <button class="btn" id="btnPay">Pagar</button>
     </div>
-    <p class="notice" style="margin-top:10px">Demo local: no hay pagos reales ni servidor. Integra tu pasarela de pago legítima si lo publicas.</p>
   </div>
 </dialog>
 
-<dialog id="modalInventory" aria-labelledby="inventoryTitle">
+<!-- Inventario -->
+<dialog id="modalInventory">
   <div class="modal-head">
-    <h3 id="inventoryTitle" style="margin:0">Tu inventario</h3>
+    <h3>Tu inventario</h3>
     <button class="btn ghost" id="closeInventory">Cerrar</button>
   </div>
   <div class="modal-body">
@@ -149,9 +142,10 @@
   </div>
 </dialog>
 
-<dialog id="modalTopup" aria-labelledby="topupTitle">
+<!-- Recarga -->
+<dialog id="modalTopup">
   <div class="modal-head">
-    <h3 id="topupTitle" style="margin:0">Recargar Coins</h3>
+    <h3>Recargar Coins</h3>
     <button class="btn ghost" id="closeTopup">Cerrar</button>
   </div>
   <div class="modal-body">
@@ -159,56 +153,63 @@
       <label for="topupAmount" class="muted">Cantidad a añadir</label>
       <input id="topupAmount" type="number" min="1" step="1" value="1000" style="width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:var(--text)" />
       <button class="btn" id="applyTopup">Añadir Coins</button>
-      <p class="notice">Solo para pruebas locales. Sustituye por una integración de pago real si lo despliegas.</p>
+    </div>
+  </div>
+</dialog>
+
+<!-- Admin: añadir item -->
+<dialog id="modalAdmin">
+  <div class="modal-head">
+    <h3>Nuevo ítem limitado</h3>
+    <button class="btn ghost" id="closeAdmin">Cerrar</button>
+  </div>
+  <div class="modal-body">
+    <div class="stack">
+      <input id="adminName" placeholder="Nombre del ítem" style="padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:var(--text)" />
+      <input id="adminPrice" type="number" placeholder="Costo en Coins" style="padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:var(--text)" />
+      <input id="adminStock" type="number" placeholder="Stock disponible" style="padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:var(--text)" />
+      <button class="btn" id="adminAdd">Añadir ítem</button>
     </div>
   </div>
 </dialog>
 
 <script>
 (() => {
-  const $ = (sel) => document.querySelector(sel);
-  const $$ = (sel) => [...document.querySelectorAll(sel)];
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => [...document.querySelectorAll(s)];
 
   const STORAGE_KEYS = {
     balance: 'pxshop.balance',
     cart: 'pxshop.cart',
     inventory: 'pxshop.inventory',
+    items: 'pxshop.items'
   };
 
-  // --- Estado
   let state = {
     balance: 0,
-    cart: [], // {id, name, price}
-    inventory: [], // {id, name, price, acquiredAt}
+    cart: [],
+    inventory: [],
+    items: []
   };
 
-  // --- Datos de ejemplo (reemplaza con tu propio catálogo)
-  const ITEMS = [
-    { id: 'sword-neo', name: 'Espada Neo', price: 350, emoji: '⚔️', desc: 'Acero ligero con brillo neón.' },
-    { id: 'jetpack', name: 'Jetpack Mk.I', price: 900, emoji: '🎒', desc: 'Vuela sobre el mapa (cosmético).' },
-    { id: 'pet-slime', name: 'Mascota Slime', price: 250, emoji: '🫧', desc: 'Compañero gelatinoso y feliz.' },
-    { id: 'skin-shadow', name: 'Skin Sombría', price: 600, emoji: '🕶️', desc: 'Textura oscura con partículas.' },
-    { id: 'emote-dance', name: 'Emote: DanceLoop', price: 180, emoji: '🕺', desc: 'Baile en loop (cosmético).' },
-    { id: 'glider', name: 'Ala Delta X', price: 520, emoji: '🪂', desc: 'Planea con estilo (cosmético).'},
+  const DEFAULT_ITEMS = [
+    { id: 'sword-neo', name: 'Espada Neo', price: 350, emoji: '⚔️', desc: 'Acero ligero con brillo neón.', limitado:false },
+    { id: 'jetpack', name: 'Jetpack Mk.I', price: 900, emoji: '🎒', desc: 'Vuela sobre el mapa (cosmético).', limitado:false }
   ];
 
-  // --- Utilidades de persistencia
   function save(){
-    localStorage.setItem(STORAGE_KEYS.balance, String(state.balance));
+    localStorage.setItem(STORAGE_KEYS.balance, state.balance);
     localStorage.setItem(STORAGE_KEYS.cart, JSON.stringify(state.cart));
     localStorage.setItem(STORAGE_KEYS.inventory, JSON.stringify(state.inventory));
+    localStorage.setItem(STORAGE_KEYS.items, JSON.stringify(state.items));
   }
   function load(){
-    const b = parseInt(localStorage.getItem(STORAGE_KEYS.balance) || '0', 10);
-    const cart = JSON.parse(localStorage.getItem(STORAGE_KEYS.cart) || '[]');
-    const inv = JSON.parse(localStorage.getItem(STORAGE_KEYS.inventory) || '[]');
-    state.balance = Number.isFinite(b) ? b : 0;
-    state.cart = Array.isArray(cart) ? cart : [];
-    state.inventory = Array.isArray(inv) ? inv : [];
+    state.balance = parseInt(localStorage.getItem(STORAGE_KEYS.balance)||'0');
+    state.cart = JSON.parse(localStorage.getItem(STORAGE_KEYS.cart)||'[]');
+    state.inventory = JSON.parse(localStorage.getItem(STORAGE_KEYS.inventory)||'[]');
+    const items = JSON.parse(localStorage.getItem(STORAGE_KEYS.items)||'null');
+    state.items = items || DEFAULT_ITEMS;
   }
-
-  // --- Render
-  function fmtCoins(n){ return `${n} Coins`; }
 
   function renderHeader(){
     $('#balance').textContent = state.balance;
@@ -220,146 +221,54 @@
   function renderItems(){
     const grid = $('#itemsGrid');
     grid.innerHTML = '';
-    ITEMS.forEach(item => {
-      const inInv = state.inventory.some(x=>x.id===item.id);
+    state.items.forEach(item => {
       const el = document.createElement('div');
       el.className = 'card';
       el.innerHTML = `
-        <div class="media" aria-hidden="true"><span>${item.emoji}</span></div>
+        ${item.limitado ? '<div class="label-limitado">Limitado</div>' : ''}
+        <div class="media"><span>${item.emoji||'🎁'}</span></div>
         <div class="body">
           <h3 class="title">${item.name}</h3>
-          <p class="muted">${item.desc}</p>
+          <p class="muted">${item.desc||''}</p>
           <div class="row">
-            <strong>${fmtCoins(item.price)}</strong>
-            <div class="inline">
-              ${inInv ? `<span class="badge">Comprado</span>` : ''}
-              <button class="btn add" data-id="${item.id}">${inInv ? 'Recomprar' : 'Agregar'}</button>
-            </div>
+            <strong>${item.price} Coins</strong>
+            <button class="btn add" data-id="${item.id}">Agregar</button>
           </div>
         </div>`;
       grid.appendChild(el);
     });
-
-    $$('.add').forEach(btn => btn.addEventListener('click', e => {
-      const id = e.currentTarget.getAttribute('data-id');
-      const item = ITEMS.find(x=>x.id===id);
-      if(!item) return;
-      state.cart.push({id:item.id, name:item.name, price:item.price});
-      save();
-      renderHeader();
+    $$('.add').forEach(btn=>btn.addEventListener('click',e=>{
+      const id = e.currentTarget.dataset.id;
+      const item = state.items.find(x=>x.id===id);
+      if(item){
+        if(item.limitado && item.stock<=0){alert('Este ítem limitado está agotado.');return;}
+        state.cart.push({id:item.id,name:item.name,price:item.price});
+        if(item.limitado){item.stock--;}
+        save();renderHeader();renderItems();
+      }
     }));
   }
 
   function renderCartModal(){
     const list = $('#cartList');
-    list.innerHTML = '';
-    if(state.cart.length === 0){
-      const empty = document.createElement('div');
-      empty.className = 'empty';
-      empty.textContent = 'Tu carrito está vacío.';
-      list.appendChild(empty);
-    } else {
-      state.cart.forEach((item, idx)=>{
-        const li = document.createElement('li');
-        li.innerHTML = `
-          <span>${item.name}</span>
-          <div class="inline">
-            <span class="muted">${fmtCoins(item.price)}</span>
-            <button class="btn ghost rm" data-idx="${idx}">Quitar</button>
-          </div>`;
-        list.appendChild(li);
-      });
-    }
-    const total = state.cart.reduce((s,i)=>s+i.price,0);
-    $('#cartTotal').textContent = fmtCoins(total);
-
-    $$('.rm').forEach(btn => btn.addEventListener('click', e => {
-      const i = parseInt(e.currentTarget.getAttribute('data-idx'),10);
-      if(Number.isInteger(i)){
-        state.cart.splice(i,1);
-        save();
-        renderHeader();
-        renderCartModal();
-      }
-    }));
-  }
-
-  function renderInventory(){
-    const grid = $('#inventoryGrid');
-    grid.innerHTML = '';
-    const empty = $('#inventoryEmpty');
-    if(state.inventory.length === 0){
-      empty.style.display = 'block';
-      return;
-    }
-    empty.style.display = 'none';
-    state.inventory.forEach(item => {
-      const el = document.createElement('div');
-      el.className = 'card';
-      el.innerHTML = `
-        <div class="media" aria-hidden="true"><span>🎁</span></div>
-        <div class="body">
-          <h4 class="title" style="font-size:16px">${item.name}</h4>
-          <p class="muted">Adquirido: ${new Date(item.acquiredAt).toLocaleString()}</p>
-          <div class="row">
-            <span class="muted">${fmtCoins(item.price)}</span>
-            <button class="btn ghost use" data-id="${item.id}">Usar</button>
-          </div>
-        </div>`;
-      grid.appendChild(el);
+    list.innerHTML='';
+    state.cart.forEach((it,i)=>{
+      const li=document.createElement('li');
+      li.innerHTML=`<span>${it.name}</span><span>${it.price} Coins</span>`;
+      list.appendChild(li);
     });
-
-    $$('.use').forEach(btn => btn.addEventListener('click', e => {
-      const id = e.currentTarget.getAttribute('data-id');
-      alert('En tu juego/app, aquí activarías el ítem con id: '+id);
-    }));
+    $('#cartTotal').textContent = state.cart.reduce((s,i)=>s+i.price,0)+ ' Coins';
   }
 
-  // --- Acciones de pago (demo)
   function pay(){
-    const total = state.cart.reduce((s,i)=>s+i.price,0);
-    if(total === 0){ alert('Tu carrito está vacío.'); return; }
-    if(state.balance < total){ alert('Saldo insuficiente. Recarga Coins para continuar.'); return; }
-    // Descuenta y mueve a inventario
-    state.balance -= total;
-    const now = Date.now();
-    state.cart.forEach(i => state.inventory.push({ ...i, acquiredAt: now }));
-    state.cart = [];
-    save();
-    renderHeader();
-    renderInventory();
-    $('#modalCheckout').close();
-    alert('¡Compra realizada! Tus ítems ya están en el inventario.');
+    const total=state.cart.reduce((s,i)=>s+i.price,0);
+    if(state.balance<total){alert('Saldo insuficiente');return;}
+    state.balance-=total;
+    state.cart=[];
+    save();renderHeader();$('#modalCheckout').close();
   }
 
-  // --- Topup demo
-  function topup(amount){
-    const n = parseInt(amount,10);
-    if(!Number.isInteger(n) || n<=0){ alert('Ingresa una cantidad válida.'); return; }
-    state.balance += n;
-    save();
-    renderHeader();
-    $('#modalTopup').close();
-  }
+  function topup(n){state.balance+=parseInt(n);save();renderHeader();$('#modalTopup').close();}
 
-  // --- Eventos UI
-  $('#btnCheckout').addEventListener('click', () => { renderCartModal(); $('#modalCheckout').showModal(); });
-  $('#closeCheckout').addEventListener('click', () => $('#modalCheckout').close());
-  $('#btnClearCart').addEventListener('click', () => { state.cart = []; save(); renderHeader(); renderCartModal(); });
-  $('#btnPay').addEventListener('click', pay);
-
-  $('#btnInventory').addEventListener('click', () => { renderInventory(); $('#modalInventory').showModal(); });
-  $('#closeInventory').addEventListener('click', () => $('#modalInventory').close());
-
-  $('#btnAddCoins').addEventListener('click', () => { $('#modalTopup').showModal(); $('#topupAmount').focus(); });
-  $('#applyTopup').addEventListener('click', () => topup($('#topupAmount').value));
-  $('#closeTopup').addEventListener('click', () => $('#modalTopup').close());
-
-  // --- Init
-  load();
-  renderHeader();
-  renderItems();
-})();
-</script>
-</body>
-</html>
+  // Eventos
+  $('#btnCheckout').onclick=()=>{renderCartModal();$('#modalCheckout').showModal();};
