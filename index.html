@@ -95,9 +95,15 @@
   <div id="adminPanel">
     <h3>Panel Admin</h3>
 
-    <h4>Añadir Robux</h4>
+    <h4>Añadir Robux a ti mismo</h4>
     <input id="robuxAmount" type="number" placeholder="Cantidad">
-    <button onclick="addRobux()">Añadir</button>
+    <button onclick="addRobuxSelf()">Añadir</button>
+
+    <hr>
+    <h4>Añadir Robux a otro usuario</h4>
+    <input id="targetUser" placeholder="Usuario destino">
+    <input id="robuxAmountUser" type="number" placeholder="Cantidad">
+    <button onclick="addRobuxToUser()">Añadir a usuario</button>
 
     <hr>
     <h4>Agregar ítem al Marketplace</h4>
@@ -256,7 +262,8 @@
   // ---- ADMIN PANEL ----
   function openAdmin() { document.getElementById("adminPanel").style.display = "block"; }
   function closeAdmin() { document.getElementById("adminPanel").style.display = "none"; }
-  function addRobux() {
+
+  function addRobuxSelf() {
     const amount = parseInt(document.getElementById("robuxAmount").value);
     if (isNaN(amount) || amount <= 0) { alert("Cantidad inválida"); return; }
     const username = localStorage.getItem("currentUser");
@@ -264,8 +271,20 @@
     users[username].robux += amount;
     saveUsers(users);
     document.getElementById("playerRobux").textContent = users[username].robux;
-    alert("Has añadido " + amount + " Robux.");
+    alert("Has añadido " + amount + " Robux a tu cuenta.");
   }
+
+  function addRobuxToUser() {
+    const target = document.getElementById("targetUser").value.trim();
+    const amount = parseInt(document.getElementById("robuxAmountUser").value);
+    if (!target || isNaN(amount) || amount <= 0) { alert("Datos inválidos."); return; }
+    let users = getUsers();
+    if (!users[target]) { alert("El usuario no existe."); return; }
+    users[target].robux += amount;
+    saveUsers(users);
+    alert("Has añadido " + amount + " Robux a " + target);
+  }
+
   function addItem() {
     const name = document.getElementById("itemName").value.trim();
     const img = document.getElementById("itemImg").value.trim();
@@ -284,6 +303,7 @@
     saveItems(items); renderMarketplace();
     alert("Nuevo ítem exclusivo agregado al Marketplace.");
   }
+
   document.addEventListener("keydown", (e) => {
     if (e.key === "F9") {
       const username = localStorage.getItem("currentUser");
