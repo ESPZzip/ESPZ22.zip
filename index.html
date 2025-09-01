@@ -1,188 +1,215 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Mini Roblox Revival</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Roblox Revival</title>
   <style>
-    body{margin:0; font-family:Arial, sans-serif; background:#f2f3f5; color:#111;}
-    header{background:#fff; border-bottom:1px solid #ccc; padding:10px 20px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50;}
-    .logo{font-weight:bold; font-size:20px; color:#e32b2b}
-    nav a, nav button{margin:0 10px; text-decoration:none; color:#333; font-weight:600; background:none; border:none; cursor:pointer; font-size:14px}
-    .container{max-width:1200px; margin:0 auto; padding:20px}
-    h1{margin:0 0 20px}
-    .catalogo{display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:16px}
-    .item{background:#fff; border:1px solid #ddd; border-radius:8px; overflow:hidden; display:flex; flex-direction:column;}
-    .item img{width:100%; aspect-ratio:1/1; object-fit:cover}
-    .item-info{padding:10px; flex:1; display:flex; flex-direction:column; justify-content:space-between}
-    .item-title{font-weight:bold; margin-bottom:6px; font-size:14px}
-    .price{color:#0b8a00; font-weight:bold; font-size:13px}
-    .btn{margin-top:8px; padding:8px; border:none; border-radius:6px; cursor:pointer; font-weight:bold}
-    .btn-buy{background:#e32b2b; color:#fff}
-    .btn-buy:hover{background:#c91f1f}
-    .searchbar{margin-bottom:20px; display:flex; gap:10px}
-    .searchbar input{flex:1; padding:10px; border-radius:6px; border:1px solid #bbb}
-    footer{background:#fff; border-top:1px solid #ccc; text-align:center; padding:14px; margin-top:30px; font-size:14px; color:#666}
-    .hidden{display:none}
-    #adminPanel{position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; border:1px solid #ccc; border-radius:10px; padding:20px; z-index:100; display:none; width:300px;}
-    #adminPanel h2{margin-top:0}
-    #overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;z-index:99}
-    #adminUsers div{margin:6px 0; display:flex; justify-content:space-between; align-items:center}
-    #adminUsers span{flex:1}
+    /* Reset */
+    * {margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
+
+    body {
+      background-color:#111;
+      color:#fff;
+      display:flex;
+      height:100vh;
+      overflow:hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width:220px;
+      background:#1a1a1a;
+      padding:20px 10px;
+      display:flex;
+      flex-direction:column;
+      overflow-y:auto;
+    }
+    .sidebar h2 {
+      font-size:18px;
+      margin-bottom:15px;
+    }
+    .sidebar a {
+      color:#ccc;
+      padding:10px;
+      display:block;
+      border-radius:6px;
+      text-decoration:none;
+      margin-bottom:5px;
+      transition:0.2s;
+    }
+    .sidebar a:hover {
+      background:#333;
+      color:#fff;
+    }
+
+    /* Main content */
+    .main {
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      overflow-y:auto;
+    }
+
+    /* Topbar */
+    .topbar {
+      background:#1a1a1a;
+      padding:10px 20px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .topbar .left a {
+      color:#ccc;
+      margin-right:15px;
+      text-decoration:none;
+      font-weight:bold;
+    }
+    .topbar .left a:hover {color:#fff;}
+    .search-box {
+      background:#333;
+      border-radius:6px;
+      padding:6px 10px;
+      border:none;
+      color:#fff;
+    }
+
+    /* Sections */
+    .section {
+      padding:20px;
+    }
+    .section h3 {
+      margin-bottom:10px;
+    }
+
+    /* Connections */
+    .connections {
+      display:flex;
+      gap:10px;
+      overflow-x:auto;
+      padding:10px 0;
+    }
+    .connections img {
+      width:60px;
+      height:60px;
+      border-radius:50%;
+      border:2px solid #333;
+    }
+
+    /* Today’s Picks */
+    .scroll-row {
+      display:flex;
+      gap:15px;
+      overflow-x:auto;
+      padding:10px 0;
+    }
+    .game-card {
+      background:#222;
+      border-radius:8px;
+      overflow:hidden;
+      min-width:220px;
+      flex-shrink:0;
+    }
+    .game-card img {
+      width:100%;
+      height:120px;
+      object-fit:cover;
+    }
+    .game-card .info {
+      padding:10px;
+      font-size:14px;
+    }
+
+    /* Continue (grid) */
+    .grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
+      gap:15px;
+    }
+    .grid .game-card img {
+      height:100px;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <div class="logo">Mini Roblox Revival</div>
-    <nav>
-      <button onclick="showSection('inicio')">Inicio</button>
-      <button onclick="showSection('catalogo')">Catálogo</button>
-      <button onclick="showSection('perfil')">Perfil</button>
-      <button onclick="showSection('comunidad')">Comunidad</button>
-      <button id="adminBtn" class="hidden" onclick="openAdminPanel()">Admin</button>
-    </nav>
-  </header>
-
-  <main class="container">
-    <section id="inicio">
-      <h1>Bienvenido</h1>
-      <p>Este es un prototipo de página estilo Roblox con catálogo, para usar como demo en GitHub Pages.</p>
-    </section>
-
-    <section id="catalogo" class="hidden">
-      <h1>Catálogo</h1>
-      <div class="searchbar">
-        <input id="search" type="text" placeholder="Buscar ítem...">
-      </div>
-      <div id="items" class="catalogo"></div>
-    </section>
-
-    <section id="perfil" class="hidden">
-      <h1>Perfil</h1>
-      <div style="background:#fff; border:1px solid #ddd; border-radius:10px; padding:20px; display:flex; gap:20px; align-items:center">
-        <img id="avatar" src="https://placehold.co/120x120" style="border-radius:10px">
-        <div>
-          <h2 id="username">UsuarioDemo</h2>
-          <p>Amigos: 15 | Items: 8</p>
-          <button class="btn btn-buy">Editar Perfil</button>
-        </div>
-      </div>
-    </section>
-
-    <section id="comunidad" class="hidden">
-      <h1>Comunidad</h1>
-      <p>Foros, amigos y más próximamente...</p>
-    </section>
-  </main>
-
-  <footer>
-    © <span id="year"></span> Mini Roblox Revival. Proyecto no oficial.
-  </footer>
-
-  <div id="overlay"></div>
-  <div id="adminPanel">
-    <h2>Panel de Admin</h2>
-    <button class="btn btn-buy" onclick="addCoins()">Agregar 500 monedas</button>
-    <h3>Usuarios</h3>
-    <div id="adminUsers"></div>
-    <button class="btn" style="margin-top:10px" onclick="closeAdminPanel()">Cerrar</button>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>MiRevival</h2>
+    <a href="#">Profile</a>
+    <a href="#">Messages</a>
+    <a href="#">Friends</a>
+    <a href="#">Avatar</a>
+    <a href="#">Inventory</a>
+    <a href="#">Trade</a>
+    <a href="#">Communities</a>
+    <a href="#">Premium</a>
+    <a href="#">Blog</a>
+    <a href="#">Store</a>
   </div>
 
-  <script>
-    const itemsData=[
-      {id:1,nombre:"Sombrero Clásico",precio:100,img:"https://placehold.co/200"},
-      {id:2,nombre:"Espada Retro",precio:250,img:"https://placehold.co/200"},
-      {id:3,nombre:"Camisa Pixelada",precio:75,img:"https://placehold.co/200"},
-      {id:4,nombre:"Cara Divertida",precio:50,img:"https://placehold.co/200"},
-      {id:5,nombre:"Gafas de Sol",precio:90,img:"https://placehold.co/200"},
-    ];
+  <!-- Main -->
+  <div class="main">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="left">
+        <a href="#">Home</a>
+        <a href="#">Marketplace</a>
+        <a href="#">Create</a>
+      </div>
+      <input type="text" class="search-box" placeholder="Search...">
+    </div>
 
-    let monedas=1000;
-    let usuarios=[{nombre:"Usuario1",baneado:false},{nombre:"Usuario2",baneado:false},{nombre:"Usuario3",baneado:false}];
+    <!-- Content -->
+    <div class="section">
+      <h3>Connections</h3>
+      <div class="connections">
+        <img src="https://placekitten.com/80/80" alt="">
+        <img src="https://placekitten.com/81/80" alt="">
+        <img src="https://placekitten.com/82/80" alt="">
+        <img src="https://placekitten.com/83/80" alt="">
+        <img src="https://placekitten.com/84/80" alt="">
+      </div>
+    </div>
 
-    const itemsContainer=document.getElementById("items");
-    const searchInput=document.getElementById("search");
+    <div class="section">
+      <h3>Today's Picks</h3>
+      <div class="scroll-row">
+        <div class="game-card">
+          <img src="https://placehold.co/300x150" alt="">
+          <div class="info">Kpop Demon Hunters</div>
+        </div>
+        <div class="game-card">
+          <img src="https://placehold.co/300x150" alt="">
+          <div class="info">Tennis Zero</div>
+        </div>
+        <div class="game-card">
+          <img src="https://placehold.co/300x150" alt="">
+          <div class="info">Dusty Trip</div>
+        </div>
+      </div>
+    </div>
 
-    function renderItems(filtro=""){
-      if(!itemsContainer) return;
-      itemsContainer.innerHTML="";
-      const filtrados=itemsData.filter(i=>i.nombre.toLowerCase().includes(filtro.toLowerCase()));
-      filtrados.forEach(item=>{
-        const div=document.createElement("div");
-        div.className="item";
-        div.innerHTML=`
-          <img src="${item.img}" alt="${item.nombre}">
-          <div class="item-info">
-            <div>
-              <div class="item-title">${item.nombre}</div>
-              <div class="price">${item.precio} Monedas</div>
-            </div>
-            <button class="btn btn-buy" onclick="comprar(${item.id})">Comprar</button>
-          </div>
-        `;
-        itemsContainer.appendChild(div);
-      });
-    }
-
-    function comprar(id){
-      const item=itemsData.find(i=>i.id===id);
-      if(item && monedas>=item.precio){
-        monedas-=item.precio;
-        alert(`Has comprado ${item.nombre}. Monedas restantes: ${monedas}`);
-      } else {
-        alert("No tienes suficientes monedas");
-      }
-    }
-
-    searchInput?.addEventListener("input",()=>{
-      renderItems(searchInput.value);
-    });
-
-    function showSection(id){
-      document.querySelectorAll("main section").forEach(sec=>sec.classList.add("hidden"));
-      document.getElementById(id).classList.remove("hidden");
-    }
-
-    // Admin
-    const adminBtn=document.getElementById("adminBtn");
-    const adminPanel=document.getElementById("adminPanel");
-    const overlay=document.getElementById("overlay");
-    const adminUsers=document.getElementById("adminUsers");
-
-    function openAdminPanel(){
-      overlay.style.display="block";
-      adminPanel.style.display="block";
-      renderAdminUsers();
-    }
-    function closeAdminPanel(){
-      overlay.style.display="none";
-      adminPanel.style.display="none";
-    }
-    function addCoins(){
-      monedas+=500;
-      alert("Ahora tienes: "+monedas+" monedas");
-    }
-    function renderAdminUsers(){
-      adminUsers.innerHTML="";
-      usuarios.forEach((u,i)=>{
-        const div=document.createElement("div");
-        div.innerHTML=`<span>${u.nombre} ${u.baneado?"(Baneado)":""}</span><button onclick="banUser(${i})">${u.baneado?"Desbanear":"Banear"}</button>`;
-        adminUsers.appendChild(div);
-      });
-    }
-    function banUser(index){
-      usuarios[index].baneado=!usuarios[index].baneado;
-      renderAdminUsers();
-    }
-
-    document.addEventListener("keydown",(e)=>{
-      if(e.key==="F8"){
-        adminBtn.classList.toggle("hidden");
-      }
-    });
-
-    document.getElementById("year").textContent=new Date().getFullYear();
-    renderItems();
-  </script>
+    <div class="section">
+      <h3>Continue</h3>
+      <div class="grid">
+        <div class="game-card">
+          <img src="https://placehold.co/300x150" alt="">
+          <div class="info">Test Game</div>
+        </div>
+        <div class="game-card">
+          <img src="https://placehold.co/300x150" alt="">
+          <div class="info">Retro Studio</div>
+        </div>
+        <div class="game-card">
+          <img src="https://placehold.co/300x150" alt="">
+          <div class="info">99 Nights</div>
+        </div>
+        <div class="game-card">
+          <img src="https://placehold.co/300x150" alt="">
+          <div class="info">Catalog Creator</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
