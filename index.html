@@ -4,62 +4,31 @@
   <meta charset="UTF-8">
   <title>ESP:Z</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #eee;
-      color: black;
-    }
-    .login-container {
-      padding: 20px;
-    }
-    input {
-      display: block;
-      margin: 10px 0;
-      padding: 5px;
-    }
-    button {
-      margin-right: 5px;
-      padding: 6px 12px;
-      border: none;
-      background: #006644;
-      color: white;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #009966;
-    }
+    body { font-family: Arial, sans-serif; margin: 0; background: #eee; }
+    .login-container { padding: 20px; }
+    input { display: block; margin: 10px 0; padding: 5px; }
+    button { margin: 5px 0; padding: 6px 12px; border: none; background: #006644; color: white; border-radius: 6px; cursor: pointer; }
+    button:hover { background: #009966; }
 
-    /* Menú principal */
-    .app {
-      display: none;
-    }
-    .header {
-      background: #222;
-      color: white;
+    .app { display: none; }
+    .header { background: #222; color: white; padding: 10px; display: flex; justify-content: space-between; }
+    .sidebar { width: 200px; background: #333; color: white; height: calc(100vh - 40px); float: left; padding: 10px; }
+    .sidebar button { display: block; width: 100%; margin: 5px 0; background: #444; }
+    .content { margin-left: 210px; padding: 20px; }
+
+    .item-card {
+      background: white;
+      border-radius: 8px;
       padding: 10px;
-      display: flex;
-      justify-content: space-between;
+      margin: 10px;
+      width: 180px;
+      display: inline-block;
+      vertical-align: top;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
-    .sidebar {
-      width: 200px;
-      background: #333;
-      color: white;
-      height: calc(100vh - 40px);
-      float: left;
-      padding: 10px;
-    }
-    .sidebar button {
-      display: block;
-      width: 100%;
-      margin: 5px 0;
-      background: #444;
-    }
-    .content {
-      margin-left: 210px;
-      padding: 20px;
+    .item-card img {
+      width: 100px; height: 100px; object-fit: contain;
     }
   </style>
 </head>
@@ -90,11 +59,11 @@
     <div class="content">
       <div id="marketplace" class="section">
         <h2>Marketplace</h2>
-        <p>Aquí aparecerán los ítems...</p>
+        <div id="itemsContainer"></div>
       </div>
       <div id="inventory" class="section" style="display:none;">
         <h2>Inventory</h2>
-        <p>Tus objetos aparecerán aquí.</p>
+        <div id="inventoryContainer"></div>
       </div>
       <div id="trades" class="section" style="display:none;">
         <h2>Trades</h2>
@@ -112,10 +81,16 @@
   </div>
 
   <script>
+    const items = [
+      { id: 1, name: "Dominus Aureus", price: 500, img: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-420-420.png" },
+      { id: 2, name: "Red Sparkle Time Fedora", price: 350, img: "https://tr.rbxcdn.com/30DAY-AvatarBust-420-420.png" },
+      { id: 3, name: "Valkyrie Helm", price: 200, img: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-420-420.png" },
+      { id: 4, name: "Clockwork's Shades", price: 150, img: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-420-420.png" }
+    ];
+
     function getUsers() {
       return JSON.parse(localStorage.getItem("users") || "{}");
     }
-
     function saveUsers(users) {
       localStorage.setItem("users", JSON.stringify(users));
     }
@@ -132,7 +107,7 @@
         alert("Ese usuario ya existe");
         return;
       }
-      users[username] = { password, robux: 100, friends: [], requests: [] };
+      users[username] = { password, robux: 300, inventory: [], friends: [], requests: [] };
       saveUsers(users);
       localStorage.setItem("currentUser", username);
       loadApp();
@@ -166,11 +141,76 @@
       document.getElementById("app").style.display = "block";
       document.getElementById("playerName").textContent = "Jugador: " + username;
       document.getElementById("playerRobux").textContent = user.robux;
+
+      renderMarketplace();
+      renderInventory();
     }
 
     function showSection(sectionId) {
       document.querySelectorAll(".section").forEach(s => s.style.display = "none");
       document.getElementById(sectionId).style.display = "block";
+    }
+
+    function renderMarketplace() {
+      const container = document.getElementById("itemsContainer");
+      container.innerHTML = "";
+      items.forEach(it => {
+        const div = document.createElement("div");
+        div.className = "item-card";
+        div.innerHTML = `
+          <img src="${it.img}" onerror="this.src='https://via.placeholder.com/100'">
+          <h4>${it.name}</h4>
+          <p>💰 ${it.price} Robux</p>
+          <button onclick="buyItem(${it.id})">Comprar</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function renderInventory() {
+      const container = document.getElementById("inventoryContainer");
+      container.innerHTML = "";
+      const username = localStorage.getItem("currentUser");
+      const users = getUsers();
+      const inv = users[username].inventory;
+      if (inv.length === 0) {
+        container.innerHTML = "<p>No tienes ítems.</p>";
+        return;
+      }
+      inv.forEach(it => {
+        const item = items.find(i => i.id === it);
+        if (item) {
+          const div = document.createElement("div");
+          div.className = "item-card";
+          div.innerHTML = `
+            <img src="${item.img}" onerror="this.src='https://via.placeholder.com/100'">
+            <h4>${item.name}</h4>
+          `;
+          container.appendChild(div);
+        }
+      });
+    }
+
+    function buyItem(itemId) {
+      const username = localStorage.getItem("currentUser");
+      let users = getUsers();
+      let user = users[username];
+      const item = items.find(i => i.id === itemId);
+
+      if (user.robux < item.price) {
+        alert("Robux insuficientes");
+        return;
+      }
+      if (user.inventory.includes(itemId)) {
+        alert("Ya tienes este ítem");
+        return;
+      }
+
+      user.robux -= item.price;
+      user.inventory.push(itemId);
+      saveUsers(users);
+      loadApp();
+      alert("Has comprado " + item.name + "!");
     }
 
     // Si ya estaba logueado, cargar directo
