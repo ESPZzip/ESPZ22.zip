@@ -1,179 +1,477 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Roblox Revival</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Revival • Roblox</title>
   <style>
-    body { margin: 0; font-family: Arial, sans-serif; background: #111; color: #fff; }
-    .hidden { display: none; }
+    :root{
+      --bg:#0f1113;
+      --panel:#181a1f;
+      --soft:#1f232b;
+      --text:#e9eef3;
+      --muted:#9aa6b2;
+      --accent:#00d47e;
+      --accent-2:#3b82f6;
+      --danger:#ef4444;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial;
+      background:var(--bg); color:var(--text);
+    }
+    a{color:inherit}
 
-    /* Login/Register */
-    #auth {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: url('https://tr.rbxcdn.com/3dbd2f89a3f861a4f0d2d6d27498cb77/768/432/Image/Webp') center/cover no-repeat;
+    /* ============ AUTH VIEW ============ */
+    #authView{
+      min-height:100vh;
+      display:grid; place-items:center;
+      background:
+        linear-gradient(0deg, rgba(0,0,0,.55), rgba(0,0,0,.55)),
+        url("https://images.rbxcdn.com/69b1f0a8e2db9b8f9cae3a4f8e33d69f.jpg") center/cover no-repeat fixed;
+      padding:24px;
     }
-    #auth-box {
-      background: rgba(0,0,0,0.8);
-      padding: 20px;
-      border-radius: 10px;
-      width: 320px;
+    .auth-card{
+      width:min(630px, 100%);
+      background:var(--panel);
+      border:1px solid #242a33;
+      border-radius:16px;
+      padding:24px;
+      box-shadow:0 10px 30px rgba(0,0,0,.35);
     }
-    #auth-box h2 { text-align: center; margin-bottom: 20px; }
-    #auth-box input, #auth-box select, #auth-box button {
-      width: 100%; padding: 10px; margin: 8px 0; border: none; border-radius: 5px;
+    .brand{
+      display:flex; justify-content:center; gap:10px; align-items:center; margin-bottom:8px;
+      font-weight:800; letter-spacing:.05em; font-size:28px;
     }
-    #auth-box button { background: #00b06f; color: white; font-weight: bold; cursor: pointer; }
-    #auth-box button:hover { background: #00d47e; }
+    .tabs{
+      display:flex; gap:8px; margin:10px 0 18px;
+      background:var(--soft); padding:6px; border-radius:12px;
+    }
+    .tab{
+      flex:1; text-align:center; padding:10px 12px; cursor:pointer; user-select:none;
+      color:var(--muted); border-radius:8px; font-weight:700;
+    }
+    .tab.active{ background:#0b0d11; color:var(--text) }
+    .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+    label{display:block; font-size:12px; color:var(--muted); margin:8px 2px}
+    input, select{
+      width:100%; padding:12px 12px; border-radius:10px; border:1px solid #2a313a;
+      background:#0b0d11; color:var(--text); outline:none;
+    }
+    input:focus, select:focus{border-color:#344053}
+    .btn{
+      width:100%; padding:12px 14px; border:0; border-radius:12px; cursor:pointer; font-weight:800;
+      background:var(--accent); color:#02130c; margin-top:8px;
+    }
+    .btn.secondary{ background:var(--soft); color:var(--text) }
+    .hint{font-size:12px; color:var(--muted); text-align:center; margin-top:10px}
+    .error{color:var(--danger); font-size:12px; margin-top:6px; display:none}
+    .success{color:var(--accent); font-size:12px; margin-top:6px; display:none}
 
-    /* Main App */
-    #app { display: flex; height: 100vh; }
-    #sidebar {
-      width: 220px; background: #181a1b; padding: 15px; box-sizing: border-box;
+    /* ============ APP VIEW ============ */
+    #appView{display:none; height:100vh}
+    .sidebar{
+      width:230px; background:var(--panel); border-right:1px solid #1f2630; padding:16px; overflow-y:auto;
     }
-    #sidebar h2 { font-size: 20px; margin-bottom: 20px; }
-    #sidebar a { display: block; color: white; padding: 8px 0; text-decoration: none; }
-    #sidebar a:hover { color: #00d47e; }
-    #content { flex: 1; padding: 20px; overflow-y: auto; }
-    #topbar {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 10px 20px; background: #202224; position: sticky; top: 0;
+    .sb-brand{font-weight:900; letter-spacing:.06em; margin-bottom:18px}
+    .sb-user{
+      display:flex; align-items:center; gap:10px; background:var(--soft);
+      padding:10px; border-radius:12px; margin-bottom:12px;
     }
-    #robux { font-weight: bold; color: #00d47e; }
+    .sb-user img{width:36px; height:36px; border-radius:50%}
+    .nav a{
+      display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px;
+      color:var(--text); text-decoration:none; margin:4px 0;
+    }
+    .nav a.active, .nav a:hover{ background:#0b0d11 }
+    .content{flex:1; display:flex; flex-direction:column; overflow:hidden}
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding:10px 16px; background:var(--panel); border-bottom:1px solid #1f2630;
+      position:sticky; top:0; z-index:5;
+    }
+    .search{flex:1; max-width:520px}
+    .search input{width:100%}
+    .robux-badge{
+      background:#0b1611; color:#00f18a; border:1px solid #143127;
+      font-weight:800; padding:8px 12px; border-radius:12px;
+    }
+    .view{padding:18px; overflow:auto; height:100%}
+    h1{margin:0 0 8px}
+    .subtitle{color:var(--muted); margin:0 0 16px}
 
-    /* Home */
-    #homeSec h1 { margin-bottom: 10px; }
-    .connections { display: flex; gap: 10px; margin: 15px 0; align-items: center; }
-    .connections .user {
-      display: flex; flex-direction: column; align-items: center; font-size: 12px;
+    /* Home specifics */
+    .connections-row{display:flex; gap:14px; margin:14px 0 22px; flex-wrap:wrap}
+    .conn{
+      width:72px; display:flex; flex-direction:column; align-items:center; gap:6px;
+      font-size:11px; color:var(--muted);
     }
-    .connections img { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #00d47e; }
+    .conn img{
+      width:56px; height:56px; border-radius:50%; border:2px solid #202631; object-fit:cover;
+    }
+    .cards{
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px;
+    }
+    .card{
+      background:var(--panel); border:1px solid #1f2630; border-radius:12px; overflow:hidden;
+    }
+    .card img{width:100%; aspect-ratio:16/9; object-fit:cover}
+    .card .p{padding:10px 12px}
+    .muted{color:var(--muted); font-size:12px}
+
+    /* Utilities */
+    .hidden{display:none !important}
+    @media (max-width:900px){
+      #appView{flex-direction:column}
+      .sidebar{width:100%; border-right:none; border-bottom:1px solid #1f2630; display:flex; gap:10px; align-items:center}
+      .nav{display:flex; gap:8px; flex-wrap:wrap}
+    }
   </style>
 </head>
 <body>
 
-  <!-- Login/Register -->
-  <section id="auth">
-    <div id="auth-box">
-      <h2>¡REGÍSTRATE Y DIVIÉRTETE!</h2>
-      <select id="day"><option>Día</option></select>
-      <select id="month"><option>Mes</option></select>
-      <select id="year"><option>Año</option></select>
-      <input type="text" id="username" placeholder="Usuario">
-      <input type="password" id="password" placeholder="Contraseña (mín. 8 caracteres)">
-      <button onclick="register()">Registrarse</button>
-      <p style="text-align:center; margin-top:10px;">¿Ya tienes cuenta? 
-        <a href="#" onclick="toggleLogin()">Inicia sesión</a>
-      </p>
-    </div>
+  <!-- ============== AUTH VIEW (Registro / Login) ============== -->
+  <section id="authView">
+    <form id="authForm" class="auth-card" autocomplete="off">
+      <div class="brand">ROBLOX</div>
+
+      <div class="tabs">
+        <div class="tab active" id="tab-register" role="button">Crear cuenta</div>
+        <div class="tab" id="tab-login" role="button">Iniciar sesión</div>
+      </div>
+
+      <!-- Registro -->
+      <div id="registerPane">
+        <label>Fecha de nacimiento</label>
+        <div class="grid-3">
+          <select id="r-day"><option value="">Día</option></select>
+          <select id="r-month"><option value="">Mes</option></select>
+          <select id="r-year"><option value="">Año</option></select>
+        </div>
+
+        <label>Usuario</label>
+        <input id="r-user" placeholder="No utilices tu nombre real" minlength="3" maxlength="20" required />
+
+        <label>Contraseña</label>
+        <input id="r-pass" type="password" placeholder="Por lo menos 8 caracteres" minlength="8" required />
+
+        <button class="btn" id="btn-register" type="submit">Registrarte</button>
+        <div id="r-error" class="error"></div>
+        <div id="r-ok" class="success">¡Cuenta creada! Enviando al inicio…</div>
+
+        <div class="hint">¿Ya tienes cuenta? <a href="#" id="goLogin">Inicia sesión</a></div>
+      </div>
+
+      <!-- Login -->
+      <div id="loginPane" class="hidden">
+        <label>Usuario</label>
+        <input id="l-user" placeholder="Tu usuario" required />
+
+        <label>Contraseña</label>
+        <input id="l-pass" type="password" placeholder="Tu contraseña" required />
+
+        <button class="btn" id="btn-login" type="submit">Entrar</button>
+        <div id="l-error" class="error"></div>
+
+        <div class="hint">¿Nuevo aquí? <a href="#" id="goRegister">Crear cuenta</a></div>
+      </div>
+    </form>
   </section>
 
-  <!-- Main App -->
-  <section id="app" class="hidden">
-    <div id="sidebar">
-      <h2>ROBLOX</h2>
-      <a href="#" onclick="showSection('home')">Home</a>
-      <a href="#" onclick="showSection('profile')">Profile</a>
-      <a href="#" onclick="showSection('catalog')">Catalog</a>
-      <a href="#" onclick="logout()">Cerrar sesión</a>
-    </div>
-    <div id="content">
-      <div id="topbar">
-        <span>Bienvenido, <b id="userDisplay"></b></span>
-        <span id="robux">Robux: 100</span>
-      </div>
-      <section id="homeSec">
-        <h1>Home</h1>
-        <h3 id="connectionsTitle"></h3>
-        <div class="connections" id="connectionsList">
-          <!-- Aquí aparecerá el usuario y sus amigos -->
+  <!-- ============== APP VIEW (Home) ============== -->
+  <section id="appView" style="display:flex">
+    <aside class="sidebar">
+      <div class="sb-brand">ROBLOX</div>
+      <div class="sb-user">
+        <img id="sbAvatar" src="https://tr.rbxcdn.com/0e5cc4633a5a97c6f0d948e57843da9b/150/150/AvatarHeadshot/Webp" alt="avatar"/>
+        <div>
+          <div id="sbUsername" style="font-weight:700">Usuario</div>
+          <div class="muted" id="sbTag">@player</div>
         </div>
-      </section>
-      <section id="profileSec" class="hidden">👤 Aquí va el perfil</section>
-      <section id="catalogSec" class="hidden">🛍️ Aquí va el catálogo</section>
-    </div>
+      </div>
+      <nav class="nav">
+        <a href="#" data-view="home" class="active">Home</a>
+        <a href="#" data-view="catalog">Catalog</a>
+        <a href="#" data-view="profile">Profile</a>
+        <a href="#" id="btn-logout" class="secondary">Cerrar sesión</a>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <div class="topbar">
+        <div class="search"><input id="search" placeholder="Search" /></div>
+        <div class="robux-badge" id="robuxBadge">Robux: 100</div>
+      </div>
+
+      <!-- HOME -->
+      <div id="view-home" class="view">
+        <h1 id="homeTitle">Home</h1>
+        <div id="connTitle" class="subtitle">Connections (16)</div>
+
+        <div id="connRow" class="connections-row"></div>
+
+        <div class="subtitle">Today's Picks</div>
+        <div class="cards">
+          <div class="card">
+            <img src="https://tr.rbxcdn.com/26d2a6f8cabf2b9a63bc8cb6cd1f0c52/768/432/Image/Webp" alt="">
+            <div class="p">
+              <div style="font-weight:700">KPOP Demon Hunters: The Block</div>
+              <div class="muted">Event · The Block</div>
+            </div>
+          </div>
+          <div class="card">
+            <img src="https://tr.rbxcdn.com/0d1f3b090d6b8ea8d4038a2b8d3cf6c7/768/432/Image/Webp" alt="">
+            <div class="p">
+              <div style="font-weight:700">Tennis Zero [UPD]</div>
+              <div class="muted">Ref Style Added</div>
+            </div>
+          </div>
+          <div class="card">
+            <img src="https://tr.rbxcdn.com/7b2f9b645f1c1c7e25f847e1fd7b8a78/768/432/Image/Webp" alt="">
+            <div class="p">
+              <div style="font-weight:700">a dusty trip [NEW SEASON]</div>
+              <div class="muted">Season 10 is here!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CATALOG -->
+      <div id="view-catalog" class="view hidden">
+        <h1>Catalog</h1>
+        <div class="subtitle">Algunos artículos populares</div>
+        <div class="cards">
+          <div class="card">
+            <img src="https://tr.rbxcdn.com/7e4ed28cf6b17a6c1e3b7c64c95d9f60/768/432/Hat/Webp" alt="">
+            <div class="p"><div style="font-weight:700">Dominus Aureus</div><div class="muted">1,000,000 R$</div></div>
+          </div>
+          <div class="card">
+            <img src="https://tr.rbxcdn.com/31dcd0ff8801c60d0b8dfc7db0c17f7e/768/432/Hat/Webp" alt="">
+            <div class="p"><div style="font-weight:700">Korblox Deathspeaker</div><div class="muted">17,000 R$</div></div>
+          </div>
+          <div class="card">
+            <img src="https://tr.rbxcdn.com/3cfe7c2b40f7e15ae8fc62075852d7f4/768/432/Hat/Webp" alt="">
+            <div class="p"><div style="font-weight:700">Valkyrie Helm</div><div class="muted">250,000 R$</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROFILE -->
+      <div id="view-profile" class="view hidden">
+        <h1>Profile</h1>
+        <div class="subtitle">Información básica del jugador</div>
+        <div class="cards">
+          <div class="card">
+            <img id="profileAvatar" src="https://tr.rbxcdn.com/0e5cc4633a5a97c6f0d948e57843da9b/768/432/AvatarHeadshot/Webp" alt="">
+            <div class="p">
+              <div id="profileName" style="font-weight:800; font-size:18px">Usuario</div>
+              <div id="profileTag" class="muted">@player</div>
+              <div class="muted" style="margin-top:6px">Join Date: <span id="joinDate">—</span></div>
+              <div class="muted">Place Visits: 0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
   </section>
 
   <script>
-    // Rellenar selects de fecha
-    for(let i=1;i<=31;i++) document.getElementById("day").innerHTML += `<option>${i}</option>`;
-    for(let i=1;i<=12;i++) document.getElementById("month").innerHTML += `<option>${i}</option>`;
-    for(let i=2023;i>=1900;i--) document.getElementById("year").innerHTML += `<option>${i}</option>`;
+    /* ================= STORAGE HELPERS ================= */
+    const LS_USERS_KEY = "rr_users";         // mapa username -> {password, robux, createdAt, avatar}
+    const LS_CURRENT_KEY = "rr_currentUser"; // username actual
 
-    function register() {
-      let user = document.getElementById("username").value;
-      let pass = document.getElementById("password").value;
-      if(user.length<3 || pass.length<8) {
-        alert("Usuario o contraseña inválidos");
-        return;
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => [...root.querySelectorAll(sel)];
+
+    function getUsers(){
+      try{ return JSON.parse(localStorage.getItem(LS_USERS_KEY)) || {} }catch{ return {} }
+    }
+    function setUsers(obj){ localStorage.setItem(LS_USERS_KEY, JSON.stringify(obj)) }
+    function setCurrentUser(username){ localStorage.setItem(LS_CURRENT_KEY, username) }
+    function getCurrentUser(){ return localStorage.getItem(LS_CURRENT_KEY) }
+
+    /* ================== AUTH UI TOGGLING ================== */
+    const tabRegister = $("#tab-register");
+    const tabLogin = $("#tab-login");
+    const registerPane = $("#registerPane");
+    const loginPane = $("#loginPane");
+    const goLogin = $("#goLogin");
+    const goRegister = $("#goRegister");
+
+    function showRegister(){
+      tabRegister.classList.add("active");
+      tabLogin.classList.remove("active");
+      registerPane.classList.remove("hidden");
+      loginPane.classList.add("hidden");
+      $("#r-user").focus();
+    }
+    function showLogin(){
+      tabLogin.classList.add("active");
+      tabRegister.classList.remove("active");
+      loginPane.classList.remove("hidden");
+      registerPane.classList.add("hidden");
+      $("#l-user").focus();
+    }
+    tabRegister.onclick = showRegister;
+    tabLogin.onclick = showLogin;
+    goLogin.onclick = (e)=>{e.preventDefault(); showLogin()};
+    goRegister.onclick = (e)=>{e.preventDefault(); showRegister()};
+
+    /* ================== POPULATE DATE SELECTS ================== */
+    const rDay = $("#r-day"), rMonth = $("#r-month"), rYear = $("#r-year");
+    for(let d=1; d<=31; d++) rDay.insertAdjacentHTML("beforeend", `<option>${d}</option>`);
+    for(let m=1; m<=12; m++) rMonth.insertAdjacentHTML("beforeend", `<option>${m}</option>`);
+    const thisYear = new Date().getFullYear();
+    for(let y=thisYear; y>=1900; y--) rYear.insertAdjacentHTML("beforeend", `<option>${y}</option>`);
+
+    /* ================== AUTH SUBMIT HANDLER ================== */
+    const authForm = $("#authForm");
+    authForm.addEventListener("submit", (e)=>{
+      e.preventDefault();
+      if(!registerPane.classList.contains("hidden")) {
+        handleRegister();
+      } else {
+        handleLogin();
       }
-      localStorage.setItem("robloxUser", user);
-      localStorage.setItem("robloxPass", pass);
-      location.reload(); // 🔥 reinicia la página después de registrarse
+    });
+
+    function handleRegister(){
+      const user = $("#r-user").value.trim();
+      const pass = $("#r-pass").value;
+      const err = $("#r-error"), ok = $("#r-ok");
+      err.style.display = "none"; ok.style.display = "none";
+
+      // Validaciones básicas
+      if(user.length < 3 || user.length > 20){
+        err.textContent = "El usuario debe tener entre 3 y 20 caracteres."; err.style.display="block"; return;
+      }
+      if(/\s/.test(user)){
+        err.textContent = "El usuario no puede contener espacios."; err.style.display="block"; return;
+      }
+      if(pass.length < 8){
+        err.textContent = "La contraseña debe tener al menos 8 caracteres."; err.style.display="block"; return;
+      }
+      const users = getUsers();
+      if(users[user]){
+        err.textContent = "Ese nombre de usuario ya existe. Elige otro."; err.style.display="block"; return;
+      }
+
+      // Crear usuario
+      const newUser = {
+        password: pass,
+        robux: 100,
+        createdAt: new Date().toISOString(),
+        avatar: "https://tr.rbxcdn.com/0e5cc4633a5a97c6f0d948e57843da9b/150/150/AvatarHeadshot/Webp",
+        tag: "@"+user.toLowerCase()
+      };
+      users[user] = newUser;
+      setUsers(users);
+      setCurrentUser(user);
+
+      ok.style.display = "block";
+      // "Redirigir" al Home (mostrar app)
+      setTimeout(()=> enterApp(user, users[user]), 350);
     }
 
-    function login(user) {
-      document.getElementById("auth").classList.add("hidden");
-      document.getElementById("app").classList.remove("hidden");
-      document.getElementById("userDisplay").textContent = user;
-      document.getElementById("connectionsTitle").textContent = `${user}'s Connections (16)`;
+    function handleLogin(){
+      const user = $("#l-user").value.trim();
+      const pass = $("#l-pass").value;
+      const err = $("#l-error"); err.style.display="none";
 
-      // Mostrar usuario con avatar en Connections
-      let conns = document.getElementById("connectionsList");
-      conns.innerHTML = `
-        <div class="user">
-          <img src="https://tr.rbxcdn.com/0e5cc4633a5a97c6f0d948e57843da9b/150/150/AvatarHeadshot/Webp" alt="Avatar">
-          <span>${user}</span>
-        </div>
-      `;
+      const users = getUsers();
+      if(!users[user] || users[user].password !== pass){
+        err.textContent = "Usuario o contraseña incorrectos."; err.style.display="block"; return;
+      }
+      setCurrentUser(user);
+      enterApp(user, users[user]);
+    }
 
-      // Agregar amigos falsos
-      let friends = [
+    /* ================== ENTER APP / RENDER ================== */
+    const authView = $("#authView");
+    const appView = $("#appView");
+    const navLinks = $$(".nav a[data-view]");
+    const views = {
+      home: $("#view-home"),
+      catalog: $("#view-catalog"),
+      profile: $("#view-profile")
+    };
+
+    function enterApp(username, data){
+      // Ocultar auth, mostrar app
+      authView.style.display = "none";
+      appView.style.display = "flex";
+
+      // Top/Side UI
+      $("#sbUsername").textContent = username;
+      $("#sbTag").textContent = data?.tag || "@"+username.toLowerCase();
+      $("#sbAvatar").src = data?.avatar || "https://tr.rbxcdn.com/0e5cc4633a5a97c6f0d948e57843da9b/150/150/AvatarHeadshot/Webp";
+      $("#robuxBadge").textContent = "Robux: " + (data?.robux ?? 100);
+
+      // Profile card
+      $("#profileName").textContent = username;
+      $("#profileTag").textContent = data?.tag || "@"+username.toLowerCase();
+      $("#profileAvatar").src = data?.avatar || "https://tr.rbxcdn.com/0e5cc4633a5a97c6f0d948e57843da9b/768/432/AvatarHeadshot/Webp";
+      $("#joinDate").textContent = new Date(data?.createdAt || Date.now()).toLocaleDateString();
+
+      // Home title + connections header
+      $("#homeTitle").textContent = "Home";
+      $("#connTitle").textContent = `${username}'s Connections (16)`;
+
+      // Render connections (usuario + “amigos” demo)
+      const connRow = $("#connRow");
+      connRow.innerHTML = ""; // clean
+      const me = {name: username, img: data?.avatar};
+      const friends = [
         {name:"Agus", img:"https://tr.rbxcdn.com/6a8858b3f1d0a037fd8e3f3a74b11ad4/150/150/AvatarHeadshot/Webp"},
         {name:"Luciano", img:"https://tr.rbxcdn.com/246e42d01afcc9a9d7ccdfd25521db0d/150/150/AvatarHeadshot/Webp"},
-        {name:"TNT_JDG", img:"https://tr.rbxcdn.com/465a33c8a7a448a3282710e8b5b7419e/150/150/AvatarHeadshot/Webp"}
+        {name:"TNT_JDG", img:"https://tr.rbxcdn.com/465a33c8a7a448a3282710e8b5b7419e/150/150/AvatarHeadshot/Webp"},
+        {name:"Hermann", img:"https://tr.rbxcdn.com/4b3f6b5c2b10231e0d2f4b0c1e2f1c1a/150/150/AvatarHeadshot/Webp"},
+        {name:"Santino", img:"https://tr.rbxcdn.com/3d7e9e7d0d1a6b1b2c1d2e3f4a5b6c7d/150/150/AvatarHeadshot/Webp"},
       ];
-      friends.forEach(f=>{
-        conns.innerHTML += `
-          <div class="user">
-            <img src="${f.img}" alt="${f.name}">
-            <span>${f.name}</span>
-          </div>
-        `;
+      [me, ...friends].forEach(p=>{
+        const el = document.createElement("div");
+        el.className = "conn";
+        el.innerHTML = `<img alt="${p.name}" src="${p.img}"><div>${p.name}</div>`;
+        connRow.appendChild(el);
       });
+
+      // Show home by default
+      switchView("home");
     }
 
-    function logout() {
-      localStorage.removeItem("robloxUser");
-      localStorage.removeItem("robloxPass");
+    function switchView(name){
+      Object.entries(views).forEach(([k,el])=>{
+        if(k===name) el.classList.remove("hidden"); else el.classList.add("hidden");
+      });
+      navLinks.forEach(a=> a.classList.toggle("active", a.dataset.view===name));
+    }
+
+    // Nav events
+    navLinks.forEach(a=>{
+      a.addEventListener("click", (e)=>{ e.preventDefault(); switchView(a.dataset.view) });
+    });
+
+    // Logout
+    $("#btn-logout").addEventListener("click", (e)=>{
+      e.preventDefault();
+      localStorage.removeItem(LS_CURRENT_KEY);
+      // Opcional: mantener usuarios registrados
       location.reload();
-    }
+    });
 
-    function toggleLogin() {
-      let user = prompt("Usuario:");
-      let pass = prompt("Contraseña:");
-      if(user === localStorage.getItem("robloxUser") && pass === localStorage.getItem("robloxPass")) {
-        login(user);
-      } else {
-        alert("Datos incorrectos");
+    // Auto-login if session exists
+    (function boot(){
+      const curr = getCurrentUser();
+      if(curr){
+        const users = getUsers();
+        enterApp(curr, users[curr]);
+      }else{
+        authView.style.display = "grid";
+        appView.style.display = "none";
+        showRegister();
       }
-    }
-
-    function showSection(sec) {
-      document.querySelectorAll("#content section").forEach(s=>s.classList.add("hidden"));
-      if(sec==="home") document.getElementById("homeSec").classList.remove("hidden");
-      if(sec==="profile") document.getElementById("profileSec").classList.remove("hidden");
-      if(sec==="catalog") document.getElementById("catalogSec").classList.remove("hidden");
-    }
-
-    // Mantener sesión si ya está logueado
-    window.onload = () => {
-      let user = localStorage.getItem("robloxUser");
-      if(user) login(user);
-    }
+    })();
   </script>
 </body>
 </html>
