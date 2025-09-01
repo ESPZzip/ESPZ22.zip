@@ -6,143 +6,78 @@
   <title>Revival • Roblox</title>
   <style>
     :root{
-      --bg:#0f1113;
-      --panel:#181a1f;
-      --soft:#1f232b;
-      --text:#e9eef3;
-      --muted:#9aa6b2;
-      --accent:#00d47e;
-      --accent-2:#3b82f6;
-      --danger:#ef4444;
+      --bg:#0f1113; --panel:#181a1f; --soft:#1f232b;
+      --text:#e9eef3; --muted:#9aa6b2; --accent:#00d47e; --danger:#ef4444;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial;
-      background:var(--bg); color:var(--text);
-    }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;background:var(--bg);color:var(--text)}
     a{color:inherit}
 
-    /* ============ AUTH VIEW ============ */
+    /* ---------- AUTH VIEW ---------- */
     #authView{
-      min-height:100vh;
-      display:grid; place-items:center;
-      background:
-        linear-gradient(0deg, rgba(0,0,0,.55), rgba(0,0,0,.55)),
+      min-height:100vh;display:grid;place-items:center;padding:24px;
+      background:linear-gradient(0deg, rgba(0,0,0,.55), rgba(0,0,0,.55)),
         url("https://images.rbxcdn.com/69b1f0a8e2db9b8f9cae3a4f8e33d69f.jpg") center/cover no-repeat fixed;
-      padding:24px;
     }
-    .auth-card{
-      width:min(630px, 100%);
-      background:var(--panel);
-      border:1px solid #242a33;
-      border-radius:16px;
-      padding:24px;
-      box-shadow:0 10px 30px rgba(0,0,0,.35);
-    }
-    .brand{
-      display:flex; justify-content:center; gap:10px; align-items:center; margin-bottom:8px;
-      font-weight:800; letter-spacing:.05em; font-size:28px;
-    }
-    .tabs{
-      display:flex; gap:8px; margin:10px 0 18px;
-      background:var(--soft); padding:6px; border-radius:12px;
-    }
-    .tab{
-      flex:1; text-align:center; padding:10px 12px; cursor:pointer; user-select:none;
-      color:var(--muted); border-radius:8px; font-weight:700;
-    }
-    .tab.active{ background:#0b0d11; color:var(--text) }
-    .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
-    label{display:block; font-size:12px; color:var(--muted); margin:8px 2px}
-    input, select{
-      width:100%; padding:12px 12px; border-radius:10px; border:1px solid #2a313a;
-      background:#0b0d11; color:var(--text); outline:none;
-    }
-    input:focus, select:focus{border-color:#344053}
-    .btn{
-      width:100%; padding:12px 14px; border:0; border-radius:12px; cursor:pointer; font-weight:800;
-      background:var(--accent); color:#02130c; margin-top:8px;
-    }
-    .btn.secondary{ background:var(--soft); color:var(--text) }
-    .hint{font-size:12px; color:var(--muted); text-align:center; margin-top:10px}
-    .error{color:var(--danger); font-size:12px; margin-top:6px; display:none}
-    .success{color:var(--accent); font-size:12px; margin-top:6px; display:none}
+    .auth-card{width:min(640px,100%);background:var(--panel);border:1px solid #242a33;border-radius:16px;padding:24px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    .brand{display:flex;justify-content:center;font-weight:900;letter-spacing:.06em;font-size:28px;margin-bottom:8px}
+    .tabs{display:flex;gap:8px;background:var(--soft);padding:6px;border-radius:12px;margin:10px 0 18px}
+    .tab{flex:1;text-align:center;padding:10px 12px;border-radius:8px;cursor:pointer;color:var(--muted);font-weight:800;user-select:none}
+    .tab.active{background:#0b0d11;color:var(--text)}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    label{display:block;font-size:12px;color:var(--muted);margin:8px 2px}
+    input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #2a313a;background:#0b0d11;color:var(--text);outline:none}
+    input:focus,select:focus{border-color:#344053}
+    .btn{width:100%;padding:12px 14px;border:0;border-radius:12px;cursor:pointer;font-weight:900;background:var(--accent);color:#02130c;margin-top:10px}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .hint{font-size:12px;color:var(--muted);text-align:center;margin-top:10px}
+    .msg{font-size:13px;margin-top:8px;display:none}
+    .msg.error{color:var(--danger)} .msg.ok{color:var(--accent);font-weight:800}
 
-    /* ============ APP VIEW ============ */
-    #appView{display:none; height:100vh}
-    .sidebar{
-      width:230px; background:var(--panel); border-right:1px solid #1f2630; padding:16px; overflow-y:auto;
-    }
-    .sb-brand{font-weight:900; letter-spacing:.06em; margin-bottom:18px}
-    .sb-user{
-      display:flex; align-items:center; gap:10px; background:var(--soft);
-      padding:10px; border-radius:12px; margin-bottom:12px;
-    }
-    .sb-user img{width:36px; height:36px; border-radius:50%}
-    .nav a{
-      display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px;
-      color:var(--text); text-decoration:none; margin:4px 0;
-    }
-    .nav a.active, .nav a:hover{ background:#0b0d11 }
-    .content{flex:1; display:flex; flex-direction:column; overflow:hidden}
-    .topbar{
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-      padding:10px 16px; background:var(--panel); border-bottom:1px solid #1f2630;
-      position:sticky; top:0; z-index:5;
-    }
-    .search{flex:1; max-width:520px}
-    .search input{width:100%}
-    .robux-badge{
-      background:#0b1611; color:#00f18a; border:1px solid #143127;
-      font-weight:800; padding:8px 12px; border-radius:12px;
-    }
-    .view{padding:18px; overflow:auto; height:100%}
-    h1{margin:0 0 8px}
-    .subtitle{color:var(--muted); margin:0 0 16px}
+    /* ---------- APP VIEW ---------- */
+    #appView{display:none;height:100vh}
+    .sidebar{width:230px;background:var(--panel);border-right:1px solid #1f2630;padding:16px;overflow-y:auto}
+    .sb-brand{font-weight:900;letter-spacing:.06em;margin-bottom:18px}
+    .sb-user{display:flex;align-items:center;gap:10px;background:var(--soft);padding:10px;border-radius:12px;margin-bottom:12px}
+    .sb-user img{width:36px;height:36px;border-radius:50%}
+    .nav a{display:block;padding:10px 12px;border-radius:10px;color:var(--text);text-decoration:none;margin:6px 0}
+    .nav a.active,.nav a:hover{background:#0b0d11}
+    .content{flex:1;display:flex;flex-direction:column;overflow:hidden}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 16px;background:var(--panel);border-bottom:1px solid #1f2630;position:sticky;top:0;z-index:5}
+    .search{flex:1;max-width:520px}
+    .robux{background:#0b1611;color:#00f18a;border:1px solid #143127;font-weight:900;padding:8px 12px;border-radius:12px}
+    .view{padding:18px;overflow:auto;height:100%}
+    h1{margin:0 0 8px}.subtitle{color:var(--muted);margin:0 0 16px}
 
-    /* Home specifics */
-    .connections-row{display:flex; gap:14px; margin:14px 0 22px; flex-wrap:wrap}
-    .conn{
-      width:72px; display:flex; flex-direction:column; align-items:center; gap:6px;
-      font-size:11px; color:var(--muted);
-    }
-    .conn img{
-      width:56px; height:56px; border-radius:50%; border:2px solid #202631; object-fit:cover;
-    }
-    .cards{
-      display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px;
-    }
-    .card{
-      background:var(--panel); border:1px solid #1f2630; border-radius:12px; overflow:hidden;
-    }
-    .card img{width:100%; aspect-ratio:16/9; object-fit:cover}
-    .card .p{padding:10px 12px}
-    .muted{color:var(--muted); font-size:12px}
+    /* Home bits */
+    .connections-row{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0 22px}
+    .empty{color:var(--muted);font-size:13px}
+    .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+    .card{background:var(--panel);border:1px solid #1f2630;border-radius:12px;overflow:hidden}
+    .card img{width:100%;aspect-ratio:16/9;object-fit:cover}
+    .card .p{padding:10px 12px}.muted{color:var(--muted);font-size:12px}
 
-    /* Utilities */
-    .hidden{display:none !important}
     @media (max-width:900px){
       #appView{flex-direction:column}
-      .sidebar{width:100%; border-right:none; border-bottom:1px solid #1f2630; display:flex; gap:10px; align-items:center}
-      .nav{display:flex; gap:8px; flex-wrap:wrap}
+      .sidebar{width:100%;border-right:none;border-bottom:1px solid #1f2630;display:flex;gap:10px;align-items:center}
+      .nav{display:flex;gap:8px;flex-wrap:wrap}
     }
   </style>
 </head>
 <body>
 
-  <!-- ============== AUTH VIEW (Registro / Login) ============== -->
+  <!-- ========== AUTH (Registro / Login) ========== -->
   <section id="authView">
-    <form id="authForm" class="auth-card" autocomplete="off">
+    <div class="auth-card">
       <div class="brand">ROBLOX</div>
 
       <div class="tabs">
-        <div class="tab active" id="tab-register" role="button">Crear cuenta</div>
-        <div class="tab" id="tab-login" role="button">Iniciar sesión</div>
+        <div id="tabReg" class="tab active">Crear cuenta</div>
+        <div id="tabLog" class="tab">Iniciar sesión</div>
       </div>
 
       <!-- Registro -->
-      <div id="registerPane">
+      <div id="paneReg">
         <label>Fecha de nacimiento</label>
         <div class="grid-3">
           <select id="r-day"><option value="">Día</option></select>
@@ -151,96 +86,87 @@
         </div>
 
         <label>Usuario</label>
-        <input id="r-user" placeholder="No utilices tu nombre real" minlength="3" maxlength="20" required />
+        <input id="r-user" minlength="3" maxlength="20" placeholder="No utilices tu nombre real"/>
 
         <label>Contraseña</label>
-        <input id="r-pass" type="password" placeholder="Por lo menos 8 caracteres" minlength="8" required />
+        <input id="r-pass" type="password" minlength="8" placeholder="Por lo menos 8 caracteres"/>
 
-        <button class="btn" id="btn-register" type="submit">Registrarte</button>
-        <div id="r-error" class="error"></div>
-        <div id="r-ok" class="success">¡Cuenta creada! Enviando al inicio…</div>
+        <button id="btnRegister" class="btn" type="button">Registrarte</button>
+        <div id="rMsgErr" class="msg error"></div>
+        <div id="rMsgOk"  class="msg ok">¡Cuenta creada! <u>REFRESCA LA PÁGINA</u> para entrar al inicio.</div>
 
         <div class="hint">¿Ya tienes cuenta? <a href="#" id="goLogin">Inicia sesión</a></div>
       </div>
 
       <!-- Login -->
-      <div id="loginPane" class="hidden">
+      <div id="paneLog" style="display:none">
         <label>Usuario</label>
-        <input id="l-user" placeholder="Tu usuario" required />
+        <input id="l-user" placeholder="Tu usuario"/>
 
         <label>Contraseña</label>
-        <input id="l-pass" type="password" placeholder="Tu contraseña" required />
+        <input id="l-pass" type="password" placeholder="Tu contraseña"/>
 
-        <button class="btn" id="btn-login" type="submit">Entrar</button>
-        <div id="l-error" class="error"></div>
+        <button id="btnLogin" class="btn" type="button">Entrar</button>
+        <div id="lMsgErr" class="msg error"></div>
 
         <div class="hint">¿Nuevo aquí? <a href="#" id="goRegister">Crear cuenta</a></div>
       </div>
-    </form>
+    </div>
   </section>
 
-  <!-- ============== APP VIEW (Home) ============== -->
-  <section id="appView" style="display:flex">
+  <!-- ========== APP (Inicio) ========== -->
+  <section id="appView" style="display:none">
     <aside class="sidebar">
       <div class="sb-brand">ROBLOX</div>
       <div class="sb-user">
         <img id="sbAvatar" src="https://tr.rbxcdn.com/0e5cc4633a5a97c6f0d948e57843da9b/150/150/AvatarHeadshot/Webp" alt="avatar"/>
         <div>
-          <div id="sbUsername" style="font-weight:700">Usuario</div>
-          <div class="muted" id="sbTag">@player</div>
+          <div id="sbUsername" style="font-weight:800">Usuario</div>
+          <div id="sbTag" class="muted">@player</div>
         </div>
       </div>
       <nav class="nav">
         <a href="#" data-view="home" class="active">Home</a>
         <a href="#" data-view="catalog">Catalog</a>
         <a href="#" data-view="profile">Profile</a>
-        <a href="#" id="btn-logout" class="secondary">Cerrar sesión</a>
+        <a href="#" id="logout">Cerrar sesión</a>
       </nav>
     </aside>
 
     <main class="content">
       <div class="topbar">
-        <div class="search"><input id="search" placeholder="Search" /></div>
-        <div class="robux-badge" id="robuxBadge">Robux: 100</div>
+        <div class="search"><input placeholder="Search"/></div>
+        <div id="robux" class="robux">Robux: 100</div>
       </div>
 
-      <!-- HOME -->
+      <!-- Home -->
       <div id="view-home" class="view">
-        <h1 id="homeTitle">Home</h1>
-        <div id="connTitle" class="subtitle">Connections (16)</div>
-
-        <div id="connRow" class="connections-row"></div>
+        <h1>Home</h1>
+        <div id="connTitle" class="subtitle">Connections (0)</div>
+        <div id="connRow" class="connections-row">
+          <div class="empty">Aún no tienes conexiones.</div>
+        </div>
 
         <div class="subtitle">Today's Picks</div>
         <div class="cards">
           <div class="card">
             <img src="https://tr.rbxcdn.com/26d2a6f8cabf2b9a63bc8cb6cd1f0c52/768/432/Image/Webp" alt="">
-            <div class="p">
-              <div style="font-weight:700">KPOP Demon Hunters: The Block</div>
-              <div class="muted">Event · The Block</div>
-            </div>
+            <div class="p"><div style="font-weight:700">KPOP Demon Hunters: The Block</div><div class="muted">Event · The Block</div></div>
           </div>
           <div class="card">
             <img src="https://tr.rbxcdn.com/0d1f3b090d6b8ea8d4038a2b8d3cf6c7/768/432/Image/Webp" alt="">
-            <div class="p">
-              <div style="font-weight:700">Tennis Zero [UPD]</div>
-              <div class="muted">Ref Style Added</div>
-            </div>
+            <div class="p"><div style="font-weight:700">Tennis Zero [UPD]</div><div class="muted">Ref Style Added</div></div>
           </div>
           <div class="card">
             <img src="https://tr.rbxcdn.com/7b2f9b645f1c1c7e25f847e1fd7b8a78/768/432/Image/Webp" alt="">
-            <div class="p">
-              <div style="font-weight:700">a dusty trip [NEW SEASON]</div>
-              <div class="muted">Season 10 is here!</div>
-            </div>
+            <div class="p"><div style="font-weight:700">a dusty trip [NEW SEASON]</div><div class="muted">Season 10 is here!</div></div>
           </div>
         </div>
       </div>
 
-      <!-- CATALOG -->
-      <div id="view-catalog" class="view hidden">
+      <!-- Catalog -->
+      <div id="view-catalog" class="view" style="display:none">
         <h1>Catalog</h1>
-        <div class="subtitle">Algunos artículos populares</div>
         <div class="cards">
           <div class="card">
             <img src="https://tr.rbxcdn.com/7e4ed28cf6b17a6c1e3b7c64c95d9f60/768/432/Hat/Webp" alt="">
@@ -257,15 +183,14 @@
         </div>
       </div>
 
-      <!-- PROFILE -->
-      <div id="view-profile" class="view hidden">
+      <!-- Profile -->
+      <div id="view-profile" class="view" style="display:none">
         <h1>Profile</h1>
-        <div class="subtitle">Información básica del jugador</div>
         <div class="cards">
           <div class="card">
             <img id="profileAvatar" src="https://tr.rbxcdn.com/0e5cc4633a5a97c6f0d948e57843da9b/768/432/AvatarHeadshot/Webp" alt="">
             <div class="p">
-              <div id="profileName" style="font-weight:800; font-size:18px">Usuario</div>
+              <div id="profileName" style="font-weight:800;font-size:18px">Usuario</div>
               <div id="profileTag" class="muted">@player</div>
               <div class="muted" style="margin-top:6px">Join Date: <span id="joinDate">—</span></div>
               <div class="muted">Place Visits: 0</div>
@@ -277,200 +202,127 @@
   </section>
 
   <script>
-    /* ================= STORAGE HELPERS ================= */
-    const LS_USERS_KEY = "rr_users";         // mapa username -> {password, robux, createdAt, avatar}
-    const LS_CURRENT_KEY = "rr_currentUser"; // username actual
+    /* ===== LocalStorage keys ===== */
+    const K_USERS = "rr_users";         // mapa username -> {password,robux,createdAt,avatar,tag}
+    const K_CURRENT = "rr_currentUser"; // username actual
 
-    const $ = (sel, root=document) => root.querySelector(sel);
-    const $$ = (sel, root=document) => [...root.querySelectorAll(sel)];
+    const $  = (s, r=document)=>r.querySelector(s);
+    const $$ = (s, r=document)=>[...r.querySelectorAll(s)];
 
-    function getUsers(){
-      try{ return JSON.parse(localStorage.getItem(LS_USERS_KEY)) || {} }catch{ return {} }
-    }
-    function setUsers(obj){ localStorage.setItem(LS_USERS_KEY, JSON.stringify(obj)) }
-    function setCurrentUser(username){ localStorage.setItem(LS_CURRENT_KEY, username) }
-    function getCurrentUser(){ return localStorage.getItem(LS_CURRENT_KEY) }
-
-    /* ================== AUTH UI TOGGLING ================== */
-    const tabRegister = $("#tab-register");
-    const tabLogin = $("#tab-login");
-    const registerPane = $("#registerPane");
-    const loginPane = $("#loginPane");
-    const goLogin = $("#goLogin");
-    const goRegister = $("#goRegister");
+    /* ---------- Tabs Auth ---------- */
+    const tabReg=$("#tabReg"), tabLog=$("#tabLog");
+    const paneReg=$("#paneReg"), paneLog=$("#paneLog");
+    $("#goLogin").onclick = e => {e.preventDefault(); showLogin()};
+    $("#goRegister").onclick = e => {e.preventDefault(); showRegister()};
+    tabReg.onclick = showRegister; tabLog.onclick = showLogin;
 
     function showRegister(){
-      tabRegister.classList.add("active");
-      tabLogin.classList.remove("active");
-      registerPane.classList.remove("hidden");
-      loginPane.classList.add("hidden");
-      $("#r-user").focus();
+      tabReg.classList.add("active"); tabLog.classList.remove("active");
+      paneReg.style.display="block"; paneLog.style.display="none";
     }
     function showLogin(){
-      tabLogin.classList.add("active");
-      tabRegister.classList.remove("active");
-      loginPane.classList.remove("hidden");
-      registerPane.classList.add("hidden");
-      $("#l-user").focus();
+      tabLog.classList.add("active"); tabReg.classList.remove("active");
+      paneReg.style.display="none"; paneLog.style.display="block";
     }
-    tabRegister.onclick = showRegister;
-    tabLogin.onclick = showLogin;
-    goLogin.onclick = (e)=>{e.preventDefault(); showLogin()};
-    goRegister.onclick = (e)=>{e.preventDefault(); showRegister()};
 
-    /* ================== POPULATE DATE SELECTS ================== */
-    const rDay = $("#r-day"), rMonth = $("#r-month"), rYear = $("#r-year");
+    /* ---------- Poblar fecha ---------- */
+    const rDay=$("#r-day"), rMonth=$("#r-month"), rYear=$("#r-year");
     for(let d=1; d<=31; d++) rDay.insertAdjacentHTML("beforeend", `<option>${d}</option>`);
     for(let m=1; m<=12; m++) rMonth.insertAdjacentHTML("beforeend", `<option>${m}</option>`);
-    const thisYear = new Date().getFullYear();
-    for(let y=thisYear; y>=1900; y--) rYear.insertAdjacentHTML("beforeend", `<option>${y}</option>`);
+    const year=new Date().getFullYear();
+    for(let y=year; y>=1900; y--) rYear.insertAdjacentHTML("beforeend", `<option>${y}</option>`);
 
-    /* ================== AUTH SUBMIT HANDLER ================== */
-    const authForm = $("#authForm");
-    authForm.addEventListener("submit", (e)=>{
-      e.preventDefault();
-      if(!registerPane.classList.contains("hidden")) {
-        handleRegister();
-      } else {
-        handleLogin();
-      }
-    });
+    /* ---------- Helpers Storage ---------- */
+    const getUsers = () => { try{ return JSON.parse(localStorage.getItem(K_USERS))||{} }catch{ return {} } };
+    const setUsers = data => localStorage.setItem(K_USERS, JSON.stringify(data));
+    const setCurrent = u => localStorage.setItem(K_CURRENT, u);
+    const getCurrent = () => localStorage.getItem(K_CURRENT);
 
-    function handleRegister(){
+    /* ---------- Registro ---------- */
+    $("#btnRegister").onclick = () => {
       const user = $("#r-user").value.trim();
       const pass = $("#r-pass").value;
-      const err = $("#r-error"), ok = $("#r-ok");
-      err.style.display = "none"; ok.style.display = "none";
+      const err = $("#rMsgErr"), ok = $("#rMsgOk");
+      err.style.display="none"; ok.style.display="none";
 
-      // Validaciones básicas
-      if(user.length < 3 || user.length > 20){
-        err.textContent = "El usuario debe tener entre 3 y 20 caracteres."; err.style.display="block"; return;
-      }
-      if(/\s/.test(user)){
-        err.textContent = "El usuario no puede contener espacios."; err.style.display="block"; return;
-      }
-      if(pass.length < 8){
-        err.textContent = "La contraseña debe tener al menos 8 caracteres."; err.style.display="block"; return;
-      }
+      if(user.length<3 || user.length>20){ err.textContent="El usuario debe tener entre 3 y 20 caracteres."; err.style.display="block"; return; }
+      if(/\s/.test(user)){ err.textContent="El usuario no puede contener espacios."; err.style.display="block"; return; }
+      if(pass.length<8){ err.textContent="La contraseña debe tener al menos 8 caracteres."; err.style.display="block"; return; }
+
       const users = getUsers();
-      if(users[user]){
-        err.textContent = "Ese nombre de usuario ya existe. Elige otro."; err.style.display="block"; return;
-      }
+      if(users[user]){ err.textContent="Ese usuario ya existe. Elige otro."; err.style.display="block"; return; }
 
-      // Crear usuario
-      const newUser = {
+      users[user] = {
         password: pass,
         robux: 100,
         createdAt: new Date().toISOString(),
         avatar: "https://tr.rbxcdn.com/0e5cc4633a5a97c6f0d948e57843da9b/150/150/AvatarHeadshot/Webp",
         tag: "@"+user.toLowerCase()
       };
-      users[user] = newUser;
       setUsers(users);
-      setCurrentUser(user);
+      setCurrent(user);
 
-      ok.style.display = "block";
-      // "Redirigir" al Home (mostrar app)
-      setTimeout(()=> enterApp(user, users[user]), 350);
-    }
-
-    function handleLogin(){
-      const user = $("#l-user").value.trim();
-      const pass = $("#l-pass").value;
-      const err = $("#l-error"); err.style.display="none";
-
-      const users = getUsers();
-      if(!users[user] || users[user].password !== pass){
-        err.textContent = "Usuario o contraseña incorrectos."; err.style.display="block"; return;
-      }
-      setCurrentUser(user);
-      enterApp(user, users[user]);
-    }
-
-    /* ================== ENTER APP / RENDER ================== */
-    const authView = $("#authView");
-    const appView = $("#appView");
-    const navLinks = $$(".nav a[data-view]");
-    const views = {
-      home: $("#view-home"),
-      catalog: $("#view-catalog"),
-      profile: $("#view-profile")
+      // Mensaje solicitado
+      ok.innerHTML = "¡Cuenta creada! <b>REFRESCA LA PÁGINA</b> para entrar al inicio.";
+      ok.style.display="block";
+      $("#btnRegister").disabled = true;
     };
 
-    function enterApp(username, data){
-      // Ocultar auth, mostrar app
-      authView.style.display = "none";
-      appView.style.display = "flex";
+    /* ---------- Login ---------- */
+    $("#btnLogin").onclick = () => {
+      const user=$("#l-user").value.trim();
+      const pass=$("#l-pass").value;
+      const users=getUsers();
+      if(!users[user] || users[user].password!==pass){
+        $("#lMsgErr").textContent="Usuario o contraseña incorrectos."; $("#lMsgErr").style.display="block"; return;
+      }
+      setCurrent(user);
+      enterApp(user, users[user]); // entra directo si inicia sesión
+    };
 
-      // Top/Side UI
+    /* ---------- App render ---------- */
+    const authView=$("#authView"), appView=$("#appView");
+    function enterApp(username, data){
+      authView.style.display="none"; appView.style.display="flex";
+
+      // Sidebar/topbar/profile
       $("#sbUsername").textContent = username;
       $("#sbTag").textContent = data?.tag || "@"+username.toLowerCase();
-      $("#sbAvatar").src = data?.avatar || "https://tr.rbxcdn.com/0e5cc4633a5a97c6f0d948e57843da9b/150/150/AvatarHeadshot/Webp";
-      $("#robuxBadge").textContent = "Robux: " + (data?.robux ?? 100);
+      $("#sbAvatar").src = data?.avatar;
+      $("#robux").textContent = "Robux: " + (data?.robux ?? 100);
 
-      // Profile card
       $("#profileName").textContent = username;
       $("#profileTag").textContent = data?.tag || "@"+username.toLowerCase();
-      $("#profileAvatar").src = data?.avatar || "https://tr.rbxcdn.com/0e5cc4633a5a97c6f0d948e57843da9b/768/432/AvatarHeadshot/Webp";
-      $("#joinDate").textContent = new Date(data?.createdAt || Date.now()).toLocaleDateString();
+      $("#profileAvatar").src = data?.avatar.replace("/150/150/","/768/432/");
+      $("#joinDate").textContent = new Date(data?.createdAt||Date.now()).toLocaleDateString();
 
-      // Home title + connections header
-      $("#homeTitle").textContent = "Home";
-      $("#connTitle").textContent = `${username}'s Connections (16)`;
+      // Home header y sin amigos (como pediste)
+      $("#connTitle").textContent = "Connections (0)";
+      $("#connRow").innerHTML = '<div class="empty">Aún no tienes conexiones.</div>';
 
-      // Render connections (usuario + “amigos” demo)
-      const connRow = $("#connRow");
-      connRow.innerHTML = ""; // clean
-      const me = {name: username, img: data?.avatar};
-      const friends = [
-        {name:"Agus", img:"https://tr.rbxcdn.com/6a8858b3f1d0a037fd8e3f3a74b11ad4/150/150/AvatarHeadshot/Webp"},
-        {name:"Luciano", img:"https://tr.rbxcdn.com/246e42d01afcc9a9d7ccdfd25521db0d/150/150/AvatarHeadshot/Webp"},
-        {name:"TNT_JDG", img:"https://tr.rbxcdn.com/465a33c8a7a448a3282710e8b5b7419e/150/150/AvatarHeadshot/Webp"},
-        {name:"Hermann", img:"https://tr.rbxcdn.com/4b3f6b5c2b10231e0d2f4b0c1e2f1c1a/150/150/AvatarHeadshot/Webp"},
-        {name:"Santino", img:"https://tr.rbxcdn.com/3d7e9e7d0d1a6b1b2c1d2e3f4a5b6c7d/150/150/AvatarHeadshot/Webp"},
-      ];
-      [me, ...friends].forEach(p=>{
-        const el = document.createElement("div");
-        el.className = "conn";
-        el.innerHTML = `<img alt="${p.name}" src="${p.img}"><div>${p.name}</div>`;
-        connRow.appendChild(el);
-      });
-
-      // Show home by default
       switchView("home");
     }
 
+    // Navegación
+    const views = {home:$("#view-home"), catalog:$("#view-catalog"), profile:$("#view-profile")};
+    $$(".nav a[data-view]").forEach(a=>{
+      a.onclick = e => { e.preventDefault(); switchView(a.dataset.view); };
+    });
     function switchView(name){
       Object.entries(views).forEach(([k,el])=>{
-        if(k===name) el.classList.remove("hidden"); else el.classList.add("hidden");
+        el.style.display = (k===name) ? "block" : "none";
       });
-      navLinks.forEach(a=> a.classList.toggle("active", a.dataset.view===name));
+      $$(".nav a[data-view]").forEach(a=>a.classList.toggle("active", a.dataset.view===name));
     }
 
-    // Nav events
-    navLinks.forEach(a=>{
-      a.addEventListener("click", (e)=>{ e.preventDefault(); switchView(a.dataset.view) });
-    });
-
     // Logout
-    $("#btn-logout").addEventListener("click", (e)=>{
-      e.preventDefault();
-      localStorage.removeItem(LS_CURRENT_KEY);
-      // Opcional: mantener usuarios registrados
-      location.reload();
-    });
+    $("#logout").onclick = e => { e.preventDefault(); localStorage.removeItem(K_CURRENT); location.reload(); };
 
-    // Auto-login if session exists
+    // Auto-login si ya se registró/inició
     (function boot(){
-      const curr = getCurrentUser();
-      if(curr){
-        const users = getUsers();
-        enterApp(curr, users[curr]);
-      }else{
-        authView.style.display = "grid";
-        appView.style.display = "none";
-        showRegister();
-      }
+      const u = getCurrent();
+      if(u){ const users=getUsers(); enterApp(u, users[u]); }
+      else{ authView.style.display="grid"; appView.style.display="none"; showRegister(); }
     })();
   </script>
 </body>
