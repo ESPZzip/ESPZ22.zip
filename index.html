@@ -3,124 +3,75 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Mini Roblox Revival — Catálogo Demo</title>
+  <title>Mini Roblox Revival</title>
   <style>
-    :root{
-      --bg:#f2f3f5; --card:#ffffff; --line:#d7d7db; --text:#111; --muted:#666; --brand:#e32b2b; --ok:#118a2e;
-      --radius:12px; --shadow:0 10px 25px rgba(0,0,0,.08)
-    }
-    *{box-sizing:border-box}
-    body{margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background:var(--bg); color:var(--text)}
-    header{background:#fff; border-bottom:1px solid var(--line); padding:10px 20px; position:sticky; top:0; z-index:50}
-    .nav{max-width:1200px; margin:0 auto; display:flex; gap:16px; align-items:center; justify-content:space-between}
-    .logo{font-weight:800; font-size:20px; color:var(--brand)}
-    nav a{margin:0 8px; text-decoration:none; color:#333; font-weight:700}
-    .balance{margin-left:auto; display:flex; align-items:center; gap:10px}
-    .pill{background:#111; color:#fff; padding:8px 12px; border-radius:999px; font-weight:700}
-    .btn{padding:8px 12px; border-radius:8px; border:1px solid var(--line); background:#fff; cursor:pointer; font-weight:700}
-    .btn.primary{background:var(--brand); border-color:var(--brand); color:#fff}
-    .btn:disabled{opacity:.6; cursor:not-allowed}
-
+    body{margin:0; font-family:Arial, sans-serif; background:#f2f3f5; color:#111;}
+    header{background:#fff; border-bottom:1px solid #ccc; padding:10px 20px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50;}
+    .logo{font-weight:bold; font-size:20px; color:#e32b2b}
+    nav a, nav button{margin:0 10px; text-decoration:none; color:#333; font-weight:600; background:none; border:none; cursor:pointer; font-size:14px}
     .container{max-width:1200px; margin:0 auto; padding:20px}
-    h1{margin:0 0 14px}
-    h2{margin:0 0 10px}
-
-    /* Catálogo */
-    .searchbar{margin:14px 0 18px; display:flex; gap:10px}
-    .searchbar input, .searchbar select{padding:10px; border-radius:8px; border:1px solid var(--line); flex:1}
+    h1{margin:0 0 20px}
     .catalogo{display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:16px}
-    .item{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; display:flex; flex-direction:column; box-shadow:var(--shadow)}
-    .item img{width:100%; aspect-ratio:1/1; object-fit:cover; background:#eee}
-    .item-info{padding:10px; display:grid; gap:6px}
-    .item-title{font-weight:800; font-size:14px}
-    .price{color:var(--ok); font-weight:800; font-size:13px}
-    .owned{background:#eef8ee; border:1px solid #cfe9cf; color:#1a6e1a; padding:6px 8px; border-radius:6px; font-size:12px; font-weight:800; display:inline-block}
-
-    /* Perfil */
-    .profile-card{background:#fff; border:1px solid var(--line); border-radius:14px; padding:20px; display:flex; gap:20px; align-items:center; box-shadow:var(--shadow)}
-    .profile-card img{border-radius:12px; width:120px; height:120px; object-fit:cover}
-    .stats{display:flex; gap:18px; color:var(--muted); font-size:14px}
-    .inv-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; margin-top:12px}
-    .inv-item{background:#fff; border:1px solid var(--line); border-radius:10px; padding:10px; text-align:center}
-
-    footer{background:#fff; border-top:1px solid var(--line); text-align:center; padding:14px; margin-top:30px; font-size:14px; color:#666}
-
-    /* Modal */
-    .modal{position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.45)}
-    .modal.open{display:grid}
-    .modal-card{background:#fff; border-radius:14px; padding:20px; width:min(460px, 92vw); border:1px solid var(--line); box-shadow:var(--shadow)}
-    .modal-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:14px}
-
-    /* Toast */
-    .toasts{position:fixed; right:16px; top:16px; display:grid; gap:10px; z-index:60}
-    .toast{background:#111; color:#fff; padding:10px 14px; border-radius:10px; box-shadow:var(--shadow)}
+    .item{background:#fff; border:1px solid #ddd; border-radius:8px; overflow:hidden; display:flex; flex-direction:column;}
+    .item img{width:100%; aspect-ratio:1/1; object-fit:cover}
+    .item-info{padding:10px; flex:1; display:flex; flex-direction:column; justify-content:space-between}
+    .item-title{font-weight:bold; margin-bottom:6px; font-size:14px}
+    .price{color:#0b8a00; font-weight:bold; font-size:13px}
+    .btn{margin-top:8px; padding:8px; border:none; border-radius:6px; cursor:pointer; font-weight:bold}
+    .btn-buy{background:#e32b2b; color:#fff}
+    .btn-buy:hover{background:#c91f1f}
+    .searchbar{margin-bottom:20px; display:flex; gap:10px}
+    .searchbar input{flex:1; padding:10px; border-radius:6px; border:1px solid #bbb}
+    footer{background:#fff; border-top:1px solid #ccc; text-align:center; padding:14px; margin-top:30px; font-size:14px; color:#666}
+    .hidden{display:none}
+    #adminPanel{position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; border:1px solid #ccc; border-radius:10px; padding:20px; z-index:100; display:none; width:300px;}
+    #adminPanel h2{margin-top:0}
+    #overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;z-index:99}
+    #adminUsers div{margin:6px 0; display:flex; justify-content:space-between; align-items:center}
+    #adminUsers span{flex:1}
   </style>
 </head>
 <body>
   <header>
-    <div class="nav">
-      <div class="logo">Mini Roblox Revival</div>
-      <nav>
-        <a href="#inicio" data-nav>Inicio</a>
-        <a href="#catalogo" data-nav>Catálogo</a>
-        <a href="#perfil" data-nav>Perfil</a>
-        <a href="#comunidad" data-nav>Comunidad</a>
-      </nav>
-      <div class="balance">
-        <span class="pill">Monedas: <span id="coins">0</span></span>
-        <button id="topup" class="btn">Obtener +250</button>
-      </div>
-    </div>
+    <div class="logo">Mini Roblox Revival</div>
+    <nav>
+      <button onclick="showSection('inicio')">Inicio</button>
+      <button onclick="showSection('catalogo')">Catálogo</button>
+      <button onclick="showSection('perfil')">Perfil</button>
+      <button onclick="showSection('comunidad')">Comunidad</button>
+      <button id="adminBtn" class="hidden" onclick="openAdminPanel()">Admin</button>
+    </nav>
   </header>
 
   <main class="container">
     <section id="inicio">
       <h1>Bienvenido</h1>
-      <p>Prototipo interactivo de interfaz estilo Roblox. Los botones ahora **funcionan**: puedes comprar ítems, editar tu perfil y ver tu inventario. Todo se guarda en tu navegador (LocalStorage).</p>
+      <p>Este es un prototipo de página estilo Roblox con catálogo, para usar como demo en GitHub Pages.</p>
     </section>
 
-    <section id="catalogo">
+    <section id="catalogo" class="hidden">
       <h1>Catálogo</h1>
       <div class="searchbar">
         <input id="search" type="text" placeholder="Buscar ítem...">
-        <select id="sort">
-          <option value="relevance">Orden: Relevancia</option>
-          <option value="price-asc">Precio: Menor a mayor</option>
-          <option value="price-desc">Precio: Mayor a menor</option>
-          <option value="name-asc">Nombre A–Z</option>
-          <option value="name-desc">Nombre Z–A</option>
-        </select>
       </div>
       <div id="items" class="catalogo"></div>
     </section>
 
-    <section id="perfil" style="margin-top:40px">
+    <section id="perfil" class="hidden">
       <h1>Perfil</h1>
-      <div class="profile-card">
-        <img id="avatar" src="https://placehold.co/120x120" alt="Avatar">
-        <div style="flex:1">
+      <div style="background:#fff; border:1px solid #ddd; border-radius:10px; padding:20px; display:flex; gap:20px; align-items:center">
+        <img id="avatar" src="https://placehold.co/120x120" style="border-radius:10px">
+        <div>
           <h2 id="username">UsuarioDemo</h2>
-          <div class="stats">
-            <div>Amigos: <b>15</b></div>
-            <div>Items: <b id="countItems">0</b></div>
-          </div>
-          <div style="margin-top:10px; display:flex; gap:10px">
-            <button id="editProfile" class="btn primary">Editar Perfil</button>
-            <button id="clearData" class="btn">Reiniciar Datos</button>
-          </div>
+          <p>Amigos: 15 | Items: 8</p>
+          <button class="btn btn-buy">Editar Perfil</button>
         </div>
       </div>
-
-      <h2 style="margin-top:20px">Inventario</h2>
-      <div id="inventory" class="inv-grid"></div>
     </section>
 
-    <section id="comunidad" style="margin-top:40px">
+    <section id="comunidad" class="hidden">
       <h1>Comunidad</h1>
-      <div style="background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px; box-shadow:var(--shadow)">
-        <p>Únete al chat (demo): <code>discord.gg/tu-servidor</code></p>
-        <button class="btn">Copiar invitación</button>
-      </div>
+      <p>Foros, amigos y más próximamente...</p>
     </section>
   </main>
 
@@ -128,232 +79,110 @@
     © <span id="year"></span> Mini Roblox Revival. Proyecto no oficial.
   </footer>
 
-  <!-- Modal -->
-  <div id="modal" class="modal" aria-hidden="true"></div>
-  <!-- Toasts -->
-  <div id="toasts" class="toasts"></div>
+  <div id="overlay"></div>
+  <div id="adminPanel">
+    <h2>Panel de Admin</h2>
+    <button class="btn btn-buy" onclick="addCoins()">Agregar 500 monedas</button>
+    <h3>Usuarios</h3>
+    <div id="adminUsers"></div>
+    <button class="btn" style="margin-top:10px" onclick="closeAdminPanel()">Cerrar</button>
+  </div>
 
   <script>
-    // ======= Estado y utilidades =======
-    const $ = sel => document.querySelector(sel);
-    const state = {
-      coins: parseInt(localStorage.getItem('coins') || '500', 10),
-      inventory: JSON.parse(localStorage.getItem('inventory') || '[]'),
-      user: {
-        name: localStorage.getItem('username') || 'UsuarioDemo',
-        avatar: localStorage.getItem('avatar') || 'https://placehold.co/160x160'
-      }
-    };
-
-    const itemsData = [
-      {id:1,nombre:'Sombrero Clásico',precio:100,img:'https://placehold.co/300?text=Sombrero'},
-      {id:2,nombre:'Espada Retro',precio:250,img:'https://placehold.co/300?text=Espada'},
-      {id:3,nombre:'Camisa Pixelada',precio:75,img:'https://placehold.co/300?text=Camisa'},
-      {id:4,nombre:'Cara Divertida',precio:50,img:'https://placehold.co/300?text=Cara'},
-      {id:5,nombre:'Gafas de Sol',precio:90,img:'https://placehold.co/300?text=Gafas'},
-      {id:6,nombre:'Capa Épica',precio:320,img:'https://placehold.co/300?text=Capa'},
-      {id:7,nombre:'Ala Mecánica',precio:480,img:'https://placehold.co/300?text=Ala'},
-      {id:8,nombre:'Botas Turbo',precio:180,img:'https://placehold.co/300?text=Botas'}
-      {id:9,nombre:'Dominus Vespertilo',precio:1000,img:'https://placehold.co/300?text=Botas'}
+    const itemsData=[
+      {id:1,nombre:"Sombrero Clásico",precio:100,img:"https://placehold.co/200"},
+      {id:2,nombre:"Espada Retro",precio:250,img:"https://placehold.co/200"},
+      {id:3,nombre:"Camisa Pixelada",precio:75,img:"https://placehold.co/200"},
+      {id:4,nombre:"Cara Divertida",precio:50,img:"https://placehold.co/200"},
+      {id:5,nombre:"Gafas de Sol",precio:90,img:"https://placehold.co/200"},
     ];
 
-    function save(){
-      localStorage.setItem('coins', String(state.coins));
-      localStorage.setItem('inventory', JSON.stringify(state.inventory));
-      localStorage.setItem('username', state.user.name);
-      localStorage.setItem('avatar', state.user.avatar);
-    }
+    let monedas=1000;
+    let usuarios=[{nombre:"Usuario1",baneado:false},{nombre:"Usuario2",baneado:false},{nombre:"Usuario3",baneado:false}];
 
-    function toast(msg){
-      const t = document.createElement('div');
-      t.className = 'toast';
-      t.textContent = msg;
-      $('#toasts').appendChild(t);
-      setTimeout(()=>{ t.remove(); }, 2200);
-    }
+    const itemsContainer=document.getElementById("items");
+    const searchInput=document.getElementById("search");
 
-    // ======= Render =======
-    function renderBalance(){ $('#coins').textContent = state.coins; }
-
-    function renderProfile(){
-      $('#username').textContent = state.user.name;
-      $('#avatar').src = state.user.avatar;
-      $('#countItems').textContent = state.inventory.length;
-      const inv = $('#inventory');
-      inv.innerHTML = '';
-      if(state.inventory.length === 0){
-        inv.innerHTML = '<div class="inv-item">Aún no tienes ítems.</div>';
-        return;
-      }
-      state.inventory.forEach(id=>{
-        const it = itemsData.find(x=>x.id===id);
-        if(!it) return;
-        const el = document.createElement('div');
-        el.className='inv-item';
-        el.innerHTML = `<img src="${it.img}" alt="${it.nombre}" style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:8px;">
-                        <div style="margin-top:6px; font-weight:800">${it.nombre}</div>`;
-        inv.appendChild(el);
-      });
-    }
-
-    function sortItems(arr, mode){
-      const a = [...arr];
-      if(mode==='price-asc') a.sort((x,y)=>x.precio-y.precio);
-      if(mode==='price-desc') a.sort((x,y)=>y.precio-x.precio);
-      if(mode==='name-asc') a.sort((x,y)=>x.nombre.localeCompare(y.nombre));
-      if(mode==='name-desc') a.sort((x,y)=>y.nombre.localeCompare(x.nombre));
-      return a;
-    }
-
-    function renderItems(){
-      const q = $('#search').value.trim().toLowerCase();
-      const mode = $('#sort').value;
-      let list = itemsData.filter(i=> i.nombre.toLowerCase().includes(q));
-      list = sortItems(list, mode);
-      const wrap = $('#items');
-      wrap.innerHTML = '';
-      list.forEach(item=>{
-        const owned = state.inventory.includes(item.id);
-        const card = document.createElement('div');
-        card.className='item';
-        card.innerHTML = `
+    function renderItems(filtro=""){
+      if(!itemsContainer) return;
+      itemsContainer.innerHTML="";
+      const filtrados=itemsData.filter(i=>i.nombre.toLowerCase().includes(filtro.toLowerCase()));
+      filtrados.forEach(item=>{
+        const div=document.createElement("div");
+        div.className="item";
+        div.innerHTML=`
           <img src="${item.img}" alt="${item.nombre}">
           <div class="item-info">
-            <div class="item-title">${item.nombre}</div>
-            <div class="price">${item.precio} Monedas</div>
-            ${owned ? '<span class="owned">En propiedad</span>' : `<button class="btn primary" data-buy="${item.id}">Comprar</button>`}
-          </div>`;
-        wrap.appendChild(card);
+            <div>
+              <div class="item-title">${item.nombre}</div>
+              <div class="price">${item.precio} Monedas</div>
+            </div>
+            <button class="btn btn-buy" onclick="comprar(${item.id})">Comprar</button>
+          </div>
+        `;
+        itemsContainer.appendChild(div);
       });
     }
 
-    // ======= Acciones =======
-    function openModal(inner){
-      const m = $('#modal');
-      m.innerHTML = `<div class="modal-card">${inner}</div>`;
-      m.classList.add('open');
-      m.setAttribute('aria-hidden','false');
-      m.addEventListener('click', e=>{ if(e.target.id==='modal') closeModal(); }, {once:true});
-    }
-    function closeModal(){
-      const m = $('#modal');
-      m.classList.remove('open');
-      m.setAttribute('aria-hidden','true');
-      m.innerHTML = '';
-    }
-
-    function buyFlow(item){
-      if(state.inventory.includes(item.id)) return toast('Ya tienes este ítem');
-      if(state.coins < item.precio){
-        openModal(`
-          <h3>Saldo insuficiente</h3>
-          <p>Te faltan <b>${item.precio - state.coins}</b> monedas para comprar <b>${item.nombre}</b>.</p>
-          <div class="modal-actions">
-            <button class="btn" id="cancel">Cerrar</button>
-            <button class="btn primary" id="getcoins">Obtener +250</button>
-          </div>`);
-        $('#cancel').onclick = closeModal;
-        $('#getcoins').onclick = ()=>{ state.coins += 250; save(); renderBalance(); closeModal(); toast('Añadiste 250 monedas'); };
-        return;
+    function comprar(id){
+      const item=itemsData.find(i=>i.id===id);
+      if(item && monedas>=item.precio){
+        monedas-=item.precio;
+        alert(`Has comprado ${item.nombre}. Monedas restantes: ${monedas}`);
+      } else {
+        alert("No tienes suficientes monedas");
       }
-      openModal(`
-        <h3>Comprar «${item.nombre}»</h3>
-        <p>Precio: <b>${item.precio}</b> monedas. ¿Confirmas?</p>
-        <div class="modal-actions">
-          <button class="btn" id="cancel">Cancelar</button>
-          <button class="btn primary" id="confirm">Confirmar</button>
-        </div>`);
-      $('#cancel').onclick = closeModal;
-      $('#confirm').onclick = ()=>{
-        state.coins -= item.precio;
-        state.inventory.push(item.id);
-        save();
-        renderBalance();
-        renderItems();
-        renderProfile();
-        closeModal();
-        toast('Compra realizada ✅');
-      };
     }
 
-    // Delegación de eventos para botones Comprar
-    $('#items').addEventListener('click', e=>{
-      const btn = e.target.closest('[data-buy]');
-      if(!btn) return;
-      const id = parseInt(btn.getAttribute('data-buy'), 10);
-      const item = itemsData.find(x=>x.id===id);
-      if(item) buyFlow(item);
+    searchInput?.addEventListener("input",()=>{
+      renderItems(searchInput.value);
     });
 
-    // Búsqueda / orden
-    $('#search').addEventListener('input', renderItems);
-    $('#sort').addEventListener('change', renderItems);
+    function showSection(id){
+      document.querySelectorAll("main section").forEach(sec=>sec.classList.add("hidden"));
+      document.getElementById(id).classList.remove("hidden");
+    }
 
-    // Top-up
-    $('#topup').addEventListener('click', ()=>{ state.coins += 250; save(); renderBalance(); toast('Añadiste 250 monedas'); });
+    // Admin
+    const adminBtn=document.getElementById("adminBtn");
+    const adminPanel=document.getElementById("adminPanel");
+    const overlay=document.getElementById("overlay");
+    const adminUsers=document.getElementById("adminUsers");
 
-    // Editar perfil
-    $('#editProfile').addEventListener('click', ()=>{
-      openModal(`
-        <h3>Editar Perfil</h3>
-        <label>Nombre</label>
-        <input id="nameInput" value="${state.user.name}" style="width:100%; padding:10px; border:1px solid var(--line); border-radius:8px">
-        <label style="margin-top:10px; display:block">URL del avatar</label>
-        <input id="avatarInput" value="${state.user.avatar}" style="width:100%; padding:10px; border:1px solid var(--line); border-radius:8px">
-        <div class="modal-actions">
-          <button class="btn" id="cancel">Cancelar</button>
-          <button class="btn primary" id="saveProfile">Guardar</button>
-        </div>`);
-      $('#cancel').onclick = closeModal;
-      $('#saveProfile').onclick = ()=>{
-        state.user.name = $('#nameInput').value.trim() || 'UsuarioDemo';
-        state.user.avatar = $('#avatarInput').value.trim() || 'https://placehold.co/160x160';
-        save();
-        renderProfile();
-        closeModal();
-        toast('Perfil actualizado');
-      };
+    function openAdminPanel(){
+      overlay.style.display="block";
+      adminPanel.style.display="block";
+      renderAdminUsers();
+    }
+    function closeAdminPanel(){
+      overlay.style.display="none";
+      adminPanel.style.display="none";
+    }
+    function addCoins(){
+      monedas+=500;
+      alert("Ahora tienes: "+monedas+" monedas");
+    }
+    function renderAdminUsers(){
+      adminUsers.innerHTML="";
+      usuarios.forEach((u,i)=>{
+        const div=document.createElement("div");
+        div.innerHTML=`<span>${u.nombre} ${u.baneado?"(Baneado)":""}</span><button onclick="banUser(${i})">${u.baneado?"Desbanear":"Banear"}</button>`;
+        adminUsers.appendChild(div);
+      });
+    }
+    function banUser(index){
+      usuarios[index].baneado=!usuarios[index].baneado;
+      renderAdminUsers();
+    }
+
+    document.addEventListener("keydown",(e)=>{
+      if(e.key==="F8"){
+        adminBtn.classList.toggle("hidden");
+      }
     });
 
-    // Reiniciar datos
-    $('#clearData').addEventListener('click', ()=>{
-      openModal(`
-        <h3>Reiniciar datos</h3>
-        <p>Esto borrará tus monedas, inventario y perfil guardado en este navegador.</p>
-        <div class="modal-actions">
-          <button class="btn" id="cancel">Cancelar</button>
-          <button class="btn primary" id="reset">Reiniciar</button>
-        </div>`);
-      $('#cancel').onclick = closeModal;
-      $('#reset').onclick = ()=>{
-        state.coins = 500;
-        state.inventory = [];
-        state.user = {name:'UsuarioDemo', avatar:'https://placehold.co/160x160'};
-        save();
-        renderBalance();
-        renderItems();
-        renderProfile();
-        closeModal();
-        toast('Datos reiniciados');
-      };
-    });
-
-    // Navegación (suavizado)
-    document.querySelectorAll('[data-nav]').forEach(a=>{
-      a.addEventListener('click', e=>{
-        const href = a.getAttribute('href');
-        if(href && href.startsWith('#')){
-          e.preventDefault();
-          document.querySelector(href)?.scrollIntoView({behavior:'smooth'});
-        }
-      })
-    });
-
-    // Init
-    document.getElementById('year').textContent = new Date().getFullYear();
-    renderBalance();
+    document.getElementById("year").textContent=new Date().getFullYear();
     renderItems();
-    renderProfile();
   </script>
 </body>
 </html>
