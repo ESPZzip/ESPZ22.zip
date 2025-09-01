@@ -23,7 +23,7 @@
 <body>
   <header>
     <h1>ESPZ</h1>
-    <p>Saldo: <span id="saldo">100</span> Robux</p>
+    <p>Saldo: <span id="saldo">0</span> Robux</p>
   </header>
 
   <main class="container" id="tienda"></main>
@@ -128,13 +128,21 @@
       itemsBase.push({ nombre, precio, stock, limitado: true });
       localStorage.setItem('catalogo', JSON.stringify(itemsBase));
       document.getElementById("adminDialog").close();
-      renderTienda();
+      location.reload(); // 🔄 fuerza recargar la página para reflejar el nuevo ítem
     }
 
     document.addEventListener("keydown", e => {
       if(e.key === "F9") {
         e.preventDefault();
         document.getElementById("adminDialog").showModal();
+      }
+    });
+
+    // 🔔 Si otro admin agrega ítems en otra pestaña, se actualiza esta automáticamente
+    window.addEventListener("storage", (e) => {
+      if(e.key === "catalogo") {
+        itemsBase = JSON.parse(localStorage.getItem('catalogo')) || [];
+        renderTienda();
       }
     });
 
