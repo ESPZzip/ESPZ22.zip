@@ -4,100 +4,34 @@
   <meta charset="UTF-8">
   <title>ESP:Z</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #777;
-      color: black;
-    }
-    header {
-      background: #222;
-      color: white;
-      padding: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    nav button {
-      margin: 0 5px;
-      padding: 6px 12px;
-      border: none;
-      border-radius: 6px;
-      background: #006644;
-      color: white;
-      cursor: pointer;
-    }
-    nav button:hover { background: #009966; }
-    .section { display: none; padding: 20px; }
-    .active { display: block; }
+    body { font-family: Arial, sans-serif; margin:0; padding:0; background:#777; color:black; }
+    header { background:#222; color:white; padding:10px; display:flex; justify-content:space-between; align-items:center; }
+    nav button { margin:0 5px; padding:6px 12px; border:none; border-radius:6px; background:#006644; color:white; cursor:pointer; }
+    nav button:hover { background:#009966; }
+    .section { display:none; padding:20px; }
+    .active { display:block; }
     .item-card {
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin: 5px;
-      display: inline-block;
-      width: 150px;
-      text-align: center;
-      background: white;
-      border-radius: 8px;
-      position: relative;
+      border:1px solid #ccc; padding:10px; margin:5px;
+      display:inline-block; width:150px; text-align:center;
+      background:white; border-radius:8px; position:relative;
     }
     .exclusive {
-      position: absolute;
-      top: 5px;
-      left: 5px;
-      background: gold;
-      color: black;
-      font-size: 12px;
-      font-weight: bold;
-      padding: 2px 5px;
-      border-radius: 4px;
+      position:absolute; top:5px; left:5px;
+      background:gold; color:black; font-size:12px;
+      font-weight:bold; padding:2px 5px; border-radius:4px;
     }
-    .login-container {
-      padding: 20px;
-      text-align: center;
-    }
-    .login-container input {
-      display: block;
-      margin: 10px auto;
-      padding: 5px;
-    }
-    .login-container button {
-      padding: 6px 12px;
-      margin: 5px;
-      background: #006644;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+    .login-container { padding:20px; text-align:center; }
+    .login-container input { display:block; margin:10px auto; padding:5px; }
+    .login-container button { padding:6px 12px; margin:5px; background:#006644; color:white; border:none; border-radius:6px; cursor:pointer; }
     #adminPanel {
-      display: none;
-      position: fixed;
-      top: 10%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: white;
-      padding: 20px;
-      border: 2px solid black;
-      border-radius: 8px;
-      z-index: 1000;
-      width: 350px;
+      display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%);
+      background:white; padding:20px; border:2px solid black; border-radius:8px; z-index:1000; width:350px;
     }
-    #adminPanel h3 { margin-top: 0; }
-    #adminPanel input {
-      margin: 5px 0;
-      padding: 4px;
-      width: 90%;
-    }
-    #adminPanel button {
-      background: #222;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      margin-top: 5px;
-      cursor: pointer;
-    }
+    #adminPanel h3 { margin-top:0; }
+    #adminPanel input { margin:5px 0; padding:4px; width:90%; }
+    #adminPanel button { background:#222; color:white; border:none; padding:5px 10px; margin-top:5px; cursor:pointer; }
+    .market-section { margin-bottom:30px; }
+    .market-section h3 { margin-bottom:10px; border-bottom:1px solid #444; padding-bottom:5px; }
   </style>
 </head>
 <body>
@@ -134,7 +68,14 @@
 
     <div id="marketplace" class="section">
       <h2>Marketplace</h2>
-      <div id="marketContainer"></div>
+      <div class="market-section">
+        <h3>Ítems Normales</h3>
+        <div id="normalMarket"></div>
+      </div>
+      <div class="market-section">
+        <h3>Ítems Exclusivos</h3>
+        <div id="exclusiveMarket"></div>
+      </div>
     </div>
 
     <div id="profile" class="section">
@@ -172,58 +113,39 @@
 
 <script>
   // ---- STORAGE HELPERS ----
-  function getUsers() {
-    return JSON.parse(localStorage.getItem("users") || "{}");
-  }
-  function saveUsers(users) {
-    localStorage.setItem("users", JSON.stringify(users));
-  }
-  function getItems() {
-    return JSON.parse(localStorage.getItem("items") || "[]");
-  }
-  function saveItems(items) {
-    localStorage.setItem("items", JSON.stringify(items));
-  }
+  function getUsers() { return JSON.parse(localStorage.getItem("users") || "{}"); }
+  function saveUsers(users) { localStorage.setItem("users", JSON.stringify(users)); }
+  function getItems() { return JSON.parse(localStorage.getItem("items") || "[]"); }
+  function saveItems(items) { localStorage.setItem("items", JSON.stringify(items)); }
 
   // ---- REGISTRO / LOGIN ----
   function register() {
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value.trim();
-    if (!username || !password) {
-      alert("Completa todos los campos");
-      return;
-    }
+    if (!username || !password) { alert("Completa todos los campos"); return; }
     let users = getUsers();
-    if (users[username]) {
-      alert("Ese usuario ya existe");
-      return;
-    }
+    if (users[username]) { alert("Ese usuario ya existe"); return; }
     users[username] = { password, robux: 100, friends: [], requests: [], inventory: [] };
     saveUsers(users);
     alert("Usuario registrado. Ahora inicia sesión.");
   }
-
   function login() {
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value.trim();
     let users = getUsers();
     if (!users[username] || users[username].password !== password) {
-      alert("Usuario o contraseña incorrectos");
-      return;
+      alert("Usuario o contraseña incorrectos"); return;
     }
     localStorage.setItem("currentUser", username);
     loadMain(username);
   }
-
   function loadMain(username) {
     document.getElementById("loginSection").style.display = "none";
     document.getElementById("mainSection").style.display = "block";
     let users = getUsers();
     document.getElementById("playerName").textContent = username;
     document.getElementById("playerRobux").textContent = users[username].robux;
-    renderMarketplace();
-    renderInventory();
-    showSection("profile");
+    renderMarketplace(); renderInventory(); showSection("profile");
   }
 
   // ---- SECCIONES ----
@@ -243,10 +165,7 @@
     const users = getUsers();
     const items = getItems();
     const inv = users[username].inventory || [];
-    if (inv.length === 0) {
-      container.innerHTML = "<p>No tienes ítems.</p>";
-      return;
-    }
+    if (inv.length === 0) { container.innerHTML = "<p>No tienes ítems.</p>"; return; }
     inv.forEach(it => {
       const item = items.find(i => i.id === it);
       if (item) {
@@ -266,17 +185,18 @@
   function initItems() {
     if (getItems().length === 0) {
       saveItems([
-        { id: "hat1", name: "Classic Fedora", price: 50, stock: 5, img: "https://tr.rbxcdn.com/2b4fbd5a198f5c6ea4a1d38d2e8cf61b/150/150/Hat/Png", exclusive: false },
-        { id: "sword1", name: "Epic Sword", price: 70, stock: 3, img: "https://tr.rbxcdn.com/1a3b983d5d06c63a7a9b7e4e99d6d8d1/150/150/Gear/Png", exclusive: false },
-        { id: "shirt1", name: "Cool Shirt", price: 20, stock: 10, img: "https://tr.rbxcdn.com/5af74ab58a73f36f79e2fdb8a7346f4a/150/150/Shirt/Png", exclusive: false }
+        { id:"hat1", name:"Classic Fedora", price:50, stock:5, img:"https://tr.rbxcdn.com/2b4fbd5a198f5c6ea4a1d38d2e8cf61b/150/150/Hat/Png", exclusive:false },
+        { id:"sword1", name:"Epic Sword", price:70, stock:3, img:"https://tr.rbxcdn.com/1a3b983d5d06c63a7a9b7e4e99d6d8d1/150/150/Gear/Png", exclusive:false },
+        { id:"shirt1", name:"Cool Shirt", price:20, stock:10, img:"https://tr.rbxcdn.com/5af74ab58a73f36f79e2fdb8a7346f4a/150/150/Shirt/Png", exclusive:false }
       ]);
     }
   }
-
   function renderMarketplace() {
     initItems();
-    const container = document.getElementById("marketContainer");
-    container.innerHTML = "";
+    const normalContainer = document.getElementById("normalMarket");
+    const exclusiveContainer = document.getElementById("exclusiveMarket");
+    normalContainer.innerHTML = "";
+    exclusiveContainer.innerHTML = "";
     const items = getItems();
     items.forEach(it => {
       const div = document.createElement("div");
@@ -289,10 +209,13 @@
         <p>Stock: ${it.stock}</p>
         <button onclick="buyItem('${it.id}')">Comprar</button>
       `;
-      container.appendChild(div);
+      if (it.exclusive) {
+        exclusiveContainer.appendChild(div);
+      } else {
+        normalContainer.appendChild(div);
+      }
     });
   }
-
   function buyItem(itemId) {
     const username = localStorage.getItem("currentUser");
     let users = getUsers();
@@ -300,21 +223,15 @@
     let items = getItems();
     const itemIndex = items.findIndex(i => i.id === itemId);
     const item = items[itemIndex];
-
     if (!item) { alert("El ítem no existe."); return; }
     if (user.robux < item.price) { alert("Robux insuficientes"); return; }
     if (item.stock <= 0) { alert("Este ítem está agotado"); return; }
-
     user.robux -= item.price;
     user.inventory.push(itemId);
     items[itemIndex].stock -= 1;
-
-    saveUsers(users);
-    saveItems(items);
-
+    saveUsers(users); saveItems(items);
     document.getElementById("playerRobux").textContent = user.robux;
-    renderMarketplace();
-    renderInventory();
+    renderMarketplace(); renderInventory();
     alert("Has comprado " + item.name + "!");
   }
 
@@ -325,7 +242,7 @@
     container.innerHTML = `<p>Bienvenido, ${username}</p>`;
   }
 
-  // ---- FRIENDS ---- (básico por ahora)
+  // ---- FRIENDS ----
   function searchUser() {
     const search = document.getElementById("searchFriend").value.trim();
     const users = getUsers();
@@ -339,7 +256,6 @@
   // ---- ADMIN PANEL ----
   function openAdmin() { document.getElementById("adminPanel").style.display = "block"; }
   function closeAdmin() { document.getElementById("adminPanel").style.display = "none"; }
-
   function addRobux() {
     const amount = parseInt(document.getElementById("robuxAmount").value);
     if (isNaN(amount) || amount <= 0) { alert("Cantidad inválida"); return; }
@@ -350,38 +266,28 @@
     document.getElementById("playerRobux").textContent = users[username].robux;
     alert("Has añadido " + amount + " Robux.");
   }
-
   function addItem() {
     const name = document.getElementById("itemName").value.trim();
     const img = document.getElementById("itemImg").value.trim();
     const price = parseInt(document.getElementById("itemPrice").value);
     const stock = parseInt(document.getElementById("itemStock").value);
-
     if (!name || isNaN(price) || isNaN(stock) || price <= 0 || stock <= 0) {
-      alert("Completa todos los campos correctamente.");
-      return;
+      alert("Completa todos los campos correctamente."); return;
     }
-
     let items = getItems();
     const newItem = {
       id: "custom_" + Date.now(),
       name, img: img || "https://via.placeholder.com/80",
-      price, stock,
-      exclusive: true
+      price, stock, exclusive: true
     };
     items.push(newItem);
-    saveItems(items);
-    renderMarketplace();
+    saveItems(items); renderMarketplace();
     alert("Nuevo ítem exclusivo agregado al Marketplace.");
   }
-
-  // Abrir panel admin con F9 solo para ROBLOX
   document.addEventListener("keydown", (e) => {
     if (e.key === "F9") {
       const username = localStorage.getItem("currentUser");
-      if (username === "ROBLOX") {
-        openAdmin();
-      }
+      if (username === "ROBLOX") { openAdmin(); }
     }
   });
 
