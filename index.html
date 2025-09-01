@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>ESPZ</title>
+  <title>Roblox Revival</title>
   <style>
     body {
       margin: 0;
@@ -55,15 +55,13 @@
     }
 
     button {
-      width: 100%;
-      padding: 12px;
+      padding: 10px 15px;
       background: #00a2ff;
       color: white;
-      font-size: 16px;
+      font-size: 14px;
       border: none;
       border-radius: 4px;
       cursor: pointer;
-      margin-top: 10px;
     }
 
     button:hover {
@@ -114,17 +112,22 @@
       border-radius: 8px;
     }
 
-    .friends-btn {
-      margin-top: 10px;
+    .friend-card {
+      background: #333;
       padding: 10px;
-      background: #28a745;
-      border: none;
+      margin: 5px 0;
       border-radius: 5px;
-      cursor: pointer;
-      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    .friends-btn:hover {
+    .friend-card button {
+      background: #28a745;
+      font-size: 12px;
+    }
+
+    .friend-card button:hover {
       background: #218838;
     }
   </style>
@@ -153,7 +156,7 @@
   <!-- HOME -->
   <div id="homePage" style="display:none;">
     <div class="navbar">
-      <div class="logo">ESPZ</div>
+      <div class="logo">ROBLOX REVIVAL</div>
       <div class="user-info">
         Bienvenido, <span id="playerName"></span> |
         Amigos: <span id="friendCount">0</span>
@@ -161,9 +164,19 @@
     </div>
     <div class="home">
       <h2>Inicio</h2>
+
+      <!-- Buscar personas -->
       <div class="stats">
-        <p>Amigos actuales: <span id="friendCount2">0</span></p>
-        <button class="friends-btn" onclick="addFriend()">Agregar amigo</button>
+        <h3>Buscar personas</h3>
+        <input type="text" id="searchInput" placeholder="Escribe un usuario">
+        <button onclick="searchUser()">Buscar</button>
+        <div id="searchResults"></div>
+      </div>
+
+      <!-- Lista de amigos -->
+      <div class="stats">
+        <h3>Mis amigos</h3>
+        <div id="friendList">No tienes amigos aún</div>
       </div>
     </div>
   </div>
@@ -171,7 +184,6 @@
   <script>
     let currentUser = null;
     let users = JSON.parse(localStorage.getItem("users")) || {};
-    let friends = 0;
 
     function toggleForm() {
       const reg = document.getElementById("registerForm");
@@ -189,7 +201,7 @@
     }
 
     function register() {
-      const user = document.getElementById("regUser").value;
+      const user = document.getElementById("regUser").value.trim();
       const pass = document.getElementById("regPass").value;
       if (!user || !pass) {
         alert("Completa todos los campos");
@@ -199,21 +211,19 @@
         alert("Ese usuario ya existe");
         return;
       }
-      users[user] = { password: pass, friends: 0 };
+      users[user] = { password: pass, friends: [] };
       localStorage.setItem("users", JSON.stringify(users));
       alert("Registrado con éxito. Ahora inicia sesión.");
       toggleForm();
     }
 
     function login() {
-      const user = document.getElementById("logUser").value;
+      const user = document.getElementById("logUser").value.trim();
       const pass = document.getElementById("logPass").value;
       if (users[user] && users[user].password === pass) {
         currentUser = user;
-        friends = users[user].friends;
         document.getElementById("playerName").innerText = currentUser;
-        document.getElementById("friendCount").innerText = friends;
-        document.getElementById("friendCount2").innerText = friends;
+        loadFriends();
         document.getElementById("loginPage").style.display = "none";
         document.getElementById("homePage").style.display = "block";
       } else {
@@ -221,12 +231,54 @@
       }
     }
 
-    function addFriend() {
-      friends++;
-      users[currentUser].friends = friends;
-      localStorage.setItem("users", JSON.stringify(users));
-      document.getElementById("friendCount").innerText = friends;
-      document.getElementById("friendCount2").innerText = friends;
+    function searchUser() {
+      const query = document.getElementById("searchInput").value.trim();
+      const resultsDiv = document.getElementById("searchResults");
+      resultsDiv.innerHTML = "";
+      if (!query) {
+        resultsDiv.innerHTML = "<p>Escribe un nombre de usuario</p>";
+        return;
+      }
+      if (users[query] && query !== currentUser) {
+        const card = document.createElement("div");
+        card.className = "friend-card";
+        card.innerHTML = `
+          <span>${query}</span>
+          <button onclick="addFriend('${query}')">Agregar amigo</button>
+        `;
+        resultsDiv.appendChild(card);
+      } else {
+        resultsDiv.innerHTML = "<p>No se encontró el usuario</p>";
+      }
+    }
+
+    function addFriend(friendName) {
+      if (!users[currentUser].friends.includes(friendName)) {
+        users[currentUser].friends.push(friendName);
+        localStorage.setItem("users", JSON.stringify(users));
+        loadFriends();
+        document.getElementById("searchResults").innerHTML = "<p>Amigo agregado ✅</p>";
+      } else {
+        alert("Ya es tu amigo");
+      }
+    }
+
+    function loadFriends() {
+      const listDiv = document.getElementById("friendList");
+      const countSpan = document.getElementById("friendCount");
+      const friends = users[currentUser].friends;
+      countSpan.innerText = friends.length;
+      if (friends.length === 0) {
+        listDiv.innerHTML = "No tienes amigos aún";
+      } else {
+        listDiv.innerHTML = "";
+        friends.forEach(f => {
+          const div = document.createElement("div");
+          div.className = "friend-card";
+          div.innerHTML = `<span>${f}</span>`;
+          listDiv.appendChild(div);
+        });
+      }
     }
   </script>
 </body>
