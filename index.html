@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>ESP:Z COINS - Cajas Roblox</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #111; color: #fff; text-align: center; }
+    body { font-family: Arial, sans-serif; background: #111; color: #fff; text-align: center; margin:0; padding:0; }
     .box { border: 2px solid #444; padding: 10px; margin: 10px; display: inline-block; border-radius: 10px; background: #222; }
     button { padding: 8px 14px; margin: 5px; border-radius: 8px; border: none; cursor: pointer; }
     #inventory { margin-top: 20px; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto; }
@@ -21,6 +21,27 @@
       50% { text-shadow: 0 0 20px gold, 0 0 30px orange; }
       100% { text-shadow: 0 0 5px gold; }
     }
+    #itemTimerBox {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(34,34,34,0.9);
+      padding: 10px 20px;
+      border: 2px solid #555;
+      border-radius: 12px;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hourglass {
+      display: inline-block;
+      animation: spin 2s infinite linear;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -34,10 +55,19 @@
   <div id="news"></div>
   <p id="dailyReward"></p>
   <p id="nextReward"></p>
-  <p id="itemTimer"></p>
+
+  <!-- Contador fijo arriba a la derecha -->
+  <div id="itemTimerBox">
+    <span class="hourglass">⏳</span>
+    <span id="itemTimer">Cargando...</span>
+  </div>
 
   <h2>📊 Tabla de probabilidades</h2>
   <div id="probTable"></div>
+
+  <!-- Sonidos -->
+  <audio id="soundNewItems" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"></audio>
+  <audio id="soundExpire" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
 
   <script>
     let coins = parseInt(localStorage.getItem('coins')) || 0;
@@ -161,6 +191,7 @@
       news.unshift("Nuevos ítems añadidos a las cajas!");
       nextItemUpdate = Date.now() + 20*60*1000;
       localStorage.setItem('nextItemUpdate', nextItemUpdate);
+      document.getElementById("soundNewItems").play();
       save();
       render();
     }
@@ -172,6 +203,7 @@
             let exclusiveItem = {...item, name: item.name+" [EXCLUSIVO]", value: item.value*2};
             inventory.push(exclusiveItem);
             alert(`El ítem ${item.name} expiró de las cajas y se guardó en tu inventario como EXCLUSIVO!`);
+            document.getElementById("soundExpire").play();
             return false;
           }
           return true;
@@ -188,7 +220,7 @@
         let diff = nextItemUpdate - now;
         if(diff>0){
           let m = Math.floor(diff/60000), s=Math.floor((diff%60000)/1000);
-          document.getElementById('itemTimer').textContent = `Nuevos ítems en: ${m}m ${s}s`;
+          document.getElementById('itemTimer').textContent = `${m}m ${s}s`;
         }
       }
       checkItemExpiry();
