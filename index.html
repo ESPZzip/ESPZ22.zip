@@ -9,6 +9,9 @@
     button { padding: 8px 14px; margin: 5px; border-radius: 8px; border: none; cursor: pointer; }
     #inventory { margin-top: 20px; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto; }
     #news { margin-top: 20px; background: #222; padding: 10px; border-radius: 10px; max-width: 600px; margin-left: auto; margin-right: auto; text-align: left; }
+    table { border-collapse: collapse; margin: 20px auto; background: #222; width: 90%; }
+    th, td { border: 1px solid #444; padding: 8px; text-align: center; }
+    th { background: #333; }
     .rarity-common { color: #bbb; }
     .rarity-rare { color: #3b82f6; }
     .rarity-epic { color: #a855f7; }
@@ -32,6 +35,9 @@
   <p id="dailyReward"></p>
   <p id="nextReward"></p>
   <p id="itemTimer"></p>
+
+  <h2>📊 Tabla de probabilidades</h2>
+  <div id="probTable"></div>
 
   <script>
     let coins = parseInt(localStorage.getItem('coins')) || 0;
@@ -61,6 +67,16 @@
       localStorage.setItem('news', JSON.stringify(news));
     }
 
+    function rarityClass(rarity){
+      switch(rarity){
+        case "Común": return "rarity-common";
+        case "Raro": return "rarity-rare";
+        case "Épico": return "rarity-epic";
+        case "Legendario": return "rarity-legendary";
+        default: return "";
+      }
+    }
+
     function render(){
       document.getElementById('coins').textContent = coins;
       let invHTML = "";
@@ -75,16 +91,8 @@
 
       let boxesHTML = BOXES.map((b,i)=> `<div class='box'><h3>${b.name}</h3><p>Precio: ${b.price}</p><button onclick='openBox(${i})'>Abrir</button></div>`).join('');
       document.getElementById('boxes').innerHTML = boxesHTML;
-    }
 
-    function rarityClass(rarity){
-      switch(rarity){
-        case "Común": return "rarity-common";
-        case "Raro": return "rarity-rare";
-        case "Épico": return "rarity-epic";
-        case "Legendario": return "rarity-legendary";
-        default: return "";
-      }
+      renderProbabilities();
     }
 
     function openBox(i){
@@ -130,7 +138,6 @@
       }
     }
 
-    // Recompensa diaria
     function dailyReward(){
       let today = new Date().toDateString();
       if(lastDaily !== today){
@@ -141,7 +148,6 @@
       }
     }
 
-    // Actualización de ítems cada 20 min
     const EXTRA_ITEMS = [
       {name:"Rainbow Dominus", value:2000, prob:5, rarity:"Legendario", icon:"⭐"},
       {name:"Ban Hammer", value:1800, prob:10, rarity:"Legendario", icon:"⭐"},
@@ -151,7 +157,7 @@
     ];
 
     function updateItems(){
-      BOXES.forEach(b=> b.items.push({...EXTRA_ITEMS[Math.floor(Math.random()*EXTRA_ITEMS.length)], expires: Date.now()+3600000 }));
+      BOXES.forEach(b=> b.items.push({...EXTRA_ITEMS[Math.floor(Math.random()*EXTRA_ITEMS.length)], expires: Date.now()+3600000, temp: true }));
       news.unshift("Nuevos ítems añadidos a las cajas!");
       nextItemUpdate = Date.now() + 20*60*1000;
       localStorage.setItem('nextItemUpdate', nextItemUpdate);
@@ -186,6 +192,21 @@
         }
       }
       checkItemExpiry();
+    }
+
+    function renderProbabilities(){
+      let html = "";
+      BOXES.forEach(b=>{
+        html += `<h3>${b.name}</h3>`;
+        html += `<table><tr><th>Ítem</th><th>Rareza</th><th>Probabilidad</th></tr>`;
+        b.items.forEach(it=>{
+          let cls = rarityClass(it.rarity);
+          let temp = it.temp ? " [TEMPORAL]" : "";
+          html += `<tr><td class='${cls}'>${it.icon} ${it.name}${temp}</td><td class='${cls}'>${it.rarity}</td><td>${it.prob}%</td></tr>`;
+        });
+        html += `</table>`;
+      });
+      document.getElementById('probTable').innerHTML = html;
     }
 
     dailyReward();
