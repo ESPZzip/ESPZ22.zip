@@ -89,7 +89,8 @@
     let lastClaim = null;
     let newsList = [];
 
-    let nextBoxUpdate = Date.now() + (20 * 60 * 1000); // 20 minutos
+    let nextBoxUpdate;
+    let temporaryItems = [];
 
     function saveGame() {
       localStorage.setItem("coins", coins);
@@ -97,14 +98,24 @@
       localStorage.setItem("lastClaim", lastClaim);
       localStorage.setItem("nextBoxUpdate", nextBoxUpdate);
       localStorage.setItem("newsList", JSON.stringify(newsList));
+      localStorage.setItem("temporaryItems", JSON.stringify(temporaryItems));
     }
 
     function loadGame() {
       coins = parseInt(localStorage.getItem("coins")) || 0;
       inventory = JSON.parse(localStorage.getItem("inventory")) || [];
       lastClaim = localStorage.getItem("lastClaim") || null;
-      nextBoxUpdate = parseInt(localStorage.getItem("nextBoxUpdate")) || Date.now() + (20 * 60 * 1000);
       newsList = JSON.parse(localStorage.getItem("newsList")) || [];
+      temporaryItems = JSON.parse(localStorage.getItem("temporaryItems")) || [];
+
+      const storedUpdate = parseInt(localStorage.getItem("nextBoxUpdate"));
+      if (storedUpdate && storedUpdate > Date.now()) {
+        nextBoxUpdate = storedUpdate;
+      } else {
+        nextBoxUpdate = Date.now() + (20 * 60 * 1000);
+      }
+
+      cleanupExpiredItems();
       updateUI();
     }
 
@@ -156,6 +167,7 @@
         inventory = [];
         lastClaim = null;
         newsList = [];
+        temporaryItems = [];
         nextBoxUpdate = Date.now() + (20 * 60 * 1000);
         saveGame();
         updateUI();
@@ -197,26 +209,54 @@
       }
     }
 
+    // Ítems temporales
+    function cleanupExpiredItems() {
+      const now = Date.now();
+      temporaryItems = temporaryItems.filter(ti => {
+        if (ti.expires > now) return true;
+        // Eliminar de caja y pasar al inventario
+        let box = BOXES[ti.box];
+        box.items = box.items.filter(it => it.name !== ti.item.name);
+        const exclusiveItem = { name: `[EXCLUSIVO] ${ti.item.name}`, value: ti.item.value };
+        inventory.push(exclusiveItem);
+        alert(`El ítem ${ti.item.name} ha expirado de ${ti.box} y fue guardado en tu inventario como exclusivo.`);
+        newsList.push(`El ítem ${ti.item.name} expiró de ${ti.box} y fue guardado en el inventario.`);
+        return false;
+      });
+      saveGame();
+    }
+
     // Actualización de cajas
     function updateBoxItems() {
       const randomItem = EXTRA_ITEMS[Math.floor(Math.random() * EXTRA_ITEMS.length)];
-      let boxName;
+      let boxName, boxKey;
       if (Math.random() > 0.5) {
         BOXES.basica.items.push(randomItem);
         boxName = "Caja Básica";
+        boxKey = "basica";
       } else {
         BOXES.epica.items.push(randomItem);
         boxName = "Caja Épica";
+        boxKey = "epica";
       }
       const msg = `¡Nuevo ítem agregado a ${boxName}: ${randomItem.name} (Vale ${randomItem.value})!`;
       newsList.push(msg);
       alert(msg);
+
+      // Guardar como temporal por 1 hora
+      temporaryItems.push({
+        item: randomItem,
+        box: boxKey,
+        expires: Date.now() + (60 * 60 * 1000)
+      });
+
       nextBoxUpdate = Date.now() + (20 * 60 * 1000);
       saveGame();
       updateUI();
     }
 
     function updateBoxCountdown() {
+      cleanupExpiredItems();
       let diff = Math.max(0, nextBoxUpdate - Date.now());
       let minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       let seconds = Math.floor((diff % (1000 * 60)) / 1000);
