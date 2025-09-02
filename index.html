@@ -1,373 +1,134 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ESP:Z BOX</title>
+  <meta charset="UTF-8">
+  <title>ESP:Z COINS - Abrir Cajas Roblox</title>
   <style>
-    :root {
-      --bg: #0f1220;
-      --panel: #171a2b;
-      --accent: #7c5cff;
-      --accent-2: #19d3da;
-      --text: #e8eaf6;
-      --muted: #a5acc9;
-      --bad: #ff5c7a;
-      --good: #19da7b;
-      --gold: #f4c430;
-    }
-    * { box-sizing: border-box }
-    body {
-      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, Noto Sans, 'Apple Color Emoji', 'Segoe UI Emoji';
-      background: radial-gradient(1200px 600px at 80% -10%, #1a1e33 0%, var(--bg) 60%); color: var(--text);
-    }
-    header {
-      padding: 24px 20px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap: wrap;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0));
-      position: sticky; top:0; z-index:10; backdrop-filter: blur(6px);
-    }
-    .brand { display:flex; align-items:center; gap:12px; font-weight:800; letter-spacing:.4px; }
-    .logo { width:32px; height:32px; border-radius:10px; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%); box-shadow: 0 6px 18px rgba(124,92,255,.4); }
-    .balance { display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:12px; background: #12162a; border:1px solid rgba(255,255,255,.06) }
-    .balance strong { color: var(--gold); }
-    .wrap { max-width: 1100px; margin: 24px auto; padding: 0 16px 40px; display:grid; grid-template-columns: 1.2fr .8fr; gap: 20px; }
-    @media (max-width: 980px){ .wrap{ grid-template-columns: 1fr; }}
-
-    .panel { background: var(--panel); border:1px solid rgba(255,255,255,.06); border-radius: 16px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
-    h2 { margin: 0 0 10px; font-size: 20px; }
-    .muted { color: var(--muted); font-size: 14px; }
-
-    .boxes { display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    @media (max-width:720px){ .boxes{ grid-template-columns: 1fr; }}
-    .box { position: relative; overflow:hidden; padding:14px; border-radius: 14px; background: linear-gradient(180deg, #1a1e33, #12162a); border:1px solid rgba(255,255,255,.06) }
-    .box h3 { margin: 0 0 6px; font-size: 16px; }
-    .price { font-size: 13px; color: var(--muted) }
-    .rarity { display:flex; gap:6px; margin:8px 0 10px }
-    .tag { font-size: 11px; padding:4px 8px; border-radius: 999px; border:1px solid rgba(255,255,255,.1); }
-    .tag.common { background:#263047 }
-    .tag.rare { background:#2b2747 }
-    .tag.epic { background:#2b3247 }
-    .tag.legendary { background:#473e26 }
-    .box .actions { display:flex; gap:8px }
-    button { cursor:pointer; border:none; background: var(--accent); color:white; padding:10px 12px; border-radius: 12px; font-weight: 700; box-shadow: 0 8px 20px rgba(124,92,255,.35); transition: transform .06s ease, filter .2s ease; }
-    button.secondary { background: transparent; border:1px solid rgba(255,255,255,.12); box-shadow:none; color: var(--text) }
-    button:active { transform: translateY(1px) scale(.98) }
-    button[disabled] { opacity:.5; cursor:not-allowed; }
-
-    .open-area { margin-top: 14px; padding: 12px; border-radius: 12px; background:#111528; border:1px dashed rgba(255,255,255,.12); min-height:72px; display:grid; place-items:center }
-    .drop { display:flex; align-items:center; gap:10px; padding: 10px 12px; border-radius: 12px; background: #12182f; border:1px solid rgba(255,255,255,.06); animation: pop .35s ease; }
-    .drop .pill { font-size: 11px; padding:4px 8px; border-radius: 999px; border:1px solid rgba(255,255,255,.12) }
-    .drop .val { color: var(--gold); font-weight: 800 }
-    @keyframes pop { from { transform: scale(.97); opacity:.0 } to { transform: scale(1); opacity:1 } }
-
-    .inv-table { width:100%; border-collapse: collapse; font-size: 14px; }
-    .inv-table th, .inv-table td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,.08) }
-    .inv-table th { text-align:left; color: var(--muted); font-weight:600 }
-    .inv-actions { display:flex; gap:8px; margin-top:8px }
-
-    .footer { text-align:center; color:var(--muted); font-size:12px; padding:20px }
-    .notice { background:#111528; border:1px solid rgba(255,255,255,.06); color:var(--muted); padding:10px 12px; border-radius:12px; font-size:12px }
+    body { font-family: Arial, sans-serif; background: #111; color: #eee; text-align: center; }
+    h1 { color: #0f0; }
+    .box, .inventory, .balance, .controls { margin: 20px auto; padding: 15px; border: 1px solid #444; border-radius: 10px; background: #222; max-width: 600px; }
+    button { padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; background: #0f0; color: #000; font-weight: bold; cursor: pointer; }
+    button:hover { background: #6f6; }
+    ul { list-style: none; padding: 0; }
+    li { margin: 5px 0; }
   </style>
 </head>
 <body>
-  <header>
-    <div class="brand"><span class="logo"></span> <div>ESP:Z COINS — Abrir Cajas</div></div>
-    <div class="balance">Saldo: <strong id="balance">0</strong> ESP:Z COINS
-      <button class="secondary" id="btnGift" style="margin-left:8px">+1000 demo</button>
-    </div>
-  </header>
+  <h1>ESP:Z COINS - Cajas Roblox</h1>
 
-  <main class="wrap">
-    <!-- PANEL IZQUIERDO: CAJAS Y APERTURAS -->
-    <section class="panel">
-      <h2>Cajas disponibles</h2>
-      <p class="muted">Compra y abre cajas. Los objetos se guardan en tu inventario y puedes venderlos por ESP:Z COINS.</p>
+  <div class="balance">
+    <h2>Monedas: <span id="coins">0</span> ESP:Z</h2>
+  </div>
 
-      <div id="boxes" class="boxes"></div>
+  <div class="controls">
+    <button onclick="openBox('basica')">Abrir Caja Básica (500)</button>
+    <button onclick="openBox('epica')">Abrir Caja Épica (2000)</button>
+    <button onclick="sellAll()">Vender Todo</button>
+    <button onclick="resetGame()">Reiniciar</button>
+  </div>
 
-      <div class="notice" style="margin-top:12px">Consejo: todo se guarda localmente en tu navegador (LocalStorage). Si borras datos del sitio, se reinicia tu progreso.</div>
-    </section>
-
-    <!-- PANEL DERECHO: INVENTARIO Y VENTAS -->
-    <section class="panel">
-      <h2>Inventario</h2>
-      <table class="inv-table" id="invTable">
-        <thead>
-          <tr>
-            <th>Objeto</th>
-            <th>Rareza</th>
-            <th>Precio venta</th>
-            <th>Cantidad</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="invBody">
-          <tr><td colspan="5" style="text-align:center; color:var(--muted)">Sin objetos aún. ¡Abre algunas cajas!</td></tr>
-        </tbody>
-      </table>
-      <div class="inv-actions">
-        <button id="sellAll" class="secondary">Vender todo</button>
-        <button id="resetData" class="secondary">Reiniciar progreso</button>
-      </div>
-    </section>
-  </main>
-
-  <div class="footer">Hecho con ❤️ para demostración — no es dinero real.</div>
+  <div class="inventory">
+    <h2>Inventario</h2>
+    <ul id="inventory"></ul>
+  </div>
 
   <script>
-    // =====================
-    // CONFIGURACIÓN BÁSICA
-    // =====================
-    const STORE_KEY = 'espzcoins_game_v1';
-
-    /** Definición de cajas, probabilidades y ítems. Puedes editar libremente. */
-    const BOXES = [
-      {
-        id: 'basic',
-        name: 'Caja Básica',
-        price: 50,
-        palette: ['#263047', '#7c5cff'],
-        loot: [
-          // prob: suma total 1.0; cada entrada tiene una pool de ítems
-          { rarity: 'Común', prob: 0.55, sellBase: 20, items: ['Tuerca oxidada', 'Pegatina genérica', 'Cromo descolorido', 'Emote estándar'] },
-          { rarity: 'Rara', prob: 0.30, sellBase: 45, items: ['Cuchillo de plástico', 'Pegatina brillante', 'Llaverito cool'] },
-          { rarity: 'Épica', prob: 0.12, sellBase: 95, items: ['Pistola de confeti', 'Skin Neon', 'Emote épico'] },
-          { rarity: 'Legendaria', prob: 0.03, sellBase: 200, items: ['Corona dorada', 'Skin Dragón'] },
+    const BOXES = {
+      basica: {
+        price: 500,
+        items: [
+          { name: "Roblox Hat", value: 300 },
+          { name: "Roblox Shirt", value: 200 },
+          { name: "Robux Coin", value: 100 },
+          { name: "Noob Character", value: 150 }
         ]
       },
-      {
-        id: 'pro',
-        name: 'Caja PRO',
-        price: 200,
-        palette: ['#2b2747', '#19d3da'],
-        loot: [
-          { rarity: 'Común', prob: 0.40, sellBase: 40, items: ['Parche PRO', 'Cromo PRO', 'Sticker PRO'] },
-          { rarity: 'Rara', prob: 0.35, sellBase: 90, items: ['Daga deportiva', 'Guantes PRO', 'Capa holográfica'] },
-          { rarity: 'Épica', prob: 0.20, sellBase: 180, items: ['Rifle Pulsar', 'Skin Prisma', 'Emote PRO'] },
-          { rarity: 'Legendaria', prob: 0.05, sellBase: 420, items: ['Mítico Fénix', 'Armadura Æsir'] },
+      epica: {
+        price: 2000,
+        items: [
+          { name: "Dominus", value: 1500 },
+          { name: "Red Valkyrie", value: 1200 },
+          { name: "Golden Robux", value: 1000 },
+          { name: "Epic Roblox Sword", value: 800 }
         ]
-      },
-      {
-        id: 'omega',
-        name: 'Caja OMEGA',
-        price: 800,
-        palette: ['#473e26', '#f4c430'],
-        loot: [
-          { rarity: 'Rara', prob: 0.45, sellBase: 200, items: ['Cetro antiguo', 'Placa de oro', 'Gema ámbar'] },
-          { rarity: 'Épica', prob: 0.40, sellBase: 420, items: ['Núcleo cuántico', 'Skin Aurora', 'Cuchilla espectral'] },
-          { rarity: 'Legendaria', prob: 0.15, sellBase: 1000, items: ['Dragón Solar', 'Corona del Vacío'] },
-        ]
-      },
-    ];
-
-    // =====================
-    // ESTADO / PERSISTENCIA
-    // =====================
-    const initialState = () => ({ coins: 250, inventory: {} });
-
-    function loadState(){
-      try {
-        const raw = localStorage.getItem(STORE_KEY);
-        if(!raw) return initialState();
-        const data = JSON.parse(raw);
-        // migración simple
-        if(typeof data.coins !== 'number' || !data.inventory) return initialState();
-        return data;
-      } catch(e){
-        console.warn('No se pudo cargar el estado:', e);
-        return initialState();
       }
+    };
+
+    let coins = 0;
+    let inventory = [];
+
+    function saveGame() {
+      localStorage.setItem("coins", coins);
+      localStorage.setItem("inventory", JSON.stringify(inventory));
+      localStorage.setItem("lastClaim", lastClaim);
     }
-    function saveState(){ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
 
-    let state = loadState();
-
-    // =====================
-    // UTILIDADES
-    // =====================
-    const $ = sel => document.querySelector(sel);
-    function fmt(n){ return n.toLocaleString('es-UY'); }
-    function weightedPick(entries){
-      // entries: [{prob, ...}]
-      const r = Math.random();
-      let acc = 0;
-      for(const e of entries){ acc += e.prob; if(r < acc) return e; }
-      return entries[entries.length-1]; // fallback
+    function loadGame() {
+      coins = parseInt(localStorage.getItem("coins")) || 0;
+      inventory = JSON.parse(localStorage.getItem("inventory")) || [];
+      lastClaim = localStorage.getItem("lastClaim") || null;
+      updateUI();
     }
-    function pickOne(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
-    // =====================
-    // RENDER
-    // =====================
-    function renderBalance(){ $('#balance').textContent = fmt(state.coins); }
-
-    function renderBoxes(){
-      const wrap = $('#boxes');
-      wrap.innerHTML = '';
-      BOXES.forEach(box => {
-        const el = document.createElement('div');
-        el.className = 'box';
-        el.style.background = `linear-gradient(180deg, ${box.palette[0]}, #111528)`;
-        el.innerHTML = `
-          <h3>${box.name}</h3>
-          <div class="price">Precio: <strong class="val">${fmt(box.price)}</strong> ESP:Z COINS</div>
-          <div class="rarity">
-            ${box.loot.map(l => `<span class="tag ${cssTag(l.rarity)}">${l.rarity} ${(l.prob*100).toFixed(0)}%</span>`).join('')}
-          </div>
-          <div class="actions">
-            <button data-act="open" data-id="${box.id}">Abrir 1</button>
-            <button class="secondary" data-act="openx" data-x="5" data-id="${box.id}">Abrir x5</button>
-            <button class="secondary" data-act="preview" data-id="${box.id}">Ver drops</button>
-          </div>
-          <div class="open-area" id="area-${box.id}"></div>
-        `;
-        wrap.appendChild(el);
+    function updateUI() {
+      document.getElementById("coins").innerText = coins;
+      const inv = document.getElementById("inventory");
+      inv.innerHTML = "";
+      inventory.forEach((item, idx) => {
+        const li = document.createElement("li");
+        li.textContent = `${item.name} (Vale ${item.value})`;
+        inv.appendChild(li);
       });
     }
 
-    function cssTag(r){
-      r = r.toLowerCase();
-      if(r.includes('legend')) return 'legendary';
-      if(r.includes('épica') || r.includes('epic')) return 'epic';
-      if(r.includes('rara')) return 'rare';
-      return 'common';
-    }
-
-    function renderInventory(){
-      const body = $('#invBody');
-      const entries = Object.entries(state.inventory);
-      if(entries.length === 0){
-        body.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--muted)">Sin objetos aún. ¡Abre algunas cajas!</td></tr>';
+    function openBox(type) {
+      const box = BOXES[type];
+      if (coins < box.price) {
+        alert("No tienes suficientes monedas");
         return;
       }
-      body.innerHTML = '';
-      for(const [key, it] of entries){
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${it.name}</td>
-          <td><span class="tag ${cssTag(it.rarity)}">${it.rarity}</span></td>
-          <td><span class="val">${fmt(it.sell)}</span></td>
-          <td>${it.qty}</td>
-          <td><button class="secondary" data-act="sellOne" data-item="${key}">Vender 1</button></td>
-        `;
-        body.appendChild(tr);
+      coins -= box.price;
+      const reward = box.items[Math.floor(Math.random() * box.items.length)];
+      inventory.push(reward);
+      alert(`Has obtenido: ${reward.name} (Vale ${reward.value})`);
+      saveGame();
+      updateUI();
+    }
+
+    function sellAll() {
+      let total = inventory.reduce((sum, item) => sum + item.value, 0);
+      coins += total;
+      inventory = [];
+      alert(`Has vendido todo por ${total} monedas.`);
+      saveGame();
+      updateUI();
+    }
+
+    function resetGame() {
+      if (confirm("¿Seguro que quieres reiniciar tu progreso?")) {
+        coins = 0;
+        inventory = [];
+        lastClaim = null;
+        saveGame();
+        updateUI();
       }
     }
 
-    // =====================
-    // LÓGICA DE APERTURA
-    // =====================
-    function openBox(boxId, times=1){
-      const box = BOXES.find(b => b.id === boxId);
-      if(!box) return;
-      const totalPrice = box.price * times;
-      if(state.coins < totalPrice){
-        toast(`No tienes suficientes ESP:Z COINS. Necesitas ${fmt(totalPrice)}.`);
-        return;
+    // Recompensa diaria de 2500 monedas
+    let lastClaim = null;
+    function checkDailyReward() {
+      const today = new Date().toDateString();
+      if (lastClaim !== today) {
+        coins += 2500;
+        lastClaim = today;
+        alert("¡Has recibido 2500 monedas diarias!");
+        saveGame();
+        updateUI();
       }
-      state.coins -= totalPrice;
-
-      const area = document.getElementById(`area-${boxId}`);
-      area.innerHTML = '';
-
-      const drops = [];
-      for(let i=0;i<times;i++){
-        const tier = weightedPick(box.loot);
-        const name = pickOne(tier.items);
-        const variance = 0.9 + Math.random()*0.2; // +-10% del base
-        const sell = Math.max(1, Math.round(tier.sellBase * variance));
-        const itemKey = `${name}|${tier.rarity}|${sell}`; // clave única por su precio calculado
-        if(!state.inventory[itemKey]) state.inventory[itemKey] = { name, rarity: tier.rarity, sell, qty: 0 };
-        state.inventory[itemKey].qty++;
-        drops.push(state.inventory[itemKey]);
-
-        const card = document.createElement('div');
-        card.className = 'drop';
-        card.innerHTML = `<span class="pill ${cssTag(tier.rarity)}">${tier.rarity}</span> <strong>${name}</strong> — Vende por <span class="val">${fmt(sell)}</span>`;
-        area.appendChild(card);
-      }
-
-      saveState();
-      renderBalance();
-      renderInventory();
     }
 
-    // =====================
-    // VENTAS / INVENTARIO
-    // =====================
-    function sellOne(key){
-      const it = state.inventory[key];
-      if(!it) return;
-      state.coins += it.sell;
-      it.qty -= 1;
-      if(it.qty <= 0) delete state.inventory[key];
-      saveState();
-      renderBalance();
-      renderInventory();
-    }
-
-    function sellAll(){
-      let gained = 0;
-      for(const [k, it] of Object.entries(state.inventory)){
-        gained += it.sell * it.qty;
-      }
-      if(gained === 0){ toast('No hay nada para vender.'); return; }
-      state.coins += gained;
-      state.inventory = {};
-      saveState();
-      renderBalance();
-      renderInventory();
-      toast(`Vendido todo por ${fmt(gained)} ESP:Z COINS.`);
-    }
-
-    function resetProgress(){
-      if(!confirm('¿Seguro que quieres reiniciar tu progreso?')) return;
-      state = initialState();
-      saveState();
-      renderBalance();
-      renderInventory();
-      document.querySelectorAll('.open-area').forEach(n => n.innerHTML='');
-      toast('Progreso reiniciado.');
-    }
-
-    // =====================
-    // UI / EVENTOS
-    // =====================
-    function toast(msg){
-      const t = document.createElement('div');
-      t.textContent = msg;
-      t.style.position='fixed'; t.style.bottom='20px'; t.style.left='50%'; t.style.transform='translateX(-50%)';
-      t.style.background='#111528'; t.style.border='1px solid rgba(255,255,255,.12)'; t.style.padding='10px 14px'; t.style.borderRadius='10px'; t.style.color='var(--text)'; t.style.boxShadow='0 10px 26px rgba(0,0,0,.35)';
-      document.body.appendChild(t);
-      setTimeout(()=>{ t.remove(); }, 2200);
-    }
-
-    function showDrops(box){
-      const lines = box.loot.map(l => `${l.rarity}:\n - ${l.items.join(', ')}`).join('\n\n');
-      alert(`${box.name} — Posibles drops\n\n${lines}`);
-    }
-
-    document.addEventListener('click', (e)=>{
-      const b = e.target.closest('button');
-      if(!b) return;
-      const act = b.dataset.act;
-      if(act === 'open') return openBox(b.dataset.id, 1);
-      if(act === 'openx') return openBox(b.dataset.id, Number(b.dataset.x)||5);
-      if(act === 'preview') { const box = BOXES.find(x=>x.id===b.dataset.id); if(box) showDrops(box); }
-      if(act === 'sellOne') return sellOne(b.dataset.item);
-    });
-
-    $('#sellAll').addEventListener('click', sellAll);
-    $('#resetData').addEventListener('click', resetProgress);
-    $('#btnGift').addEventListener('click', ()=>{ state.coins += 1000; saveState(); renderBalance(); toast('Se añadieron 1000 ESP:Z COINS de prueba.'); });
-
-    // =====================
-    // INICIALIZAR
-    // =====================
-    renderBalance();
-    renderBoxes();
-    renderInventory();
+    loadGame();
+    checkDailyReward();
   </script>
 </body>
 </html>
