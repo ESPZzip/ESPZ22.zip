@@ -6,11 +6,12 @@
   <style>
     body { font-family: Arial, sans-serif; background: #111; color: #eee; text-align: center; }
     h1 { color: #0f0; }
-    .box, .inventory, .balance, .controls { margin: 20px auto; padding: 15px; border: 1px solid #444; border-radius: 10px; background: #222; max-width: 600px; }
+    .box, .inventory, .balance, .controls, .daily { margin: 20px auto; padding: 15px; border: 1px solid #444; border-radius: 10px; background: #222; max-width: 600px; }
     button { padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; background: #0f0; color: #000; font-weight: bold; cursor: pointer; }
     button:hover { background: #6f6; }
     ul { list-style: none; padding: 0; }
     li { margin: 5px 0; }
+    #countdown { font-weight: bold; color: #0f0; }
   </style>
 </head>
 <body>
@@ -18,6 +19,12 @@
 
   <div class="balance">
     <h2>Monedas: <span id="coins">0</span> ESP:Z</h2>
+  </div>
+
+  <div class="daily">
+    <h2>Recompensa diaria</h2>
+    <p id="daily-status">Revisando...</p>
+    <p>Siguiente recompensa en: <span id="countdown">--:--:--</span></p>
   </div>
 
   <div class="controls">
@@ -56,6 +63,7 @@
 
     let coins = 0;
     let inventory = [];
+    let lastClaim = null;
 
     function saveGame() {
       localStorage.setItem("coins", coins);
@@ -74,7 +82,7 @@
       document.getElementById("coins").innerText = coins;
       const inv = document.getElementById("inventory");
       inv.innerHTML = "";
-      inventory.forEach((item, idx) => {
+      inventory.forEach((item) => {
         const li = document.createElement("li");
         li.textContent = `${item.name} (Vale ${item.value})`;
         inv.appendChild(li);
@@ -115,17 +123,37 @@
     }
 
     // Recompensa diaria de 2500 monedas
-    let lastClaim = null;
     function checkDailyReward() {
-      const today = new Date().toDateString();
+      const now = new Date();
+      const today = now.toDateString();
       if (lastClaim !== today) {
         coins += 2500;
         lastClaim = today;
+        document.getElementById("daily-status").innerText = "¡Has recibido 2500 monedas hoy!";
         alert("¡Has recibido 2500 monedas diarias!");
         saveGame();
         updateUI();
+      } else {
+        document.getElementById("daily-status").innerText = "Ya reclamaste tu recompensa hoy.";
       }
+      updateCountdown();
     }
+
+    function updateCountdown() {
+      const now = new Date();
+      const tomorrow = new Date();
+      tomorrow.setHours(24, 0, 0, 0);
+      let diff = Math.max(0, tomorrow - now);
+
+      let hours = Math.floor(diff / (1000 * 60 * 60));
+      let minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      let seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      document.getElementById("countdown").innerText =
+        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    setInterval(updateCountdown, 1000);
 
     loadGame();
     checkDailyReward();
