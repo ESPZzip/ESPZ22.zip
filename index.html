@@ -200,12 +200,15 @@
     // Actualización de cajas
     function updateBoxItems() {
       const randomItem = EXTRA_ITEMS[Math.floor(Math.random() * EXTRA_ITEMS.length)];
+      let boxName;
       if (Math.random() > 0.5) {
         BOXES.basica.items.push(randomItem);
+        boxName = "Caja Básica";
       } else {
         BOXES.epica.items.push(randomItem);
+        boxName = "Caja Épica";
       }
-      const msg = `¡Nuevo ítem agregado: ${randomItem.name} (Vale ${randomItem.value})!`;
+      const msg = `¡Nuevo ítem agregado a ${boxName}: ${randomItem.name} (Vale ${randomItem.value})!`;
       newsList.push(msg);
       alert(msg);
       nextBoxUpdate = Date.now() + (20 * 60 * 1000);
