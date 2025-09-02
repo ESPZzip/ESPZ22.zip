@@ -25,7 +25,7 @@
   <h1>ESP:Z COINS - Cajas Roblox</h1>
 
   <div class="balance">
-    <h2>Robux: <span id="coins">0</span> ESP:Z</h2>
+    <h2>Monedas: <span id="coins">0</span> ESP:Z</h2>
   </div>
 
   <div class="daily">
@@ -61,29 +61,29 @@
       basica: {
         price: 150,
         items: [
-          { name: "Roblox Hat", value: 300 },
-          { name: "Roblox Shirt", value: 200 },
-          { name: "Robux Coin", value: 100 },
-          { name: "Noob Character", value: 150 }
+          { name: "Robux Coin", value: 100, prob: 0.5 },
+          { name: "Noob Character", value: 150, prob: 0.3 },
+          { name: "Roblox Shirt", value: 200, prob: 0.15 },
+          { name: "Roblox Hat", value: 300, prob: 0.05 }
         ]
       },
       epica: {
         price: 1200,
         items: [
-          { name: "Dominus", value: 1500 },
-          { name: "Red Valkyrie", value: 1200 },
-          { name: "Golden Robux", value: 1000 },
-          { name: "Epic Roblox Sword", value: 800 }
+          { name: "Epic Roblox Sword", value: 800, prob: 0.4 },
+          { name: "Golden Robux", value: 1000, prob: 0.3 },
+          { name: "Red Valkyrie", value: 1200, prob: 0.2 },
+          { name: "Dominus", value: 1500, prob: 0.1 }
         ]
       }
     };
 
     const EXTRA_ITEMS = [
-      { name: "Rainbow Dominus", value: 2000 },
-      { name: "Ban Hammer", value: 1800 },
-      { name: "Roblox Fedora", value: 900 },
-      { name: "Builder’s Hat", value: 700 },
-      { name: "Bloxy Award", value: 2200 }
+      { name: "Rainbow Dominus", value: 2000, prob: 0.05 },
+      { name: "Ban Hammer", value: 1800, prob: 0.1 },
+      { name: "Roblox Fedora", value: 900, prob: 0.3 },
+      { name: "Builder’s Hat", value: 700, prob: 0.35 },
+      { name: "Bloxy Award", value: 2200, prob: 0.2 }
     ];
 
     let coins = 0;
@@ -140,6 +140,17 @@
       });
     }
 
+    function weightedRandom(items) {
+      let totalProb = items.reduce((sum, it) => sum + it.prob, 0);
+      let r = Math.random() * totalProb;
+      let acc = 0;
+      for (let it of items) {
+        acc += it.prob;
+        if (r <= acc) return it;
+      }
+      return items[items.length - 1];
+    }
+
     function openBox(type) {
       const box = BOXES[type];
       if (coins < box.price) {
@@ -147,7 +158,7 @@
         return;
       }
       coins -= box.price;
-      const reward = box.items[Math.floor(Math.random() * box.items.length)];
+      const reward = weightedRandom(box.items);
       inventory.push(reward);
       alert(`Has obtenido: ${reward.name} (Vale ${reward.value})`);
       saveGame();
@@ -228,7 +239,7 @@
         if (ti.expires > now) return true;
         let box = BOXES[ti.box];
         box.items = box.items.filter(it => it.name !== ti.item.name);
-        const exclusiveItem = { name: `[EXCLUSIVO] ${ti.item.name}`, value: ti.item.value * 2 };
+        const exclusiveItem = { name: `[EXCLUSIVO] ${ti.item.name}`, value: ti.item.value * 2, prob: 0 };
         inventory.push(exclusiveItem);
         alert(`El ítem ${ti.item.name} ha expirado de ${ti.box} y fue guardado en tu inventario como exclusivo.`);
         newsList.push(`El ítem ${ti.item.name} expiró de ${ti.box} y fue guardado en el inventario como exclusivo.`);
@@ -239,7 +250,7 @@
 
     // Actualización de cajas
     function updateBoxItems() {
-      const randomItem = EXTRA_ITEMS[Math.floor(Math.random() * EXTRA_ITEMS.length)];
+      const randomItem = weightedRandom(EXTRA_ITEMS);
       let boxName, boxKey;
       if (Math.random() > 0.5) {
         BOXES.basica.items.push(randomItem);
