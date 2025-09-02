@@ -27,6 +27,9 @@
     th, td { border:1px solid #555; padding:8px; }
     th { background:#333; }
     .panel-novedades { background:#222; margin:20px auto; padding:15px; border-radius:12px; width:60%; border:1px solid #555; }
+    .codigo-box { background:#222; padding:15px; margin:20px auto; border-radius:12px; width:300px; border:1px solid #555; }
+    .codigo-box input { padding:8px; width:160px; border-radius:6px; border:none; }
+    .codigo-box button { padding:8px 12px; border:none; border-radius:6px; background:#28a745; color:#fff; cursor:pointer; }
   </style>
 </head>
 <body>
@@ -66,6 +69,13 @@
     <tbody id="tablaItems"></tbody>
   </table>
 
+  <div class="codigo-box">
+    <h3>Canjear código</h3>
+    <input type="text" id="codigoInput" placeholder="Ingresa código">
+    <button onclick="redeemCode()">Canjear</button>
+    <div id="codigoMsg"></div>
+  </div>
+
   <div id="timerBox"><span id="hourglass">⏳</span> <span id="timer">Cargando...</span></div>
 
   <audio id="soundNew" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
@@ -74,6 +84,33 @@
   <script>
     let coins = parseInt(localStorage.getItem('coins')) || 0;
     document.getElementById('coins').innerText = coins;
+
+    // Códigos disponibles
+    const codes = {
+      "CRACKYRECOMPENSE": {reward:50000, used: localStorage.getItem("code_CRACKYRECOMPENSE") === "true"}
+    };
+
+    function redeemCode(){
+      const code = document.getElementById('codigoInput').value.trim().toUpperCase();
+      const msg = document.getElementById('codigoMsg');
+      if(!codes[code]){
+        msg.innerText = "Código inválido";
+        msg.style.color = "red";
+        return;
+      }
+      if(codes[code].used){
+        msg.innerText = "Ya usaste este código";
+        msg.style.color = "orange";
+        return;
+      }
+      coins += codes[code].reward;
+      localStorage.setItem('coins', coins);
+      document.getElementById('coins').innerText = coins;
+      codes[code].used = true;
+      localStorage.setItem("code_"+code, "true");
+      msg.innerText = `¡Canjeado con éxito! +${codes[code].reward} monedas`;
+      msg.style.color = "lime";
+    }
 
     // Ítems
     const itemsBasic = [
@@ -104,7 +141,6 @@
 
     let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
 
-    // Random ponderado
     function weightedRandom(items) {
       let total = items.reduce((sum, i) => sum + i.prob, 0);
       let r = Math.random() * total;
@@ -155,7 +191,6 @@
 
     renderInventory();
 
-    // Rellenar tabla de items
     function renderTabla(){
       const tbody = document.getElementById('tablaItems');
       tbody.innerHTML = '';
@@ -170,7 +205,6 @@
     }
     renderTabla();
 
-    // Timer 20 min
     let nextUpdate = localStorage.getItem('nextItemUpdate');
     if(!nextUpdate){
       nextUpdate = Date.now() + 20*60*1000;
@@ -198,7 +232,6 @@
       document.getElementById('timer').innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     },1000);
 
-    // Expiración de ítems
     setInterval(()=>{
       let now = Date.now();
       function check(arr){
