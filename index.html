@@ -28,18 +28,18 @@
     th, td { border:1px solid #555; padding:8px; }
     th { background:#333; }
     .panel-novedades { background:#222; margin:20px auto; padding:15px; border-radius:12px; width:60%; border:1px solid #555; }
-    .redeem { margin:20px; padding:15px; background:#222; border-radius:12px; width:60%; margin:auto; }
-    .redeem input { padding:8px; border:none; border-radius:8px; }
-    .redeem button { padding:8px 15px; border:none; border-radius:8px; background:#007bff; color:#fff; cursor:pointer; }
+    .code-panel { margin:20px auto; padding:15px; background:#222; border-radius:12px; width:50%; border:1px solid #555; }
+    .code-panel input { padding:8px; border-radius:6px; border:none; }
+    .code-panel button { padding:8px 12px; margin-left:10px; border:none; border-radius:6px; cursor:pointer; background:#28a745; color:#fff; }
   </style>
 </head>
 <body>
   <header>ESP:Z COINS - Cajas Roblox</header>
   <div class="coins">Monedas: <span id="coins">0</span></div>
 
-  <div class="redeem">
+  <div class="code-panel">
     <h2>Canjear Código</h2>
-    <input type="text" id="codeInput" placeholder="Escribe tu código aquí">
+    <input type="text" id="codeInput" placeholder="Ingresa tu código">
     <button onclick="redeemCode()">Canjear</button>
   </div>
 
@@ -84,6 +84,8 @@
   <script>
     let coins = parseInt(localStorage.getItem('coins')) || 0;
     document.getElementById('coins').innerText = coins;
+
+    let usedCodes = JSON.parse(localStorage.getItem('usedCodes')) || [];
 
     const itemsBasic = [
       {name:"Robux Coin", value:100, rarity:"Común", icon:"⚪", prob:50},
@@ -144,8 +146,7 @@
       let div = document.getElementById('inventoryList');
       div.innerHTML = '';
       inventory.forEach((item, idx)=>{
-        let rarityClass = `rarity-${item.rarity ? item.rarity.toLowerCase() : 'común'}`;
-        div.innerHTML += `<div class="item ${rarityClass}">${item.tag?`<span class='rarity-especial'>[${item.tag}]</span> `:''}${item.name} (${item.icon} ${item.rarity}) - Valor: ${item.value}
+        div.innerHTML += `<div class="item rarity-${item.rarity.toLowerCase()}">${item.name} (${item.icon} ${item.rarity}) - Valor: ${item.value}
           <button class='sell-btn' onclick='sellItem(${idx})'>Vender</button></div>`;
       });
     }
@@ -178,6 +179,38 @@
     }
     renderTabla();
 
+    // Canjear códigos
+    function redeemCode(){
+      let code = document.getElementById('codeInput').value.trim().toUpperCase();
+      if(usedCodes.includes(code)){
+        alert("Este código ya fue usado.");
+        return;
+      }
+
+      if(code === "CRACKYRECOMPENSE" || code === "COINS50K"){
+        coins += 50000;
+        localStorage.setItem('coins', coins);
+        document.getElementById('coins').innerText = coins;
+        alert("Recibiste 50,000 monedas!");
+        usedCodes.push(code);
+      }
+      else if(code === "ITEMSECRET"){
+        let secretItem = {name:"ITEM SECRETO [EXCLUSIVO]", value:800000, rarity:"Especial", icon:"💚"};
+        inventory.push(secretItem);
+        localStorage.setItem('inventory', JSON.stringify(inventory));
+        renderInventory();
+        alert("¡Obtuviste el ITEM SECRETO!");
+        usedCodes.push(code);
+      } else {
+        alert("Código inválido");
+        return;
+      }
+
+      localStorage.setItem('usedCodes', JSON.stringify(usedCodes));
+      document.getElementById('codeInput').value = '';
+    }
+
+    // Timer 20 min + expiración
     let nextUpdate = localStorage.getItem('nextItemUpdate');
     if(!nextUpdate){
       nextUpdate = Date.now() + 20*60*1000;
@@ -222,29 +255,6 @@
       check(itemsBasic);
       check(itemsEpic);
     },5000);
-
-    function redeemCode(){
-      let code = document.getElementById('codeInput').value.trim().toUpperCase();
-      if(!code){ alert("Ingresa un código"); return; }
-      if(code=="CRACKYRECOMPENSE"){
-        coins += 50000;
-        alert("¡Has recibido 50,000 monedas!");
-      } else if(code=="COINS50K"){
-        coins += 50000;
-        alert("¡Has recibido 50,000 monedas!");
-      } else if(code=="ITEMSECRET"){
-        let secretItem = {name:"Item Secreto", value:800000, rarity:"Especial", icon:"💚", tag:"EXCLUSIVO"};
-        inventory.push(secretItem);
-        alert("¡Has recibido el Item Secreto!");
-      } else {
-        alert("Código inválido");
-        return;
-      }
-      localStorage.setItem('coins', coins);
-      localStorage.setItem('inventory', JSON.stringify(inventory));
-      document.getElementById('coins').innerText = coins;
-      renderInventory();
-    }
   </script>
 </body>
 </html>
