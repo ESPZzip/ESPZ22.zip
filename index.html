@@ -9,17 +9,20 @@
     .coins { margin:20px; font-size:22px; }
     .container { display:flex; justify-content:center; gap:30px; margin:20px; flex-wrap:wrap; }
     .box { background:#222; padding:20px; border-radius:15px; width:220px; }
+    .box img { width:120px; height:120px; object-fit:contain; margin-bottom:10px; }
     .box h2 { font-size:18px; margin-bottom:10px; }
     .box button { margin-top:10px; padding:10px 15px; border:none; border-radius:8px; background:#28a745; color:#fff; cursor:pointer; font-size:16px; }
     .inventory { padding:20px; background:#222; margin:20px; border-radius:15px; }
     .inventory h2 { margin-bottom:10px; }
-    .item { margin:8px 0; }
+    .inventory-grid { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; }
+    .item-card { background:#333; padding:10px; border-radius:10px; width:150px; text-align:center; }
+    .item-card img { width:60px; height:60px; object-fit:contain; margin-bottom:5px; }
     .rarity-común { color:lightgray; }
     .rarity-raro { color:#4da6ff; }
     .rarity-épic { color:#b84dff; }
     .rarity-legendario { color:gold; text-shadow:0 0 8px gold; animation: shine 2s infinite; }
     @keyframes shine { 50% { text-shadow:0 0 16px gold; } }
-    .sell-btn { margin-left:10px; padding:4px 8px; font-size:12px; cursor:pointer; background:#c00; border:none; border-radius:5px; color:white; }
+    .sell-btn { margin-top:6px; padding:4px 8px; font-size:12px; cursor:pointer; background:#c00; border:none; border-radius:5px; color:white; }
     #timerBox { position:fixed; top:15px; right:15px; background:#222; padding:10px 15px; border-radius:10px; border:2px solid #555; font-size:16px; display:flex; align-items:center; gap:6px; }
     #hourglass { animation: spin 2s linear infinite; display:inline-block; }
     @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
@@ -35,14 +38,17 @@
 
   <div class="container">
     <div class="box">
+      <img src="https://media.discordapp.net/attachments/1412227402414821426/1412580654931251301/P7ryoBP.png?format=webp&quality=lossless&width=648&height=648" alt="Caja Básica">
       <h2>Caja Básica - 150 monedas</h2>
       <button onclick="openBox('basic')">Abrir</button>
     </div>
     <div class="box">
+      <img src="https://media.discordapp.net/attachments/1412227402414821426/1412574672939126824/TsnB7J6.png?format=webp&quality=lossless&width=648&height=648" alt="Caja Épica">
       <h2>Caja Épica - 1200 monedas</h2>
       <button onclick="openBox('epic')">Abrir</button>
     </div>
     <div class="box">
+      <img src="https://media.discordapp.net/attachments/1412227402414821426/1412577203748733038/Ez7wbts.png?format=webp&quality=lossless&width=648&height=648" alt="Caja Cracky">
       <h2>CAJA CRACKY (Especial) - 100,000 monedas</h2>
       <button onclick="openBox('cracky')">Abrir</button>
     </div>
@@ -50,7 +56,7 @@
 
   <div class="inventory">
     <h2>Inventario</h2>
-    <div id="inventoryList"></div>
+    <div id="inventoryList" class="inventory-grid"></div>
   </div>
 
   <div class="panel-novedades">
@@ -74,36 +80,35 @@
     let coins = parseInt(localStorage.getItem('coins')) || 0;
     document.getElementById('coins').innerText = coins;
 
-    // Ítems
+    // Ítems con imágenes
     const itemsBasic = [
-      {name:"Robux Coin", value:100, rarity:"Común", icon:"⚪", prob:50},
-      {name:"Noob Character", value:150, rarity:"Común", icon:"⚪", prob:30},
-      {name:"Roblox Shirt", value:200, rarity:"Raro", icon:"🔹", prob:15},
-      {name:"Roblox Hat", value:300, rarity:"Raro", icon:"🔹", prob:5}
+      {name:"Robux Coin", value:100, rarity:"Común", img:"https://tr.rbxcdn.com/8f46e5ac529f7b39b279b1091d651d81/420/420/Image/Png", prob:50},
+      {name:"Noob Character", value:150, rarity:"Común", img:"https://tr.rbxcdn.com/3b90e45d214fb88987a99ab6dbb31a90/420/420/Image/Png", prob:30},
+      {name:"Roblox Shirt", value:200, rarity:"Raro", img:"https://tr.rbxcdn.com/01dbdcb5e2ef4e2e166e9d14a6f9016f/420/420/Image/Png", prob:15},
+      {name:"Roblox Hat", value:300, rarity:"Raro", img:"https://tr.rbxcdn.com/34de807401c92ba64d18ecabf7ed6765/420/420/Image/Png", prob:5}
     ];
 
     const itemsEpic = [
-      {name:"Epic Roblox Sword", value:800, rarity:"Épic", icon:"💎", prob:40},
-      {name:"Golden Robux", value:1000, rarity:"Épic", icon:"💎", prob:30},
-      {name:"Red Valkyrie", value:1200, rarity:"Legendario", icon:"⭐", prob:20},
-      {name:"Dominus", value:1500, rarity:"Legendario", icon:"⭐", prob:10}
+      {name:"Epic Roblox Sword", value:800, rarity:"Épic", img:"https://tr.rbxcdn.com/7c6bc2a40cf2df75b2c0b6eb28de0bdf/420/420/Image/Png", prob:40},
+      {name:"Golden Robux", value:1000, rarity:"Épic", img:"https://tr.rbxcdn.com/4a4a4dfc2a7f6f9c3513dba22c5434aa/420/420/Image/Png", prob:30},
+      {name:"Red Valkyrie", value:1200, rarity:"Legendario", img:"https://tr.rbxcdn.com/fed0477a6ac8e1ab76859e86cdc84eeb/420/420/Image/Png", prob:20},
+      {name:"Dominus", value:1500, rarity:"Legendario", img:"https://tr.rbxcdn.com/746795af1e7cf6842a1d8fb34e66e4ae/420/420/Image/Png", prob:10}
     ];
 
     const itemsCracky = [
-      {name:"Cracky Hat", value:250000, rarity:"Legendario", icon:"👑", prob:0.001},
-      {name:"Cracky Face", value:10000, rarity:"Raro", icon:"😀", prob:50},
-      {name:"Cracky Mods", value:50000, rarity:"Épic", icon:"🛠", prob:20}
+      {name:"Cracky Hat", value:250000, rarity:"Legendario", img:"https://tr.rbxcdn.com/746795af1e7cf6842a1d8fb34e66e4ae/420/420/Image/Png", prob:0.001},
+      {name:"Cracky Face", value:10000, rarity:"Raro", img:"https://tr.rbxcdn.com/7d42fef6fdbd25bbf6d8dca9e5078e1a/420/420/Image/Png", prob:50},
+      {name:"Cracky Mods", value:50000, rarity:"Épic", img:"https://tr.rbxcdn.com/8f46e5ac529f7b39b279b1091d651d81/420/420/Image/Png", prob:20}
     ];
 
     const extraItems = [
-      {name:"Rainbow Dominus", value:2000, rarity:"Legendario", icon:"⭐", prob:5},
-      {name:"Ban Hammer", value:1800, rarity:"Legendario", icon:"⭐", prob:10},
-      {name:"Bloxy Award", value:2200, rarity:"Legendario", icon:"⭐", prob:5}
+      {name:"Rainbow Dominus", value:2000, rarity:"Legendario", img:"https://tr.rbxcdn.com/746795af1e7cf6842a1d8fb34e66e4ae/420/420/Image/Png", prob:5},
+      {name:"Ban Hammer", value:1800, rarity:"Legendario", img:"https://tr.rbxcdn.com/2df02735e44d3dba2b12a2fc90d1c1fd/420/420/Image/Png", prob:10},
+      {name:"Bloxy Award", value:2200, rarity:"Legendario", img:"https://tr.rbxcdn.com/9089e2b2f18a9784f05ee4d84989e21d/420/420/Image/Png", prob:5}
     ];
 
     let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
 
-    // Random ponderado
     function weightedRandom(items) {
       let total = items.reduce((sum, i) => sum + i.prob, 0);
       let r = Math.random() * total;
@@ -128,21 +133,27 @@
       inventory.push(won);
       localStorage.setItem('inventory', JSON.stringify(inventory));
       renderInventory();
-      alert(`¡Ganaste ${won.name} (${won.icon} ${won.rarity})!`);
+      alert(`¡Ganaste ${won.name}!`);
     }
 
     function renderInventory(){
       let div = document.getElementById('inventoryList');
       div.innerHTML = '';
       inventory.forEach((item, idx)=>{
-        div.innerHTML += `<div class="item rarity-${item.rarity.toLowerCase()}">${item.name} (${item.icon} ${item.rarity}) - Valor: ${item.value}
-          <button class='sell-btn' onclick='sellItem(${idx})'>Vender</button></div>`;
+        div.innerHTML += `
+          <div class="item-card rarity-${item.rarity.toLowerCase()}">
+            <img src="${item.img}" alt="${item.name}">
+            <div>${item.name}</div>
+            <div>${item.rarity}</div>
+            <div>💰 ${item.value}</div>
+            <button class='sell-btn' onclick='sellItem(${idx})'>Vender</button>
+          </div>`;
       });
     }
 
     function sellItem(i){
       let item = inventory[i];
-      if(confirm(`¿Vender ${item.name} (${item.icon} ${item.rarity}) por ${item.value} monedas?`)){
+      if(confirm(`¿Vender ${item.name} por ${item.value} monedas?`)){
         coins += item.value;
         inventory.splice(i,1);
         localStorage.setItem('coins', coins);
@@ -170,7 +181,7 @@
         let newItem = weightedRandom(extraItems);
         itemsBasic.push({...newItem, temp:true, expire:Date.now()+60*60*1000});
         itemsEpic.push({...newItem, temp:true, expire:Date.now()+60*60*1000});
-        document.getElementById('ultimoAgregado').innerText = `${newItem.name} (${newItem.icon} ${newItem.rarity})`;
+        document.getElementById('ultimoAgregado').innerText = `${newItem.name}`;
         document.getElementById('soundNew').play();
         nextUpdate = Date.now() + 20*60*1000;
         localStorage.setItem('nextItemUpdate', nextUpdate);
@@ -181,7 +192,7 @@
       document.getElementById('timer').innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     },1000);
 
-    // Expiración de ítems
+    // Expiración
     setInterval(()=>{
       let now = Date.now();
       function check(arr){
@@ -199,7 +210,7 @@
       check(itemsEpic);
     },5000);
 
-    // Canjear códigos
+    // Códigos
     const usedCodes = JSON.parse(localStorage.getItem('usedCodes')) || [];
 
     function redeemCode(){
