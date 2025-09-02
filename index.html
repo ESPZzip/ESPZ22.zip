@@ -18,6 +18,7 @@
     .rarity-raro { color:#4da6ff; }
     .rarity-épic { color:#b84dff; }
     .rarity-legendario { color:gold; text-shadow:0 0 8px gold; animation: shine 2s infinite; }
+    .rarity-especial { color:lime; font-weight:bold; }
     @keyframes shine { 50% { text-shadow:0 0 16px gold; } }
     .sell-btn { margin-left:10px; padding:4px 8px; font-size:12px; cursor:pointer; background:#c00; border:none; border-radius:5px; color:white; }
     #timerBox { position:fixed; top:15px; right:15px; background:#222; padding:10px 15px; border-radius:10px; border:2px solid #555; font-size:16px; display:flex; align-items:center; gap:6px; }
@@ -27,16 +28,18 @@
     th, td { border:1px solid #555; padding:8px; }
     th { background:#333; }
     .panel-novedades { background:#222; margin:20px auto; padding:15px; border-radius:12px; width:60%; border:1px solid #555; }
-    .code-redeem { margin:20px; }
-    .special-tag { color:lime; font-weight:bold; display:block; }
+    .redeem { margin:20px; padding:15px; background:#222; border-radius:12px; width:60%; margin:auto; }
+    .redeem input { padding:8px; border:none; border-radius:8px; }
+    .redeem button { padding:8px 15px; border:none; border-radius:8px; background:#007bff; color:#fff; cursor:pointer; }
   </style>
 </head>
 <body>
   <header>ESP:Z COINS - Cajas Roblox</header>
   <div class="coins">Monedas: <span id="coins">0</span></div>
 
-  <div class="code-redeem">
-    <input type="text" id="codeInput" placeholder="Introduce un código">
+  <div class="redeem">
+    <h2>Canjear Código</h2>
+    <input type="text" id="codeInput" placeholder="Escribe tu código aquí">
     <button onclick="redeemCode()">Canjear</button>
   </div>
 
@@ -82,7 +85,6 @@
     let coins = parseInt(localStorage.getItem('coins')) || 0;
     document.getElementById('coins').innerText = coins;
 
-    // Ítems
     const itemsBasic = [
       {name:"Robux Coin", value:100, rarity:"Común", icon:"⚪", prob:50},
       {name:"Noob Character", value:150, rarity:"Común", icon:"⚪", prob:30},
@@ -110,9 +112,7 @@
     ];
 
     let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
-    let usedCodes = JSON.parse(localStorage.getItem('usedCodes')) || [];
 
-    // Random ponderado
     function weightedRandom(items) {
       let total = items.reduce((sum, i) => sum + i.prob, 0);
       let r = Math.random() * total;
@@ -144,15 +144,15 @@
       let div = document.getElementById('inventoryList');
       div.innerHTML = '';
       inventory.forEach((item, idx)=>{
-        let tag = item.special ? `<span class='special-tag'>[EXCLUSIVO]</span>` : '';
-        div.innerHTML += `<div class="item rarity-${item.rarity ? item.rarity.toLowerCase() : 'común'}">${tag}${item.name} (${item.icon || ''} ${item.rarity || ''}) - Valor: ${item.value || 0}
+        let rarityClass = `rarity-${item.rarity ? item.rarity.toLowerCase() : 'común'}`;
+        div.innerHTML += `<div class="item ${rarityClass}">${item.tag?`<span class='rarity-especial'>[${item.tag}]</span> `:''}${item.name} (${item.icon} ${item.rarity}) - Valor: ${item.value}
           <button class='sell-btn' onclick='sellItem(${idx})'>Vender</button></div>`;
       });
     }
 
     function sellItem(i){
       let item = inventory[i];
-      if(confirm(`¿Vender ${item.name} (${item.icon || ''} ${item.rarity || ''}) por ${item.value} monedas?`)){
+      if(confirm(`¿Vender ${item.name} (${item.icon} ${item.rarity}) por ${item.value} monedas?`)){
         coins += item.value;
         inventory.splice(i,1);
         localStorage.setItem('coins', coins);
@@ -164,7 +164,6 @@
 
     renderInventory();
 
-    // Rellenar tabla de items
     function renderTabla(){
       const tbody = document.getElementById('tablaItems');
       tbody.innerHTML = '';
@@ -179,7 +178,6 @@
     }
     renderTabla();
 
-    // Timer 20 min
     let nextUpdate = localStorage.getItem('nextItemUpdate');
     if(!nextUpdate){
       nextUpdate = Date.now() + 20*60*1000;
@@ -207,7 +205,6 @@
       document.getElementById('timer').innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     },1000);
 
-    // Expiración de ítems
     setInterval(()=>{
       let now = Date.now();
       function check(arr){
@@ -226,32 +223,24 @@
       check(itemsEpic);
     },5000);
 
-    // Códigos de canje
     function redeemCode(){
       let code = document.getElementById('codeInput').value.trim().toUpperCase();
-      if(usedCodes.includes(code)){
-        alert("Ya usaste este código");
-        return;
-      }
-      if(code === "CRACKYRECOMPENSE"){
+      if(!code){ alert("Ingresa un código"); return; }
+      if(code=="CRACKYRECOMPENSE"){
         coins += 50000;
-        usedCodes.push(code);
-        alert("¡Canjeaste 50,000 monedas!");
-      } else if(code === "COINS50K"){
+        alert("¡Has recibido 50,000 monedas!");
+      } else if(code=="COINS50K"){
         coins += 50000;
-        usedCodes.push(code);
-        alert("¡Canjeaste 50,000 monedas!");
-      } else if(code === "ITEMSECRET"){
-        let secretItem = {name:"Item Secreto", value:0, rarity:"Especial", icon:"❇️", special:true};
+        alert("¡Has recibido 50,000 monedas!");
+      } else if(code=="ITEMSECRET"){
+        let secretItem = {name:"Item Secreto", value:800000, rarity:"Especial", icon:"💚", tag:"EXCLUSIVO"};
         inventory.push(secretItem);
-        alert("¡Recibiste un Item Secreto!");
-        usedCodes.push(code);
+        alert("¡Has recibido el Item Secreto!");
       } else {
         alert("Código inválido");
         return;
       }
       localStorage.setItem('coins', coins);
-      localStorage.setItem('usedCodes', JSON.stringify(usedCodes));
       localStorage.setItem('inventory', JSON.stringify(inventory));
       document.getElementById('coins').innerText = coins;
       renderInventory();
