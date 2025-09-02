@@ -1,153 +1,329 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>ESPZ</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f4f4; }
-    header { background: #4CAF50; color: white; padding: 10px; text-align: center; }
-    #saldo { font-weight: bold; }
-    .container { padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 20px; }
-    .item { background: white; border-radius: 10px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: relative; }
-    .item h3 { margin: 0 0 10px 0; }
-    .item button { background: #4CAF50; border: none; color: white; padding: 8px; border-radius: 6px; cursor: pointer; }
-    .item button:disabled { background: grey; cursor: not-allowed; }
-    #carrito { position: fixed; right: 0; top: 0; background: white; height: 100%; width: 300px; box-shadow: -2px 0 5px rgba(0,0,0,0.2); padding: 20px; overflow-y: auto; }
-    #carrito h2 { margin-top: 0; }
-    .limitado { position: absolute; top: 10px; left: 10px; background: gold; color: black; font-weight: bold; padding: 2px 6px; border-radius: 5px; font-size: 12px; }
-    dialog { border: none; border-radius: 8px; padding: 20px; }
-    dialog input { display:block; margin-bottom:10px; width:100%; padding:5px; }
-    dialog button { margin-top:5px; }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>ESPZ</h1>
-    <p>Saldo: <span id="saldo">0</span> Robux</p>
-  </header>
 
-  <main class="container" id="tienda"></main>
-
-  <aside id="carrito">
-    <h2>Carrito</h2>
-    <ul id="carritoLista"></ul>
-    <p>Total: <span id="total">0</span> Coins</p>
-    <button onclick="comprar()">Comprar</button>
-  </aside>
-
-  <dialog id="adminDialog">
-    <h3>Agregar Ítem Limitado</h3>
-    <input type="text" id="newNombre" placeholder="Nombre del ítem">
-    <input type="number" id="newPrecio" placeholder="Precio">
-    <input type="number" id="newStock" placeholder="Stock">
-    <button onclick="agregarItemLimitado()">Agregar</button>
-    <button onclick="document.getElementById('adminDialog').close()">Cerrar</button>
-  </dialog>
-
-  <script>
-    let saldo = parseInt(localStorage.getItem('saldo')) || 1000;
-    let inventario = JSON.parse(localStorage.getItem('inventario')) || [];
-    let itemsBase = JSON.parse(localStorage.getItem('catalogo')) || [
-      { nombre: "Espada", precio: 200, stock: Infinity, limitado: false },
-      { nombre: "Escudo", precio: 150, stock: Infinity, limitado: false }
-    ];
-
-    let carrito = [];
-
-    function renderTienda() {
-      const tienda = document.getElementById("tienda");
-      tienda.innerHTML = "";
-      itemsBase.forEach((item, i) => {
-        const div = document.createElement("div");
-        div.className = "item";
-
-        if(item.limitado) {
-          const badge = document.createElement("div");
-          badge.className = "limitado";
-          badge.textContent = "Limitado";
-          div.appendChild(badge);
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><script src="/js/RobloxHybrid.js" type="68a9d91e70e02c3c461e42aa-text/javascript"></script><title>Home - ESP:Z</title><link rel="icon" type="image/vnd.microsoft.icon" href="/favicon.ico"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="next-head-count" content="8"/><link rel="preload" href="/_next/static/css/6271e15cbec1b51a.css" as="style"/><link rel="stylesheet" href="/_next/static/css/6271e15cbec1b51a.css" data-n-g=""/><noscript data-n-css=""></noscript><script defer="" nomodule="" src="/_next/static/chunks/polyfills-c67a75d1b6f99dc8.js" type="68a9d91e70e02c3c461e42aa-text/javascript"></script><script src="/_next/static/chunks/webpack-fcbbd36f1a82244f.js" defer="" type="68a9d91e70e02c3c461e42aa-text/javascript"></script><script src="/_next/static/chunks/framework-a070cbfff3c750c5.js" defer="" type="68a9d91e70e02c3c461e42aa-text/javascript"></script><script src="/_next/static/chunks/main-7e41b0d2f816b874.js" defer="" type="68a9d91e70e02c3c461e42aa-text/javascript"></script><script src="/_next/static/chunks/pages/_app-e69d7412f8cf1525.js" defer="" type="68a9d91e70e02c3c461e42aa-text/javascript"></script><script src="/_next/static/chunks/8553-ff384e97bb03d2d4.js" defer="" type="68a9d91e70e02c3c461e42aa-text/javascript"></script><script src="/_next/static/chunks/2269-db76d6f65f7e826c.js" defer="" type="68a9d91e70e02c3c461e42aa-text/javascript"></script><script src="/_next/static/chunks/pages/home-da369d978b5a246b.js" defer="" type="68a9d91e70e02c3c461e42aa-text/javascript"></script><script src="/_next/static/XZ3gZK-1Z4QaMZAkZnMyI/_buildManifest.js" defer="" type="68a9d91e70e02c3c461e42aa-text/javascript"></script><script src="/_next/static/XZ3gZK-1Z4QaMZAkZnMyI/_ssgManifest.js" defer="" type="68a9d91e70e02c3c461e42aa-text/javascript"></script><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,500,600,700" rel="stylesheet"/><style id="server-side-styles">.imgDesktop-0-2-7 {
+  width: 118px;
+  height: 30px;
+  display: none;
+  background-size: 118px 30px;
+  background-image: url(/img/ecsr_logo.png);
+}
+@media(min-width: 1301px) {
+  .imgDesktop-0-2-7 {
+    display: block;
+  }
+}
+  .imgMobile-0-2-8 {
+    width: 30px;
+    height: 30px;
+    display: block;
+    background-size: 30px;
+    background-image: url(/img/logo_R.svg);
+  }
+@media(min-width: 1301px) {
+  .imgMobile-0-2-8 {
+    display: none;
+  }
+}
+  .imgMobileWrapper-0-2-9 {
+    margin-left: 40px;
+  }
+  .col-0-2-10 {
+    max-width: 140px;
+  }
+  .openSideNavMobile-0-2-11 {
+    display: none;
+  }
+@media(max-width: 1300px) {
+  .openSideNavMobile-0-2-11 {
+    float: left;
+    width: 30px;
+    cursor: pointer;
+    height: 30px;
+    display: block;
+  }
+}
+  .container-0-2-12 {
+    margin-top: 3px;
+    padding-left: 0;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  .linkEntry-0-2-13 {
+    color: white;
+    padding: 4px 8px;
+    font-size: 16px;
+    text-align: center;
+    transition: none;
+    font-weight: 400;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    text-decoration: none;
+  }
+  .linkEntry-0-2-13:hover {
+    color: white;
+    cursor: pointer;
+    background: rgba(25,25,25,0.1);
+    transition: none;
+    border-radius: 4px;
+  }
+  .navItem-0-2-14 {
+    padding-right: 2rem;
+  }
+@media(max-width: 1300px) {
+  .navItem-0-2-14 {
+    padding-right: 1.75rem;
+  }
+}
+@media(max-width: 1250px) {
+  .navItem-0-2-14 {
+    padding-right: 1.5rem;
+  }
+}
+@media(max-width: 1175px) {
+  .navItem-0-2-14 {
+    padding-right: 1rem;
+  }
+}
+  .col-0-2-15 {
+    margin-left: 0;
+    padding-left: 0;
+  }
+  .icon-0-2-18 {
+    float: right;
+    margin-top: -24px;
+    padding-top: 0;
+  }
+  .wrapper-0-2-16 {
+    width: 100%;
+    border: 1px solid #c3c3c3;
+    padding: 4px 2px;
+    background: white;
+    border-radius: 2px;
+  }
+  .searchInput-0-2-17 {
+    width: 100%;
+    border: none;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .searchInput-0-2-17:focus {
+    border: none!important;
+    box-shadow: none!important;
+  }
+  .navbar-0-2-1 {
+    padding-top: 6px;
+    padding-bottom: 3px;
+  }
+  .navContainer-0-2-2 {
+    max-width: 100%!important;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .leftContainer-0-2-3 {  }
+  .row-0-2-4 {
+    width: 100%;
+  }
+  .wrapper-0-2-5 {
+    overflow: auto;
+    max-width: 100vw;
+    margin-bottom: 40px;
+  }
+@media(max-width: 991px) {
+  .wrapper-0-2-5 {
+    margin-bottom: 98px;
+  }
+}
+  .navbar-d0-0-2-6 {
+    background-color: #0074BD;
+  }
+  .text-0-2-45 {
+    color: #B8B8B8;
+    font-size: 12px;
+    font-weight: 400;
+  }
+  .link-0-2-46 {
+    font-size: 21px;
+    text-align: center;
+    font-weight: 300;
+    text-decoration: none;
+  }
+  .link-0-2-46:hover {
+    color: #191919;
+  }
+  .footerBg-0-2-47 {  }
+  .footerContainer-0-2-48 {
+    padding-top: 5px;
+    padding-bottom: 20px;
+  }
+  .footerBg-d0-0-2-49 {
+    background: #ffffff;
+  }
+  .main-0-2-27 {
+    min-height: 95vh;
+  }
+  .alertBg-0-2-19 {
+    background: #F68802;
+  }
+  .alertText-0-2-20 {
+    color: #fff;
+    padding: 12px 0;
+    font-size: 18px;
+    text-align: center;
+    font-weight: bold;
+  }
+  .alertLink-0-2-21 {
+    color: #fff;
+  }
+  .alertLink-0-2-21:hover {
+    text-decoration: underline;
+  }
+  .fakeAlert-0-2-22 {
+    width: 100%;
+    height: 40px;
+    position: relative;
+  }
+  .alertBg-0-2-23 {
+    background: #F50606;
+  }
+  .alertText-0-2-24 {
+    color: #fff;
+    padding: 12px 0;
+    font-size: 18px;
+    text-align: center;
+    font-weight: bold;
+  }
+  .alertLink-0-2-25 {
+    color: #fff;
+  }
+  .alertLink-0-2-25:hover {
+    text-decoration: underline;
+  }
+  .fakeAlert-0-2-26 {
+    width: 100%;
+    height: 40px;
+    position: relative;
+  }
+  .card-0-2-42 {
+    box-shadow: 0 1px 4px 0 rgb(25 25 25 / 30%);
+    border-radius: 0;
+  }
+  .cardNoBg-0-2-43 {
+    border-radius: 0;
+  }
+  .card-d0-0-2-44 {
+    background: white;
+  }
+  .container-0-2-28 {
+    max-width: 1200px!Important;
+  }
+  .headshotWrapper-0-2-29 {
+    overflow: hidden;
+    box-shadow: 0 -5px 20px rgba(25,25,25,0.15);
+    border-radius: 100%;
+  }
+  .helloMessage-0-2-30 {
+    font-size: 40px;
+    font-weight: 600;
+  }
+@media(min-width: 980px) {
+  .helloMessage-0-2-30 {
+    margin-top: 60px;
+  }
+}
+  .subHeader-0-2-31 {
+    font-size: 24px;
+    font-weight: 300;
+  }
+  .card-0-2-32 {
+    box-shadow: 0 -5px 20px rgba(25,25,25,0.15);
+  }
+  .friendRow-0-2-33 {
+    overflow: hidden;
+    flex-flow: row;
+    margin-right: -7px;
+  }
+  .mainBody-0-2-34 {  }
+  .memberIcons-0-2-35 {  }
+  .memberIcons-0-2-35 span[class^=&quot;icon-obc&quot;], .memberIcons-0-2-35 span[class^=&quot;icon-tbc&quot;], .memberIcons-0-2-35 span[class^=&quot;icon-bc&quot;] {  }
+  .headshotWrapper-d0-0-2-36 {
+    background: white;
+    border: 1px solid #c3c3c3;
+  }
+  .helloMessage-d1-0-2-37 {
+    color: inherit;
+  }
+  .subHeader-d2-0-2-38 {
+    color: #4a4a4a;
+  }
+  .card-d3-0-2-39 {  }
+  .mainBody-d4-0-2-40 {
+    background: #e3e3e3;
+  }
+  .memberIcons-d5-0-2-41 {  }
+  .memberIcons-d5-0-2-41 span[class^=&quot;icon-obc&quot;], .memberIcons-d5-0-2-41 span[class^=&quot;icon-tbc&quot;], .memberIcons-d5-0-2-41 span[class^=&quot;icon-bc&quot;] {  }</style></head><body><div id="__next" data-reactroot=""><div><div class="wrapper-0-2-5 navbar-wrapper-main"><nav class="navbar fixed-top navbar-expand-lg navbar-0-2-1 navbar-d0-0-2-6"><div class="navContainer-0-2-2 container"><div class="row-0-2-4 row"><div class="col-12 col-lg-8"><div class="row-0-2-4 row"><div class="col-0-2-10 col-2 col-lg-2"><div class="openSideNavMobile-0-2-11 icon-menu"></div><div class="imgDesktop-0-2-7"></div><div class="imgMobileWrapper-0-2-9"><div class="imgMobile-0-2-8"></div></div></div><div class="col-0-2-15 col-10 col-lg-5"><div class="container-0-2-12"><div class="row"><div class="col-3"><a class="linkEntry-0-2-13 nav-link active pt-0" href="/games">Games</a></div><div class="col-3"><a class="linkEntry-0-2-13 nav-link active pt-0" href="/catalog">Catalog</a></div><div class="col-3"><a class="linkEntry-0-2-13 nav-link active pt-0" href="/develop">Develop</a></div><div class="col-3"><a class="linkEntry-0-2-13 nav-link active pt-0" href="/Forum/Default.aspx">Forums</a></div></div></div></div><div class="col-12 col-lg-5"><div style="width:100%"><div class="wrapper-0-2-16"><input value="" class="form-control searchInput-0-2-17" placeholder="Search"/><span class="icon-0-2-18 icon-nav-search"></span></div></div></div></div></div><div class="col-12 col-lg-4"></div></div></div></nav></div><div class="fakeAlert-0-2-22"></div><div class="main-0-2-27"><style>
+      #nprogress {
+        pointer-events: none;
+      }
+      #nprogress .bar {
+        background: #fff;
+        position: fixed;
+        z-index: 9999;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+      }
+      #nprogress .peg {
+        display: block;
+        position: absolute;
+        right: 0px;
+        width: 100px;
+        height: 100%;
+        box-shadow: 0 0 10px #fff, 0 0 5px #fff;
+        opacity: 1;
+        -webkit-transform: rotate(3deg) translate(0px, -4px);
+        -ms-transform: rotate(3deg) translate(0px, -4px);
+        transform: rotate(3deg) translate(0px, -4px);
+      }
+      #nprogress .spinner {
+        display: block;
+        position: fixed;
+        z-index: 1031;
+        top: 15px;
+        right: 15px;
+      }
+      #nprogress .spinner-icon {
+        width: 18px;
+        height: 18px;
+        box-sizing: border-box;
+        border: solid 2px transparent;
+        border-top-color: #fff;
+        border-left-color: #fff;
+        border-radius: 50%;
+        -webkit-animation: nprogresss-spinner 400ms linear infinite;
+        animation: nprogress-spinner 400ms linear infinite;
+      }
+      .nprogress-custom-parent {
+        overflow: hidden;
+        position: relative;
+      }
+      .nprogress-custom-parent #nprogress .spinner,
+      .nprogress-custom-parent #nprogress .bar {
+        position: absolute;
+      }
+      @-webkit-keyframes nprogress-spinner {
+        0% {
+          -webkit-transform: rotate(0deg);
         }
-
-        div.innerHTML += `<h3>${item.nombre}</h3>
-          <p>Precio: ${item.precio} Coins</p>
-          <p>Stock: ${item.stock === Infinity ? '∞' : item.stock}</p>`;
-        const btn = document.createElement("button");
-        btn.textContent = "Agregar al carrito";
-        btn.onclick = () => addToCarrito(i);
-        if(item.stock !== Infinity && item.stock <= 0) btn.disabled = true;
-        div.appendChild(btn);
-        tienda.appendChild(div);
-      });
-      document.getElementById("saldo").textContent = saldo;
-    }
-
-    function renderCarrito() {
-      const lista = document.getElementById("carritoLista");
-      lista.innerHTML = "";
-      let total = 0;
-      carrito.forEach((item, i) => {
-        const li = document.createElement("li");
-        li.textContent = `${item.nombre} - ${item.precio} Coins`;
-        total += item.precio;
-        lista.appendChild(li);
-      });
-      document.getElementById("total").textContent = total;
-    }
-
-    function addToCarrito(index) {
-      const item = itemsBase[index];
-      if(item.stock !== Infinity && item.stock <= 0) return;
-      carrito.push(item);
-      if(item.stock !== Infinity) item.stock--;
-      renderTienda();
-      renderCarrito();
-      localStorage.setItem('catalogo', JSON.stringify(itemsBase));
-    }
-
-    function comprar() {
-      let total = carrito.reduce((sum, item) => sum + item.precio, 0);
-      if(total > saldo) {
-        alert("No tienes suficientes Coins");
-        return;
+        100% {
+          -webkit-transform: rotate(360deg);
+        }
       }
-      saldo -= total;
-      inventario = inventario.concat(carrito);
-      carrito = [];
-      localStorage.setItem('saldo', saldo);
-      localStorage.setItem('inventario', JSON.stringify(inventario));
-      renderTienda();
-      renderCarrito();
-      alert("Compra realizada");
-    }
-
-    function agregarItemLimitado() {
-      const nombre = document.getElementById("newNombre").value;
-      const precio = parseInt(document.getElementById("newPrecio").value);
-      const stock = parseInt(document.getElementById("newStock").value);
-      if(!nombre || !precio || !stock) return alert("Completa todos los campos");
-      itemsBase.push({ nombre, precio, stock, limitado: true });
-      localStorage.setItem('catalogo', JSON.stringify(itemsBase));
-      document.getElementById("adminDialog").close();
-      location.reload(); // 🔄 fuerza recargar la página para reflejar el nuevo ítem
-    }
-
-    document.addEventListener("keydown", e => {
-      if(e.key === "F9") {
-        e.preventDefault();
-        document.getElementById("adminDialog").showModal();
+      @keyframes nprogress-spinner {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
       }
-    });
-
-    // 🔔 Si otro admin agrega ítems en otra pestaña, se actualiza esta automáticamente
-    window.addEventListener("storage", (e) => {
-      if(e.key === "catalogo") {
-        itemsBase = JSON.parse(localStorage.getItem('catalogo')) || [];
-        renderTienda();
-      }
-    });
-
-    renderTienda();
-    renderCarrito();
-  </script>
-</body>
-</html>
+    </style><div id="theme-2016-enabled"></div></div><footer class="footerBg-0-2-47 footerBg-d0-0-2-49"><div class="container mt-4 mb-0 footerContainer-0-2-48"><div class="row"><div class="col-12 col-lg-10 offset-lg-1"><p class="text-0-2-45">ROBLOX, &quot;Online Building Toy&quot;, characters, logos, names, and all related indicia are trademarks of ROBLOX Corporation, ©2016. Patents pending. ROBLOX is not sponsored, authorized or endorsed by any producer of plastic building bricks, including The LEGO Group, MEGA Brands, and K&#x27;Nex, and no resemblance to the products of these companies is intended. Use of this site signifies your acceptance of the Terms and Conditions.</p></div></div></div></footer></div></div><script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"title":"Home - ECS:R"},"__N_SSG":true},"page":"/home","query":{},"buildId":"XZ3gZK-1Z4QaMZAkZnMyI","runtimeConfig":{"backend":{"proxyEnabled":false,"flags":{"useSignalCoreForRealTimeChat":true,"captchaOnPurchase":true,"enableTryOnButton":true,"myAccountPage2016Enabled":true,"catalogGenreFilterSupported":false,"catalogPageLimit":28,"catalogSaleCountVisibleFromDetailsEndpoint":true,"catalogDetailsPageResellerLimit":10,"avatarPageInventoryLimit":10,"friendsPageLimit":25,"settingsPageThemeSelectorEnabled":true,"tradeWindowInventoryCollectibleLimit":10,"moneyPagePromotionTabVisible":false,"gameGenreFilterMethod":"default","gameGenreFilterSupported":true,"avatarPageOutfitCreatedAtAvailable":true,"userFeedEnabled":true,"sellItemForTickets":true,"clientSideRenderingEnabled":true,"2015GameDetailsPageEnabled":false,"itemPageLate2016Enabled":true,"userProfileUserStatusEnabled":true,"accessoriesEnabled":true,"packagesEnabled":true,"requireLoginThroughCookie":false,"showTicketBalace":true,"forumSearchEnabled":true,"commentsEndpointHasAreCommentsDisabledProp":true,"catalogDetailsPageOwnersTabEnabled":true,"launchUsingEsURI":true,"downloadPageEnabled":true,"enableEcomonsLinks":true,"downloadGameClients":[{"imageUrl":"https://ecsr.io/img/windows.png","title":"Download ECS:R Player for Windows","url":"https://ecsr.io/BootstrapperDeployment/RobloxPlayerLauncher.exe"},{"imageUrl":"https://ecsr.io/img/android.png","title":"Download ECS:R Player for Android","url":"https://ecsr.io/BootstrapperDeployment/ECSRAndroidClient.apk"},{"imageUrl":"https://ecsr.io/img/apple.png","title":"Download ECS:R Player for iOS","url":"https://ecsr.io/BootstrapperDeployment/ECSRiOS.ipa"},{"imageUrl":"https://ecsr.io/img/windows.png","title":"Download ECS:R Studio for Windows","url":"https://ecsr.io/BootstrapperDeployment/RobloxStudioLauncherBeta.exe"}]},"baseUrl":"https://ecsr.io","apiFormat":"https://ecsr.io/apisite/{0}{1}"}},"isFallback":false,"gsp":true,"scriptLoader":[]}</script><script src="/cdn-cgi/scripts/7d0fa10a/cloudflare-static/rocket-loader.min.js" data-cf-settings="68a9d91e70e02c3c461e42aa-|49" defer></script></body></html>
