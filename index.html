@@ -10,20 +10,22 @@
       margin: 20px auto; padding: 15px; border: 1px solid #444;
       border-radius: 10px; background: #222; max-width: 600px;
     }
-    button { padding: 10px 20px; margin: 5px; border: none;
+    button { padding: 6px 12px; margin: 3px; border: none;
       border-radius: 5px; background: #0f0; color: #000;
-      font-weight: bold; cursor: pointer; }
+      font-weight: bold; cursor: pointer; font-size: 14px; }
     button:hover { background: #6f6; }
     ul { list-style: none; padding: 0; }
-    li { margin: 5px 0; }
+    li { margin: 5px 0; display: flex; justify-content: space-between; align-items: center; }
     #countdown, #box-countdown { font-weight: bold; color: #0f0; }
+    .sell-btn { background: #f33; color: #fff; font-size: 12px; padding: 4px 8px; }
+    .sell-btn:hover { background: #f66; }
   </style>
 </head>
 <body>
   <h1>ESP:Z COINS - Cajas Roblox</h1>
 
   <div class="balance">
-    <h2>Monedas: <span id="coins">0</span> ESP:Z</h2>
+    <h2>Robux: <span id="coins">0</span> ESP:Z</h2>
   </div>
 
   <div class="daily">
@@ -123,9 +125,9 @@
       document.getElementById("coins").innerText = coins;
       const inv = document.getElementById("inventory");
       inv.innerHTML = "";
-      inventory.forEach((item) => {
+      inventory.forEach((item, index) => {
         const li = document.createElement("li");
-        li.textContent = `${item.name} (Vale ${item.value})`;
+        li.innerHTML = `${item.name} (Vale ${item.value}) <button class='sell-btn' onclick='sellItem(${index})'>Vender</button>`;
         inv.appendChild(li);
       });
 
@@ -150,6 +152,16 @@
       alert(`Has obtenido: ${reward.name} (Vale ${reward.value})`);
       saveGame();
       updateUI();
+    }
+
+    function sellItem(index) {
+      const item = inventory[index];
+      if (confirm(`¿Seguro que quieres vender ${item.name} por ${item.value} monedas?`)) {
+        coins += item.value;
+        inventory.splice(index, 1);
+        saveGame();
+        updateUI();
+      }
     }
 
     function sellAll() {
@@ -214,7 +226,6 @@
       const now = Date.now();
       temporaryItems = temporaryItems.filter(ti => {
         if (ti.expires > now) return true;
-        // Eliminar de caja y pasar al inventario exclusivo con valor duplicado
         let box = BOXES[ti.box];
         box.items = box.items.filter(it => it.name !== ti.item.name);
         const exclusiveItem = { name: `[EXCLUSIVO] ${ti.item.name}`, value: ti.item.value * 2 };
@@ -243,7 +254,6 @@
       newsList.push(msg);
       alert(msg);
 
-      // Guardar como temporal por 1 hora
       temporaryItems.push({
         item: randomItem,
         box: boxKey,
