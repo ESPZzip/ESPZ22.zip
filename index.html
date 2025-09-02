@@ -4,26 +4,25 @@
   <meta charset="UTF-8">
   <title>ESP:Z COINS - Cajas Roblox</title>
   <style>
-    body { font-family: Arial, sans-serif; background:#111; color:#fff; margin:0; padding:0; }
-    header { background:#222; padding:10px; text-align:center; font-size:24px; }
-    .coins { margin:10px; font-size:20px; }
-    .container { display:flex; gap:20px; padding:20px; }
-    .box { background:#333; padding:15px; border-radius:12px; flex:1; text-align:center; }
-    .box button { margin-top:10px; padding:10px; border:none; border-radius:8px; background:#28a745; color:#fff; cursor:pointer; }
-    .inventory { padding:20px; background:#222; }
-    .item { margin:5px 0; }
-    .rarity-common { color:lightgray; }
-    .rarity-rare { color:#4da6ff; }
-    .rarity-epic { color:#b84dff; }
-    .rarity-legendary { color:gold; text-shadow:0 0 8px gold; animation: shine 2s infinite; }
+    body { font-family: Arial, sans-serif; background:#111; color:#fff; margin:0; padding:0; text-align:center; }
+    header { background:#222; padding:15px; font-size:26px; }
+    .coins { margin:20px; font-size:22px; }
+    .container { display:flex; justify-content:center; gap:30px; margin:20px; }
+    .box { background:#222; padding:20px; border-radius:15px; width:220px; }
+    .box h2 { font-size:20px; margin-bottom:10px; }
+    .box button { margin-top:10px; padding:10px 15px; border:none; border-radius:8px; background:#28a745; color:#fff; cursor:pointer; font-size:16px; }
+    .inventory { padding:20px; background:#222; margin:20px; border-radius:15px; }
+    .inventory h2 { margin-bottom:10px; }
+    .item { margin:8px 0; }
+    .rarity-común { color:lightgray; }
+    .rarity-raro { color:#4da6ff; }
+    .rarity-épic { color:#b84dff; }
+    .rarity-legendario { color:gold; text-shadow:0 0 8px gold; animation: shine 2s infinite; }
     @keyframes shine { 50% { text-shadow:0 0 16px gold; } }
-    .sell-btn { margin-left:10px; padding:3px 6px; font-size:12px; cursor:pointer; }
-    #timerBox { position:fixed; top:10px; right:10px; background:#222; padding:10px 15px; border-radius:10px; border:2px solid #555; font-size:16px; display:flex; align-items:center; gap:6px; }
+    .sell-btn { margin-left:10px; padding:4px 8px; font-size:12px; cursor:pointer; background:#c00; border:none; border-radius:5px; color:white; }
+    #timerBox { position:fixed; top:15px; right:15px; background:#222; padding:10px 15px; border-radius:10px; border:2px solid #555; font-size:16px; display:flex; align-items:center; gap:6px; }
     #hourglass { animation: spin 2s linear infinite; display:inline-block; }
     @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
-    table { width:100%; border-collapse:collapse; margin-top:20px; }
-    th, td { border:1px solid #555; padding:6px; text-align:center; }
-    th { background:#444; }
   </style>
 </head>
 <body>
@@ -46,11 +45,6 @@
     <div id="inventoryList"></div>
   </div>
 
-  <div id="probabilities">
-    <h2>Tabla de Probabilidades</h2>
-    <div id="probTable"></div>
-  </div>
-
   <div id="timerBox"><span id="hourglass">⏳</span> <span id="timer">Cargando...</span></div>
 
   <audio id="soundNew" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
@@ -69,13 +63,12 @@
     ];
 
     const itemsEpic = [
-      {name:"Epic Roblox Sword", value:800, rarity:"Épico", icon:"💎", prob:40},
-      {name:"Golden Robux", value:1000, rarity:"Épico", icon:"💎", prob:30},
+      {name:"Epic Roblox Sword", value:800, rarity:"Épic", icon:"💎", prob:40},
+      {name:"Golden Robux", value:1000, rarity:"Épic", icon:"💎", prob:30},
       {name:"Red Valkyrie", value:1200, rarity:"Legendario", icon:"⭐", prob:20},
       {name:"Dominus", value:1500, rarity:"Legendario", icon:"⭐", prob:10}
     ];
 
-    // Ítems extra de alto valor con baja probabilidad
     const extraItems = [
       {name:"Rainbow Dominus", value:2000, rarity:"Legendario", icon:"⭐", prob:5},
       {name:"Ban Hammer", value:1800, rarity:"Legendario", icon:"⭐", prob:10},
@@ -84,7 +77,7 @@
 
     let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
 
-    // --- Funciones de cajas ---
+    // --- Funciones ---
     function weightedRandom(items) {
       let total = items.reduce((sum, i) => sum + i.prob, 0);
       let r = Math.random() * total;
@@ -110,7 +103,6 @@
       alert(`¡Ganaste ${won.name} (${won.icon} ${won.rarity})!`);
     }
 
-    // --- Inventario ---
     function renderInventory(){
       let div = document.getElementById('inventoryList');
       div.innerHTML = '';
@@ -147,17 +139,16 @@
       let now = Date.now();
       let diff = nextUpdate - now;
       if(diff <= 0){
-        // agregar ítem extra
         let newItem = weightedRandom(extraItems);
         itemsBasic.push({...newItem, temp:true, expire:Date.now()+60*60*1000});
         itemsEpic.push({...newItem, temp:true, expire:Date.now()+60*60*1000});
         document.getElementById('soundNew').play();
         nextUpdate = Date.now() + 20*60*1000;
         localStorage.setItem('nextItemUpdate', nextUpdate);
-        renderProbTable();
       }
       let m = Math.floor(diff/60000);
       let s = Math.floor((diff%60000)/1000);
+      if(m<0||s<0){m=0;s=0;}
       document.getElementById('timer').innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     },1000);
 
@@ -177,23 +168,7 @@
       }
       check(itemsBasic);
       check(itemsEpic);
-      renderProbTable();
     },5000);
-
-    // --- Probabilidades ---
-    function renderProbTable(){
-      function renderBox(name, arr){
-        let html = `<h3>${name}</h3><table><tr><th>Ítem</th><th>Rareza</th><th>Probabilidad</th><th>Valor</th></tr>`;
-        arr.forEach(it=>{
-          html += `<tr><td class="rarity-${it.rarity.toLowerCase()}">${it.name}${it.temp?" [TEMPORAL]":""}</td><td>${it.icon} ${it.rarity}</td><td>${it.prob}%</td><td>${it.value}</td></tr>`;
-        });
-        html += `</table>`;
-        return html;
-      }
-      document.getElementById('probTable').innerHTML = renderBox("Caja Básica", itemsBasic)+renderBox("Caja Épica", itemsEpic);
-    }
-
-    renderProbTable();
   </script>
 </body>
 </html>
