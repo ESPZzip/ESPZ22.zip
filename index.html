@@ -151,6 +151,10 @@
 
       document.getElementById("countdown").innerText =
         `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+      if (diff <= 0) {
+        checkDailyReward();
+      }
     }
 
     setInterval(updateCountdown, 1000);
