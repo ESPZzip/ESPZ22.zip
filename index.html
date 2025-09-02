@@ -4,171 +4,246 @@
   <meta charset="UTF-8">
   <title>ESP:Z COINS - Cajas Roblox</title>
   <style>
-    body { font-family: Arial, sans-serif; background:#111; color:#fff; margin:0; padding:0; text-align:center; }
-    header { background:#222; padding:15px; font-size:26px; }
-    .coins { margin:20px; font-size:22px; }
-    .container { display:flex; justify-content:center; gap:30px; margin:20px; }
-    .box { background:#222; padding:20px; border-radius:15px; width:220px; }
-    .box h2 { font-size:20px; margin-bottom:10px; }
-    .box button { margin-top:10px; padding:10px 15px; border:none; border-radius:8px; background:#28a745; color:#fff; cursor:pointer; font-size:16px; }
-    .inventory { padding:20px; background:#222; margin:20px; border-radius:15px; }
-    .inventory h2 { margin-bottom:10px; }
-    .item { margin:8px 0; }
-    .rarity-común { color:lightgray; }
-    .rarity-raro { color:#4da6ff; }
-    .rarity-épic { color:#b84dff; }
-    .rarity-legendario { color:gold; text-shadow:0 0 8px gold; animation: shine 2s infinite; }
-    @keyframes shine { 50% { text-shadow:0 0 16px gold; } }
-    .sell-btn { margin-left:10px; padding:4px 8px; font-size:12px; cursor:pointer; background:#c00; border:none; border-radius:5px; color:white; }
-    #timerBox { position:fixed; top:15px; right:15px; background:#222; padding:10px 15px; border-radius:10px; border:2px solid #555; font-size:16px; display:flex; align-items:center; gap:6px; }
-    #hourglass { animation: spin 2s linear infinite; display:inline-block; }
-    @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
+    body { font-family: Arial, sans-serif; background: #111; color: #fff; text-align: center; margin:0; padding:0; }
+    .box { border: 2px solid #444; padding: 10px; margin: 10px; display: inline-block; border-radius: 10px; background: #222; }
+    button { padding: 8px 14px; margin: 5px; border-radius: 8px; border: none; cursor: pointer; }
+    #inventory { margin-top: 20px; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto; }
+    #news { margin-top: 20px; background: #222; padding: 10px; border-radius: 10px; max-width: 600px; margin-left: auto; margin-right: auto; text-align: left; }
+    table { border-collapse: collapse; margin: 20px auto; background: #222; width: 90%; }
+    th, td { border: 1px solid #444; padding: 8px; text-align: center; }
+    th { background: #333; }
+    .rarity-common { color: #bbb; }
+    .rarity-rare { color: #3b82f6; }
+    .rarity-epic { color: #a855f7; }
+    .rarity-legendary { color: gold; animation: shine 2s infinite linear; }
+    @keyframes shine {
+      0% { text-shadow: 0 0 5px gold; }
+      50% { text-shadow: 0 0 20px gold, 0 0 30px orange; }
+      100% { text-shadow: 0 0 5px gold; }
+    }
+    #itemTimerBox {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(34,34,34,0.9);
+      padding: 10px 20px;
+      border: 2px solid #555;
+      border-radius: 12px;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hourglass {
+      display: inline-block;
+      animation: spin 2s infinite linear;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
-  <header>ESP:Z COINS - Cajas Roblox</header>
-  <div class="coins">Monedas: <span id="coins">0</span></div>
+  <h1>🎁 ESP:Z COINS - Cajas Roblox</h1>
+  <p>Monedas: <span id="coins">0</span></p>
+  <div id="boxes"></div>
+  <h2>🗃️ Inventario</h2>
+  <div id="inventory"></div>
+  <button onclick="sellAll()">Vender Todo</button>
+  <h2>📰 Noticias</h2>
+  <div id="news"></div>
+  <p id="dailyReward"></p>
+  <p id="nextReward"></p>
 
-  <div class="container">
-    <div class="box">
-      <h2>Caja Básica - 150 monedas</h2>
-      <button onclick="openBox('basic')">Abrir</button>
-    </div>
-    <div class="box">
-      <h2>Caja Épica - 1200 monedas</h2>
-      <button onclick="openBox('epic')">Abrir</button>
-    </div>
+  <!-- Contador fijo arriba a la derecha -->
+  <div id="itemTimerBox">
+    <span class="hourglass">⏳</span>
+    <span id="itemTimer">Cargando...</span>
   </div>
 
-  <div class="inventory">
-    <h2>Inventario</h2>
-    <div id="inventoryList"></div>
-  </div>
+  <h2>📊 Tabla de probabilidades</h2>
+  <div id="probTable"></div>
 
-  <div id="timerBox"><span id="hourglass">⏳</span> <span id="timer">Cargando...</span></div>
-
-  <audio id="soundNew" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
-  <audio id="soundExpire" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3"></audio>
+  <!-- Sonidos -->
+  <audio id="soundNewItems" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"></audio>
+  <audio id="soundExpire" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
 
   <script>
     let coins = parseInt(localStorage.getItem('coins')) || 0;
-    document.getElementById('coins').innerText = coins;
-
-    // --- Definición de ítems ---
-    const itemsBasic = [
-      {name:"Robux Coin", value:100, rarity:"Común", icon:"⚪", prob:50},
-      {name:"Noob Character", value:150, rarity:"Común", icon:"⚪", prob:30},
-      {name:"Roblox Shirt", value:200, rarity:"Raro", icon:"🔹", prob:15},
-      {name:"Roblox Hat", value:300, rarity:"Raro", icon:"🔹", prob:5}
-    ];
-
-    const itemsEpic = [
-      {name:"Epic Roblox Sword", value:800, rarity:"Épic", icon:"💎", prob:40},
-      {name:"Golden Robux", value:1000, rarity:"Épic", icon:"💎", prob:30},
-      {name:"Red Valkyrie", value:1200, rarity:"Legendario", icon:"⭐", prob:20},
-      {name:"Dominus", value:1500, rarity:"Legendario", icon:"⭐", prob:10}
-    ];
-
-    const extraItems = [
-      {name:"Rainbow Dominus", value:2000, rarity:"Legendario", icon:"⭐", prob:5},
-      {name:"Ban Hammer", value:1800, rarity:"Legendario", icon:"⭐", prob:10},
-      {name:"Bloxy Award", value:2200, rarity:"Legendario", icon:"⭐", prob:5}
-    ];
-
     let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+    let news = JSON.parse(localStorage.getItem('news')) || [];
+    let lastDaily = localStorage.getItem('lastDaily') || null;
+    let nextItemUpdate = localStorage.getItem('nextItemUpdate');
 
-    // --- Funciones ---
-    function weightedRandom(items) {
-      let total = items.reduce((sum, i) => sum + i.prob, 0);
-      let r = Math.random() * total;
-      let acum = 0;
-      for (let i of items) {
-        acum += i.prob;
-        if (r < acum) return i;
-      }
-      return items[0];
-    }
+    const BOXES = [
+      { name: "Caja Básica", price: 150, items: [
+        {name: "Robux Coin", value: 100, prob: 50, rarity: "Común", icon:"⚪"},
+        {name: "Noob Character", value: 150, prob: 30, rarity: "Común", icon:"⚪"},
+        {name: "Roblox Shirt", value: 200, prob: 15, rarity: "Raro", icon:"🔹"},
+        {name: "Roblox Hat", value: 300, prob: 5, rarity: "Raro", icon:"🔹"}
+      ]},
+      { name: "Caja Épica", price: 1200, items: [
+        {name: "Epic Roblox Sword", value: 800, prob: 40, rarity: "Épico", icon:"💎"},
+        {name: "Golden Robux", value: 1000, prob: 30, rarity: "Épico", icon:"💎"},
+        {name: "Red Valkyrie", value: 1200, prob: 20, rarity: "Legendario", icon:"⭐"},
+        {name: "Dominus", value: 1500, prob: 10, rarity: "Legendario", icon:"⭐"}
+      ]}
+    ];
 
-    function openBox(type){
-      let boxItems = (type=="basic") ? itemsBasic : itemsEpic;
-      let cost = (type=="basic") ? 150 : 1200;
-      if(coins < cost){ alert("No tienes suficientes monedas"); return; }
-      coins -= cost;
+    function save(){
       localStorage.setItem('coins', coins);
-      document.getElementById('coins').innerText = coins;
-      let won = weightedRandom(boxItems);
-      inventory.push(won);
       localStorage.setItem('inventory', JSON.stringify(inventory));
-      renderInventory();
-      alert(`¡Ganaste ${won.name} (${won.icon} ${won.rarity})!`);
+      localStorage.setItem('news', JSON.stringify(news));
     }
 
-    function renderInventory(){
-      let div = document.getElementById('inventoryList');
-      div.innerHTML = '';
-      inventory.forEach((item, idx)=>{
-        div.innerHTML += `<div class="item rarity-${item.rarity.toLowerCase()}">${item.name} (${item.icon} ${item.rarity}) - Valor: ${item.value}
-          <button class='sell-btn' onclick='sellItem(${idx})'>Vender</button></div>`;
+    function rarityClass(rarity){
+      switch(rarity){
+        case "Común": return "rarity-common";
+        case "Raro": return "rarity-rare";
+        case "Épico": return "rarity-epic";
+        case "Legendario": return "rarity-legendary";
+        default: return "";
+      }
+    }
+
+    function render(){
+      document.getElementById('coins').textContent = coins;
+      let invHTML = "";
+      inventory.forEach((item,i)=>{
+        let cls = rarityClass(item.rarity);
+        invHTML += `<div class="${cls}">${item.icon} ${item.name} (${item.rarity}) - Valor: ${item.value} <button onclick="sellItem(${i})">Vender</button></div>`;
       });
+      document.getElementById('inventory').innerHTML = invHTML;
+
+      let newsHTML = news.map(n => `<div>${n}</div>`).join('');
+      document.getElementById('news').innerHTML = newsHTML;
+
+      let boxesHTML = BOXES.map((b,i)=> `<div class='box'><h3>${b.name}</h3><p>Precio: ${b.price}</p><button onclick='openBox(${i})'>Abrir</button></div>`).join('');
+      document.getElementById('boxes').innerHTML = boxesHTML;
+
+      renderProbabilities();
+    }
+
+    function openBox(i){
+      let box = BOXES[i];
+      if(coins < box.price){ alert("No tienes suficientes monedas"); return; }
+      coins -= box.price;
+      let item = getRandomItem(box.items);
+      inventory.push(item);
+      news.unshift(`Ganaste ${item.icon} <span class='${rarityClass(item.rarity)}'>${item.name} (${item.rarity})</span>`);
+      save();
+      render();
+    }
+
+    function getRandomItem(items){
+      let totalProb = items.reduce((a,b)=>a+b.prob,0);
+      let rand = Math.random()*totalProb;
+      let cumulative = 0;
+      for(let item of items){
+        cumulative += item.prob;
+        if(rand <= cumulative){
+          return {...item};
+        }
+      }
     }
 
     function sellItem(i){
       let item = inventory[i];
-      if(confirm(`¿Vender ${item.name} (${item.icon} ${item.rarity}) por ${item.value} monedas?`)){
+      if(confirm(`¿Vender ${item.name} (${item.rarity}) por ${item.value} monedas?`)){
         coins += item.value;
         inventory.splice(i,1);
-        localStorage.setItem('coins', coins);
-        localStorage.setItem('inventory', JSON.stringify(inventory));
-        document.getElementById('coins').innerText = coins;
-        renderInventory();
+        save();
+        render();
       }
     }
 
-    renderInventory();
-
-    // --- Timer de 20 minutos ---
-    let nextUpdate = localStorage.getItem('nextItemUpdate');
-    if(!nextUpdate){
-      nextUpdate = Date.now() + 20*60*1000;
-      localStorage.setItem('nextItemUpdate', nextUpdate);
-    } else {
-      nextUpdate = parseInt(nextUpdate);
+    function sellAll(){
+      let total = inventory.reduce((a,b)=>a+b.value,0);
+      if(confirm(`¿Vender todo por ${total} monedas?`)){
+        coins += total;
+        inventory = [];
+        save();
+        render();
+      }
     }
 
-    setInterval(()=>{
-      let now = Date.now();
-      let diff = nextUpdate - now;
-      if(diff <= 0){
-        let newItem = weightedRandom(extraItems);
-        itemsBasic.push({...newItem, temp:true, expire:Date.now()+60*60*1000});
-        itemsEpic.push({...newItem, temp:true, expire:Date.now()+60*60*1000});
-        document.getElementById('soundNew').play();
-        nextUpdate = Date.now() + 20*60*1000;
-        localStorage.setItem('nextItemUpdate', nextUpdate);
+    function dailyReward(){
+      let today = new Date().toDateString();
+      if(lastDaily !== today){
+        coins += 2500;
+        lastDaily = today;
+        localStorage.setItem('lastDaily', lastDaily);
+        alert("Has recibido 2500 ESP:Z COINS por recompensa diaria!");
       }
-      let m = Math.floor(diff/60000);
-      let s = Math.floor((diff%60000)/1000);
-      if(m<0||s<0){m=0;s=0;}
-      document.getElementById('timer').innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    },1000);
+    }
 
-    // --- Expiración de ítems temporales ---
-    setInterval(()=>{
-      let now = Date.now();
-      function check(arr){
-        for(let i=arr.length-1;i>=0;i--){
-          if(arr[i].temp && arr[i].expire<=now){
-            inventory.push({...arr[i], name: arr[i].name+" [EXCLUSIVO]"});
-            document.getElementById('soundExpire').play();
-            arr.splice(i,1);
-            localStorage.setItem('inventory', JSON.stringify(inventory));
-            renderInventory();
+    const EXTRA_ITEMS = [
+      {name:"Rainbow Dominus", value:2000, prob:5, rarity:"Legendario", icon:"⭐"},
+      {name:"Ban Hammer", value:1800, prob:10, rarity:"Legendario", icon:"⭐"},
+      {name:"Roblox Fedora", value:900, prob:30, rarity:"Épico", icon:"💎"},
+      {name:"Builder’s Hat", value:700, prob:35, rarity:"Raro", icon:"🔹"},
+      {name:"Bloxy Award", value:2200, prob:20, rarity:"Legendario", icon:"⭐"}
+    ];
+
+    function updateItems(){
+      BOXES.forEach(b=> b.items.push({...EXTRA_ITEMS[Math.floor(Math.random()*EXTRA_ITEMS.length)], expires: Date.now()+3600000, temp: true }));
+      news.unshift("Nuevos ítems añadidos a las cajas!");
+      nextItemUpdate = Date.now() + 20*60*1000;
+      localStorage.setItem('nextItemUpdate', nextItemUpdate);
+      document.getElementById("soundNewItems").play();
+      save();
+      render();
+    }
+
+    function checkItemExpiry(){
+      BOXES.forEach(b=>{
+        b.items = b.items.filter(item=>{
+          if(item.expires && Date.now()>item.expires){
+            let exclusiveItem = {...item, name: item.name+" [EXCLUSIVO]", value: item.value*2};
+            inventory.push(exclusiveItem);
+            alert(`El ítem ${item.name} expiró de las cajas y se guardó en tu inventario como EXCLUSIVO!`);
+            document.getElementById("soundExpire").play();
+            return false;
           }
+          return true;
+        });
+      });
+      save();
+      render();
+    }
+
+    function tick(){
+      let now = Date.now();
+      if(nextItemUpdate && now >= nextItemUpdate){ updateItems(); }
+      if(nextItemUpdate){
+        let diff = nextItemUpdate - now;
+        if(diff>0){
+          let m = Math.floor(diff/60000), s=Math.floor((diff%60000)/1000);
+          document.getElementById('itemTimer').textContent = `${m}m ${s}s`;
         }
       }
-      check(itemsBasic);
-      check(itemsEpic);
-    },5000);
+      checkItemExpiry();
+    }
+
+    function renderProbabilities(){
+      let html = "";
+      BOXES.forEach(b=>{
+        html += `<h3>${b.name}</h3>`;
+        html += `<table><tr><th>Ítem</th><th>Rareza</th><th>Probabilidad</th></tr>`;
+        b.items.forEach(it=>{
+          let cls = rarityClass(it.rarity);
+          let temp = it.temp ? " [TEMPORAL]" : "";
+          html += `<tr><td class='${cls}'>${it.icon} ${it.name}${temp}</td><td class='${cls}'>${it.rarity}</td><td>${it.prob}%</td></tr>`;
+        });
+        html += `</table>`;
+      });
+      document.getElementById('probTable').innerHTML = html;
+    }
+
+    dailyReward();
+    setInterval(tick,1000);
+    render();
   </script>
 </body>
 </html>
