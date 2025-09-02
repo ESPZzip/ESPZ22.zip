@@ -6,12 +6,17 @@
   <style>
     body { font-family: Arial, sans-serif; background: #111; color: #eee; text-align: center; }
     h1 { color: #0f0; }
-    .box, .inventory, .balance, .controls, .daily { margin: 20px auto; padding: 15px; border: 1px solid #444; border-radius: 10px; background: #222; max-width: 600px; }
-    button { padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; background: #0f0; color: #000; font-weight: bold; cursor: pointer; }
+    .box, .inventory, .balance, .controls, .daily, .updates {
+      margin: 20px auto; padding: 15px; border: 1px solid #444;
+      border-radius: 10px; background: #222; max-width: 600px;
+    }
+    button { padding: 10px 20px; margin: 5px; border: none;
+      border-radius: 5px; background: #0f0; color: #000;
+      font-weight: bold; cursor: pointer; }
     button:hover { background: #6f6; }
     ul { list-style: none; padding: 0; }
     li { margin: 5px 0; }
-    #countdown { font-weight: bold; color: #0f0; }
+    #countdown, #box-countdown { font-weight: bold; color: #0f0; }
   </style>
 </head>
 <body>
@@ -27,6 +32,11 @@
     <p>Siguiente recompensa en: <span id="countdown">--:--:--</span></p>
   </div>
 
+  <div class="updates">
+    <h2>Actualización de cajas</h2>
+    <p>Próximos ítems en: <span id="box-countdown">--:--</span></p>
+  </div>
+
   <div class="controls">
     <button onclick="openBox('basica')">Abrir Caja Básica (500)</button>
     <button onclick="openBox('epica')">Abrir Caja Épica (2000)</button>
@@ -40,7 +50,7 @@
   </div>
 
   <script>
-    const BOXES = {
+    let BOXES = {
       basica: {
         price: 500,
         items: [
@@ -61,20 +71,32 @@
       }
     };
 
+    const EXTRA_ITEMS = [
+      { name: "Rainbow Dominus", value: 2000 },
+      { name: "Ban Hammer", value: 1800 },
+      { name: "Roblox Fedora", value: 900 },
+      { name: "Builder’s Hat", value: 700 },
+      { name: "Bloxy Award", value: 2200 }
+    ];
+
     let coins = 0;
     let inventory = [];
     let lastClaim = null;
+
+    let nextBoxUpdate = Date.now() + (20 * 60 * 1000); // 20 minutos
 
     function saveGame() {
       localStorage.setItem("coins", coins);
       localStorage.setItem("inventory", JSON.stringify(inventory));
       localStorage.setItem("lastClaim", lastClaim);
+      localStorage.setItem("nextBoxUpdate", nextBoxUpdate);
     }
 
     function loadGame() {
       coins = parseInt(localStorage.getItem("coins")) || 0;
       inventory = JSON.parse(localStorage.getItem("inventory")) || [];
       lastClaim = localStorage.getItem("lastClaim") || null;
+      nextBoxUpdate = parseInt(localStorage.getItem("nextBoxUpdate")) || Date.now() + (20 * 60 * 1000);
       updateUI();
     }
 
@@ -117,12 +139,13 @@
         coins = 0;
         inventory = [];
         lastClaim = null;
+        nextBoxUpdate = Date.now() + (20 * 60 * 1000);
         saveGame();
         updateUI();
       }
     }
 
-    // Recompensa diaria de 2500 monedas
+    // Recompensa diaria
     function checkDailyReward() {
       const now = new Date();
       const today = now.toDateString();
@@ -157,7 +180,34 @@
       }
     }
 
+    // Actualización de cajas
+    function updateBoxItems() {
+      const randomItem = EXTRA_ITEMS[Math.floor(Math.random() * EXTRA_ITEMS.length)];
+      if (Math.random() > 0.5) {
+        BOXES.basica.items.push(randomItem);
+      } else {
+        BOXES.epica.items.push(randomItem);
+      }
+      alert(`¡Se han agregado nuevos ítems a las cajas: ${randomItem.name}!`);
+      nextBoxUpdate = Date.now() + (20 * 60 * 1000);
+      saveGame();
+    }
+
+    function updateBoxCountdown() {
+      let diff = Math.max(0, nextBoxUpdate - Date.now());
+      let minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      let seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      document.getElementById("box-countdown").innerText =
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+      if (diff <= 0) {
+        updateBoxItems();
+      }
+    }
+
     setInterval(updateCountdown, 1000);
+    setInterval(updateBoxCountdown, 1000);
 
     loadGame();
     checkDailyReward();
