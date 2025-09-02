@@ -43,8 +43,8 @@
   </div>
 
   <div class="controls">
-    <button onclick="openBox('basica')">Abrir Caja Básica (500)</button>
-    <button onclick="openBox('epica')">Abrir Caja Épica (2000)</button>
+    <button onclick="openBox('basica')">Abrir Caja Básica (150)</button>
+    <button onclick="openBox('epica')">Abrir Caja Épica (1200)</button>
     <button onclick="sellAll()">Vender Todo</button>
     <button onclick="resetGame()">Reiniciar</button>
   </div>
@@ -57,7 +57,7 @@
   <script>
     let BOXES = {
       basica: {
-        price: 500,
+        price: 150,
         items: [
           { name: "Roblox Hat", value: 300 },
           { name: "Roblox Shirt", value: 200 },
@@ -66,7 +66,7 @@
         ]
       },
       epica: {
-        price: 2000,
+        price: 1200,
         items: [
           { name: "Dominus", value: 1500 },
           { name: "Red Valkyrie", value: 1200 },
@@ -214,13 +214,13 @@
       const now = Date.now();
       temporaryItems = temporaryItems.filter(ti => {
         if (ti.expires > now) return true;
-        // Eliminar de caja y pasar al inventario
+        // Eliminar de caja y pasar al inventario exclusivo con valor duplicado
         let box = BOXES[ti.box];
         box.items = box.items.filter(it => it.name !== ti.item.name);
-        const exclusiveItem = { name: `[EXCLUSIVO] ${ti.item.name}`, value: ti.item.value };
+        const exclusiveItem = { name: `[EXCLUSIVO] ${ti.item.name}`, value: ti.item.value * 2 };
         inventory.push(exclusiveItem);
         alert(`El ítem ${ti.item.name} ha expirado de ${ti.box} y fue guardado en tu inventario como exclusivo.`);
-        newsList.push(`El ítem ${ti.item.name} expiró de ${ti.box} y fue guardado en el inventario.`);
+        newsList.push(`El ítem ${ti.item.name} expiró de ${ti.box} y fue guardado en el inventario como exclusivo.`);
         return false;
       });
       saveGame();
