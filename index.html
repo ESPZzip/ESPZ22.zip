@@ -4,27 +4,26 @@
   <meta charset="UTF-8">
   <title>ESP:Z COINS - Cajas Roblox</title>
   <style>
-    body { font-family: Arial, sans-serif; background:#111; color:#fff; margin:0; padding:0; text-align:center; }
-    header { background:#222; padding:15px; font-size:26px; }
+    body { font-family: Arial, sans-serif; background:#f4f4f4; color:#333; margin:0; padding:0; text-align:center; }
+    header { background:#333; color:white; padding:15px; font-size:26px; }
     .coins { margin:20px; font-size:22px; }
     .container { display:flex; justify-content:center; gap:30px; margin:20px; flex-wrap:wrap; }
-    .box { background:#222; padding:20px; border-radius:15px; width:220px; }
+    .box { background:white; padding:20px; border-radius:10px; width:220px; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
     .box img { width:180px; height:180px; object-fit:contain; margin-bottom:10px; }
     .box h2 { font-size:18px; margin-bottom:10px; }
-    .box button { margin-top:10px; padding:10px 15px; border:none; border-radius:8px; background:#28a745; color:#fff; cursor:pointer; font-size:16px; display:block; width:100%; }
-    .inventory { padding:20px; background:#222; margin:20px; border-radius:15px; }
+    .box button { margin-top:10px; padding:10px 15px; border:none; border-radius:6px; background:#28a745; color:#fff; cursor:pointer; font-size:14px; display:block; width:100%; }
+    .inventory { padding:20px; background:white; margin:20px; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
     .inventory h2 { margin-bottom:10px; }
     .inventory-items { display:flex; flex-wrap:wrap; gap:15px; justify-content:center; }
-    .item { background:#333; padding:10px; border-radius:10px; width:120px; }
+    .item { background:#f9f9f9; padding:10px; border-radius:8px; width:120px; box-shadow:0 1px 4px rgba(0,0,0,0.1); }
     .item img { width:100px; height:100px; object-fit:contain; }
-    .rarity-común { color:lightgray; }
-    .rarity-raro { color:#4da6ff; }
-    .rarity-épico { color:#b84dff; }
-    .rarity-legendario { color:gold; text-shadow:0 0 8px gold; animation: shine 2s infinite; }
-    @keyframes shine { 50% { text-shadow:0 0 16px gold; } }
+    .rarity-común { color:gray; }
+    .rarity-raro { color:#007bff; }
+    .rarity-épico { color:#8000ff; }
+    .rarity-legendario { color:gold; font-weight:bold; }
     .sell-btn { margin-top:5px; padding:4px 8px; font-size:12px; cursor:pointer; background:#c00; border:none; border-radius:5px; color:white; }
     .sell-all-btn { margin-top:10px; padding:8px 15px; font-size:14px; cursor:pointer; background:#e67e22; border:none; border-radius:8px; color:white; }
-    #timerBox { position:fixed; top:15px; right:15px; background:#222; padding:10px 15px; border-radius:10px; border:2px solid #555; font-size:16px; }
+    #timerBox { position:fixed; top:15px; right:15px; background:#fff; padding:10px 15px; border-radius:8px; border:1px solid #ccc; font-size:14px; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
   </style>
 </head>
 <body>
@@ -84,8 +83,8 @@
   </div>
 
   <!-- Modal -->
-  <div id="itemModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); justify-content:center; align-items:center;">
-    <div style="background:#222; padding:20px; border-radius:15px; max-width:600px; max-height:80%; overflow-y:auto;">
+  <div id="itemModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center;">
+    <div style="background:white; padding:20px; border-radius:10px; max-width:600px; max-height:80%; overflow-y:auto; color:#333;">
       <h2 id="modalTitle">Ítems</h2>
       <div id="modalContent"></div>
       <button style="margin-top:15px; padding:10px 15px;" onclick="closeModal()">Cerrar</button>
@@ -178,7 +177,7 @@
         div.className = "item";
         div.innerHTML = `
           <img src="${it.img}" alt="${it.name}">
-          <div class="rarity-${it.raridad}">${it.name}</div>
+          <div class="rarity-${it.rarity}">${it.name}</div>
           <small>Valor: ${it.value}</small><br>
           <button class="sell-btn" onclick="sellItem(${idx})">Vender</button>
         `;
@@ -230,7 +229,7 @@
       let html = "";
       box.items.forEach(it => {
         html += `
-          <div style="margin:10px; background:#333; padding:10px; border-radius:10px;">
+          <div style="margin:10px; background:#f9f9f9; padding:10px; border-radius:8px;">
             <img src="${it.img}" style="width:80px; height:80px;"><br>
             <b>${it.name}</b><br>
             Valor: ${it.value} | Prob: ${(it.prob*100).toFixed(2)}%
