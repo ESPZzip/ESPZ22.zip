@@ -42,19 +42,19 @@
 
   <div class="container">
     <div class="box">
-      <img src="https://tr.rbxcdn.com/e1ad8bf7a60b2bcc066edc0b7c682434/420/420/Hat/Webp/noFilter" alt="Caja Básica">
+      <img src="https://media.discordapp.net/attachments/1412227402414821426/1412580654931251301/P7ryoBP.png?ex=68b8cfc0&is=68b77e40&hm=592f99cda9bdffd708190dfc6af1d3312c509df9adb8edc2be7b4c3438f59a24&=&format=webp&quality=lossless&width=648&height=648" alt="Caja Básica">
       <h2>Caja Básica - 150 monedas</h2>
       <button onclick="openBox('basic')">Abrir</button>
       <button onclick="showItems('basic')">Ver ítems</button>
     </div>
     <div class="box">
-      <img src="https://tr.rbxcdn.com/e7339c197ae51d4b21eaf333be36b706/420/420/Hat/Webp/noFilter" alt="Caja Épica">
+      <img src="https://media.discordapp.net/attachments/1412227402414821426/1412574672939126824/TsnB7J6.png?ex=68b8ca2e&is=68b778ae&hm=42891d71e25bb4aab972f7aea9c9f35ebbe7a33aaafed161de7f4602aa2db66d&=&format=webp&quality=lossless&width=648&height=648" alt="Caja Épica">
       <h2>Caja Épica - 1200 monedas</h2>
       <button onclick="openBox('epic')">Abrir</button>
       <button onclick="showItems('epic')">Ver ítems</button>
     </div>
     <div class="box">
-      <img src="https://tr.rbxcdn.com/b7043de22033715c8ea293e4670bf02f/420/420/Hat/Webp/noFilter" alt="Caja Cracky">
+      <img src="https://media.discordapp.net/attachments/1412227402414821426/1412577203748733038/Ez7wbts.png?ex=68b8cc89&is=68b77b09&hm=4abb733306e095b48098c416100ba884dd5cdc9e05114c1889acb5996dc23308&=&format=webp&quality=lossless&width=648&height=648" alt="Caja Cracky">
       <h2>CAJA CRACKY (Especial) - 100,000 monedas</h2>
       <button onclick="openBox('cracky')">Abrir</button>
       <button onclick="showItems('cracky')">Ver ítems</button>
@@ -91,23 +91,23 @@
     document.getElementById('coins').innerText = coins;
 
     const itemsBasic = [
-      {name:"Robux Coin", value:100, rarity:"Común", icon:"⚪", prob:50, img:"https://tr.rbxcdn.com/9be29224c8e546d0c9efbe17c7ba1cb5/420/420/Hat/Webp/noFilter"},
-      {name:"Noob Character", value:150, rarity:"Común", icon:"⚪", prob:30, img:"https://tr.rbxcdn.com/3da1fd8b537ab31244e680e888fa2d6b/420/420/Hat/Webp/noFilter"},
-      {name:"Roblox Shirt", value:200, rarity:"Raro", icon:"🔹", prob:15, img:"https://tr.rbxcdn.com/7a3c5605fc33e9fc1b20e1f0662c3cf4/420/420/Hat/Webp/noFilter"},
-      {name:"Roblox Hat", value:300, rarity:"Raro", icon:"🔹", prob:5, img:"https://tr.rbxcdn.com/71e49a7d00d90293fadc72e69e8da920/420/420/Hat/Webp/noFilter"}
+      {name:"Robux Coin", value:100, rarity:"Común", icon:"⚪", prob:50},
+      {name:"Noob Character", value:150, rarity:"Común", icon:"⚪", prob:30},
+      {name:"Roblox Shirt", value:200, rarity:"Raro", icon:"🔹", prob:15},
+      {name:"Roblox Hat", value:300, rarity:"Raro", icon:"🔹", prob:5}
     ];
 
     const itemsEpic = [
-      {name:"Epic Roblox Sword", value:800, rarity:"Épic", icon:"💎", prob:40, img:"https://tr.rbxcdn.com/f5dbd908f079f8c3fb2f912790e5b13e/420/420/Hat/Webp/noFilter"},
-      {name:"Golden Robux", value:1000, rarity:"Épic", icon:"💎", prob:30, img:"https://tr.rbxcdn.com/0916f7d6675b67cf10d91510b48eb91f/420/420/Hat/Webp/noFilter"},
-      {name:"Red Valkyrie", value:1200, rarity:"Legendario", icon:"⭐", prob:20, img:"https://tr.rbxcdn.com/ab79ceecf54df106de13a04d1dfbbaad/420/420/Hat/Webp/noFilter"},
-      {name:"Dominus", value:1500, rarity:"Legendario", icon:"⭐", prob:10, img:"https://tr.rbxcdn.com/ff5c53a1f6300a4e8051a2ebadcb5e11/420/420/Hat/Webp/noFilter"}
+      {name:"Epic Roblox Sword", value:800, rarity:"Épic", icon:"💎", prob:40},
+      {name:"Golden Robux", value:1000, rarity:"Épic", icon:"💎", prob:30},
+      {name:"Red Valkyrie", value:1200, rarity:"Legendario", icon:"⭐", prob:20},
+      {name:"Dominus", value:1500, rarity:"Legendario", icon:"⭐", prob:10}
     ];
 
     const itemsCracky = [
-      {name:"Cracky Hat", value:250000, rarity:"Legendario", icon:"👑", prob:0.001, img:"https://tr.rbxcdn.com/f22dc14fc6f97152c16f6e3f4935d1c9/420/420/Hat/Webp/noFilter"},
-      {name:"Cracky Face", value:10000, rarity:"Raro", icon:"😀", prob:50, img:"https://tr.rbxcdn.com/4139a92a34d9e226d74e7a487c2fbb4f/420/420/Hat/Webp/noFilter"},
-      {name:"Cracky Mods", value:50000, rarity:"Épic", icon:"🛠", prob:20, img:"https://tr.rbxcdn.com/3a94dd7cf2058b98b5eb2d646f092d32/420/420/Hat/Webp/noFilter"}
+      {name:"Cracky Hat", value:250000, rarity:"Legendario", icon:"👑", prob:0.001},
+      {name:"Cracky Face", value:10000, rarity:"Raro", icon:"😀", prob:50},
+      {name:"Cracky Mods", value:50000, rarity:"Épic", icon:"🛠", prob:20}
     ];
 
     const extraItems = [
@@ -149,9 +149,7 @@
       let div = document.getElementById('inventoryList');
       div.innerHTML = '';
       inventory.forEach((item, idx)=>{
-        div.innerHTML += `<div class="item rarity-${item.rarity.toLowerCase()}">
-          <img src="${item.img||''}" alt="" width="30" height="30"> 
-          ${item.name} (${item.icon} ${item.rarity}) - Valor: ${item.value}
+        div.innerHTML += `<div class="item rarity-${item.rarity.toLowerCase()}">${item.name} (${item.icon} ${item.rarity}) - Valor: ${item.value}
           <button class='sell-btn' onclick='sellItem(${idx})'>Vender</button></div>`;
       });
     }
@@ -196,7 +194,6 @@
       cont.innerHTML = '';
       items.forEach(it=>{
         cont.innerHTML += `<div class="item-card">
-          <img src="${it.img||''}" alt="">
           <div><b>${it.name}</b></div>
           <div>${it.icon} ${it.rarity}</div>
           <div>Valor: ${it.value}</div>
