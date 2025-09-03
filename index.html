@@ -23,6 +23,7 @@
     .rarity-legendario { color:gold; text-shadow:0 0 8px gold; animation: shine 2s infinite; }
     @keyframes shine { 50% { text-shadow:0 0 16px gold; } }
     .sell-btn { margin-top:6px; padding:4px 8px; font-size:12px; cursor:pointer; background:#c00; border:none; border-radius:5px; color:white; }
+    .sell-all-btn { margin:10px auto; padding:8px 15px; font-size:14px; cursor:pointer; background:#ff4500; border:none; border-radius:8px; color:white; display:block; }
     #timerBox { position:fixed; top:15px; right:15px; background:#222; padding:10px 15px; border-radius:10px; border:2px solid #555; font-size:16px; display:flex; align-items:center; gap:6px; }
     #hourglass { animation: spin 2s linear infinite; display:inline-block; }
     @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
@@ -38,17 +39,17 @@
 
   <div class="container">
     <div class="box">
-      <img src="https://tr.rbxcdn.com/180DAY-e1ad8bf7a60b2bcc066edc0b7c682434/420/420/Hat/Webp/noFilter" alt="Caja Básica">
+      <img src="https://media.discordapp.net/attachments/1412227402414821426/1412580654931251301/P7ryoBP.png" alt="Caja Básica">
       <h2>Caja Básica - 150 monedas</h2>
       <button onclick="openBox('basic')">Abrir</button>
     </div>
     <div class="box">
-      <img src="https://tr.rbxcdn.com/180DAY-e7339c197ae51d4b21eaf333be36b706/420/420/Hat/Webp/noFilter" alt="Caja Épica">
+      <img src="https://media.discordapp.net/attachments/1412227402414821426/1412574672939126824/TsnB7J6.png" alt="Caja Épica">
       <h2>Caja Épica - 1200 monedas</h2>
       <button onclick="openBox('epic')">Abrir</button>
     </div>
     <div class="box">
-      <img src="https://tr.rbxcdn.com/180DAY-b7043de22033715c8ea293e4670bf02f/420/420/Hat/Webp/noFilter" alt="Caja Cracky">
+      <img src="https://media.discordapp.net/attachments/1412227402414821426/1412577203748733038/Ez7wbts.png" alt="Caja Cracky">
       <h2>CAJA CRACKY (Especial) - 100,000 monedas</h2>
       <button onclick="openBox('cracky')">Abrir</button>
     </div>
@@ -56,6 +57,7 @@
 
   <div class="inventory">
     <h2>Inventario</h2>
+    <button class="sell-all-btn" onclick="sellAll()">🗑 Vender Todo</button>
     <div id="inventoryList" class="inventory-grid"></div>
   </div>
 
@@ -82,17 +84,17 @@
 
     // Ítems con imágenes
     const itemsBasic = [
-      {name:"Robux Coin", value:100, rarity:"Común", img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/ROBUX_2014_Logo.svg/1024px-ROBUX_2014_Logo.svg.png", prob:50},
-      {name:"Noob Character", value:150, rarity:"Común", img:"https://vp3zjvjttshy6341ql6o.c.websim.com/noob.png", prob:30},
-      {name:"Roblox Shirt", value:200, rarity:"Raro", img:"https://public.customuse.com/uploader/files/ccfe0116-4c04-4970-977a-0936b10f9813/779769ca-5e8a-4bd2-89a6-fa639be3e252.webp?v=10", prob:15},
-      {name:"Roblox Hat", value:300, rarity:"Raro", img:"https://tr.rbxcdn.com/180DAY-5cd5be2d554d1e8c96dd3002300f4245/420/420/Hat/Png/noFilter", prob:5}
+      {name:"Robux Coin", value:100, rarity:"Común", img:"https://tr.rbxcdn.com/8f46e5ac529f7b39b279b1091d651d81/420/420/Image/Png", prob:50},
+      {name:"Noob Character", value:150, rarity:"Común", img:"https://tr.rbxcdn.com/3b90e45d214fb88987a99ab6dbb31a90/420/420/Image/Png", prob:30},
+      {name:"Roblox Shirt", value:200, rarity:"Raro", img:"https://tr.rbxcdn.com/01dbdcb5e2ef4e2e166e9d14a6f9016f/420/420/Image/Png", prob:15},
+      {name:"Roblox Hat", value:300, rarity:"Raro", img:"https://tr.rbxcdn.com/34de807401c92ba64d18ecabf7ed6765/420/420/Image/Png", prob:5}
     ];
 
     const itemsEpic = [
-      {name:"Epic Roblox Sword", value:800, rarity:"Épic", img:"https://tr.rbxcdn.com/180DAY-77d0d0c65e9a926c22e89b507cbd4766/420/420/Gear/Png/noFilter", prob:40},
-      {name:"Golden Robux", value:1000, rarity:"Épic", img:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Robux_2019_Logo_gold.svg/250px-Robux_2019_Logo_gold.svg.png", prob:30},
-      {name:"Red Valkyrie", value:1200, rarity:"Legendario", img:"https://tr.rbxcdn.com/ca62fb3ee8fdad4897242afd4e3618dc/420/420/Hat/Webp", prob:20},
-      {name:"Dominus", value:1500, rarity:"Legendario", img:"https://ik.imagekit.io/x2dirkim6/images/avatars/characters/character_avatar_xZ7FWILYSo.webp?tr=w-3840", prob:10}
+      {name:"Epic Roblox Sword", value:800, rarity:"Épic", img:"https://tr.rbxcdn.com/7c6bc2a40cf2df75b2c0b6eb28de0bdf/420/420/Image/Png", prob:40},
+      {name:"Golden Robux", value:1000, rarity:"Épic", img:"https://tr.rbxcdn.com/4a4a4dfc2a7f6f9c3513dba22c5434aa/420/420/Image/Png", prob:30},
+      {name:"Red Valkyrie", value:1200, rarity:"Legendario", img:"https://tr.rbxcdn.com/fed0477a6ac8e1ab76859e86cdc84eeb/420/420/Image/Png", prob:20},
+      {name:"Dominus", value:1500, rarity:"Legendario", img:"https://tr.rbxcdn.com/746795af1e7cf6842a1d8fb34e66e4ae/420/420/Image/Png", prob:10}
     ];
 
     const itemsCracky = [
@@ -102,9 +104,9 @@
     ];
 
     const extraItems = [
-      {name:"Rainbow Dominus", value:2000, rarity:"Legendario", img:"https://static.wikia.nocookie.net/case-clicker-roblox/images/3/37/Rainbow_Sparkle_Time_Dominus.png/revision/latest?cb=20210603024304", prob:5},
-      {name:"Ban Hammer", value:1800, rarity:"Legendario", img:"https://static.wikia.nocookie.net/roblox/images/2/2b/B1.png/revision/latest?cb=20180702070128", prob:10},
-      {name:"Bloxy Award", value:2200, rarity:"Legendario", img:"https://tr.rbxcdn.com/180DAY-bf3f965c927263902a4bf0756663fcd4/420/420/Gear/Png/noFilter", prob:5}
+      {name:"Rainbow Dominus", value:2000, rarity:"Legendario", img:"https://tr.rbxcdn.com/746795af1e7cf6842a1d8fb34e66e4ae/420/420/Image/Png", prob:5},
+      {name:"Ban Hammer", value:1800, rarity:"Legendario", img:"https://tr.rbxcdn.com/2df02735e44d3dba2b12a2fc90d1c1fd/420/420/Image/Png", prob:10},
+      {name:"Bloxy Award", value:2200, rarity:"Legendario", img:"https://tr.rbxcdn.com/9089e2b2f18a9784f05ee4d84989e21d/420/420/Image/Png", prob:5}
     ];
 
     let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
@@ -160,6 +162,20 @@
         localStorage.setItem('inventory', JSON.stringify(inventory));
         document.getElementById('coins').innerText = coins;
         renderInventory();
+      }
+    }
+
+    function sellAll(){
+      if(inventory.length === 0){ alert("No tienes items en el inventario."); return; }
+      if(confirm("¿Seguro que quieres vender TODOS tus ítems?")){
+        let totalValue = inventory.reduce((sum, item)=> sum + item.value, 0);
+        coins += totalValue;
+        inventory = [];
+        localStorage.setItem('coins', coins);
+        localStorage.setItem('inventory', JSON.stringify(inventory));
+        document.getElementById('coins').innerText = coins;
+        renderInventory();
+        alert(`Vendiste todo por ${totalValue} monedas.`);
       }
     }
 
