@@ -9,28 +9,31 @@
     .coins { margin:20px; font-size:22px; }
     .container { display:flex; justify-content:center; gap:30px; margin:20px; flex-wrap:wrap; }
     .box { background:#222; padding:20px; border-radius:15px; width:220px; }
-    .box img { width:120px; height:120px; object-fit:contain; margin-bottom:10px; }
-    .box h2 { font-size:18px; margin-bottom:10px; }
-    .box button { margin-top:10px; padding:10px 15px; border:none; border-radius:8px; background:#28a745; color:#fff; cursor:pointer; font-size:16px; }
+    .box h2 { font-size:18px; margin:10px 0; }
+    .box img { width:120px; height:120px; object-fit:contain; border-radius:12px; }
+    .box button { margin-top:8px; padding:8px 12px; border:none; border-radius:8px; background:#28a745; color:#fff; cursor:pointer; font-size:14px; display:block; margin-left:auto; margin-right:auto; }
     .inventory { padding:20px; background:#222; margin:20px; border-radius:15px; }
     .inventory h2 { margin-bottom:10px; }
-    .inventory-grid { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; }
-    .item-card { background:#333; padding:10px; border-radius:10px; width:150px; text-align:center; }
-    .item-card img { width:60px; height:60px; object-fit:contain; margin-bottom:5px; }
+    .inventory .item { display:inline-block; margin:8px; padding:6px 10px; background:#333; border-radius:8px; }
     .rarity-común { color:lightgray; }
     .rarity-raro { color:#4da6ff; }
     .rarity-épic { color:#b84dff; }
     .rarity-legendario { color:gold; text-shadow:0 0 8px gold; animation: shine 2s infinite; }
     @keyframes shine { 50% { text-shadow:0 0 16px gold; } }
-    .sell-btn { margin-top:6px; padding:4px 8px; font-size:12px; cursor:pointer; background:#c00; border:none; border-radius:5px; color:white; }
-    .sell-all-btn { margin:10px auto; padding:8px 15px; font-size:14px; cursor:pointer; background:#ff4500; border:none; border-radius:8px; color:white; display:block; }
+    .sell-btn { margin-left:10px; padding:4px 8px; font-size:12px; cursor:pointer; background:#c00; border:none; border-radius:5px; color:white; }
+    .sell-all-btn { margin-top:10px; padding:8px 12px; font-size:14px; cursor:pointer; background:#e74c3c; border:none; border-radius:8px; color:white; }
     #timerBox { position:fixed; top:15px; right:15px; background:#222; padding:10px 15px; border-radius:10px; border:2px solid #555; font-size:16px; display:flex; align-items:center; gap:6px; }
     #hourglass { animation: spin 2s linear infinite; display:inline-block; }
     @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
     .panel-novedades { background:#222; margin:20px auto; padding:15px; border-radius:12px; width:60%; border:1px solid #555; }
-    .redeem { margin:20px auto; background:#222; padding:15px; border-radius:12px; width:60%; border:1px solid #555; }
-    .redeem input { padding:8px; border:none; border-radius:6px; width:60%; }
-    .redeem button { padding:8px 15px; border:none; border-radius:6px; background:#007bff; color:#fff; cursor:pointer; margin-left:10px; }
+    /* Modal */
+    .modal { display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; overflow:auto; background:rgba(0,0,0,0.7); }
+    .modal-content { background:#222; margin:5% auto; padding:20px; border-radius:15px; width:70%; color:#fff; }
+    .modal h2 { margin-bottom:15px; }
+    .close { float:right; font-size:28px; cursor:pointer; }
+    .items-grid { display:flex; flex-wrap:wrap; gap:15px; justify-content:center; }
+    .item-card { background:#333; border-radius:10px; padding:10px; width:160px; text-align:center; }
+    .item-card img { width:80px; height:80px; object-fit:contain; margin-bottom:8px; }
   </style>
 </head>
 <body>
@@ -42,23 +45,26 @@
       <img src="https://tr.rbxcdn.com/e1ad8bf7a60b2bcc066edc0b7c682434/420/420/Hat/Webp/noFilter" alt="Caja Básica">
       <h2>Caja Básica - 150 monedas</h2>
       <button onclick="openBox('basic')">Abrir</button>
+      <button onclick="showItems('basic')">Ver ítems</button>
     </div>
     <div class="box">
-      <img src="https://tr.rbxcdn.com/180DAY-e7339c197ae51d4b21eaf333be36b706/420/420/Hat/Webp/noFilter" alt="Caja Épica">
+      <img src="https://tr.rbxcdn.com/e7339c197ae51d4b21eaf333be36b706/420/420/Hat/Webp/noFilter" alt="Caja Épica">
       <h2>Caja Épica - 1200 monedas</h2>
       <button onclick="openBox('epic')">Abrir</button>
+      <button onclick="showItems('epic')">Ver ítems</button>
     </div>
     <div class="box">
-      <img src="https://tr.rbxcdn.com/180DAY-b7043de22033715c8ea293e4670bf02f/420/420/Hat/Webp/noFilter" alt="Caja Cracky">
+      <img src="https://tr.rbxcdn.com/b7043de22033715c8ea293e4670bf02f/420/420/Hat/Webp/noFilter" alt="Caja Cracky">
       <h2>CAJA CRACKY (Especial) - 100,000 monedas</h2>
       <button onclick="openBox('cracky')">Abrir</button>
+      <button onclick="showItems('cracky')">Ver ítems</button>
     </div>
   </div>
 
   <div class="inventory">
     <h2>Inventario</h2>
-    <button class="sell-all-btn" onclick="sellAll()">🗑 Vender Todo</button>
-    <div id="inventoryList" class="inventory-grid"></div>
+    <button class="sell-all-btn" onclick="sellAll()">Vender Todo</button>
+    <div id="inventoryList"></div>
   </div>
 
   <div class="panel-novedades">
@@ -66,14 +72,16 @@
     <div id="ultimoAgregado">Ninguno aún</div>
   </div>
 
-  <div class="redeem">
-    <h2>Canjear Código</h2>
-    <input type="text" id="codigoInput" placeholder="Ingresa tu código">
-    <button onclick="redeemCode()">Canjear</button>
-    <div id="mensajeCodigo"></div>
-  </div>
-
   <div id="timerBox"><span id="hourglass">⏳</span> <span id="timer">Cargando...</span></div>
+
+  <!-- Modal -->
+  <div id="itemsModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2 id="modalTitle">Ítems</h2>
+      <div id="modalItems" class="items-grid"></div>
+    </div>
+  </div>
 
   <audio id="soundNew" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
   <audio id="soundExpire" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3"></audio>
@@ -82,31 +90,30 @@
     let coins = parseInt(localStorage.getItem('coins')) || 0;
     document.getElementById('coins').innerText = coins;
 
-    // Ítems
     const itemsBasic = [
-      {name:"Robux Coin", value:100, rarity:"Común", img:"https://tr.rbxcdn.com/8f46e5ac529f7b39b279b1091d651d81/420/420/Image/Png", prob:50},
-      {name:"Noob Character", value:150, rarity:"Común", img:"https://tr.rbxcdn.com/3b90e45d214fb88987a99ab6dbb31a90/420/420/Image/Png", prob:30},
-      {name:"Roblox Shirt", value:200, rarity:"Raro", img:"https://tr.rbxcdn.com/01dbdcb5e2ef4e2e166e9d14a6f9016f/420/420/Image/Png", prob:15},
-      {name:"Roblox Hat", value:300, rarity:"Raro", img:"https://tr.rbxcdn.com/34de807401c92ba64d18ecabf7ed6765/420/420/Image/Png", prob:5}
+      {name:"Robux Coin", value:100, rarity:"Común", icon:"⚪", prob:50, img:"https://tr.rbxcdn.com/9be29224c8e546d0c9efbe17c7ba1cb5/420/420/Hat/Webp/noFilter"},
+      {name:"Noob Character", value:150, rarity:"Común", icon:"⚪", prob:30, img:"https://tr.rbxcdn.com/3da1fd8b537ab31244e680e888fa2d6b/420/420/Hat/Webp/noFilter"},
+      {name:"Roblox Shirt", value:200, rarity:"Raro", icon:"🔹", prob:15, img:"https://tr.rbxcdn.com/7a3c5605fc33e9fc1b20e1f0662c3cf4/420/420/Hat/Webp/noFilter"},
+      {name:"Roblox Hat", value:300, rarity:"Raro", icon:"🔹", prob:5, img:"https://tr.rbxcdn.com/71e49a7d00d90293fadc72e69e8da920/420/420/Hat/Webp/noFilter"}
     ];
 
     const itemsEpic = [
-      {name:"Epic Roblox Sword", value:800, rarity:"Épic", img:"https://tr.rbxcdn.com/7c6bc2a40cf2df75b2c0b6eb28de0bdf/420/420/Image/Png", prob:40},
-      {name:"Golden Robux", value:1000, rarity:"Épic", img:"https://tr.rbxcdn.com/4a4a4dfc2a7f6f9c3513dba22c5434aa/420/420/Image/Png", prob:30},
-      {name:"Red Valkyrie", value:1200, rarity:"Legendario", img:"https://tr.rbxcdn.com/fed0477a6ac8e1ab76859e86cdc84eeb/420/420/Image/Png", prob:20},
-      {name:"Dominus", value:1500, rarity:"Legendario", img:"https://tr.rbxcdn.com/746795af1e7cf6842a1d8fb34e66e4ae/420/420/Image/Png", prob:10}
+      {name:"Epic Roblox Sword", value:800, rarity:"Épic", icon:"💎", prob:40, img:"https://tr.rbxcdn.com/f5dbd908f079f8c3fb2f912790e5b13e/420/420/Hat/Webp/noFilter"},
+      {name:"Golden Robux", value:1000, rarity:"Épic", icon:"💎", prob:30, img:"https://tr.rbxcdn.com/0916f7d6675b67cf10d91510b48eb91f/420/420/Hat/Webp/noFilter"},
+      {name:"Red Valkyrie", value:1200, rarity:"Legendario", icon:"⭐", prob:20, img:"https://tr.rbxcdn.com/ab79ceecf54df106de13a04d1dfbbaad/420/420/Hat/Webp/noFilter"},
+      {name:"Dominus", value:1500, rarity:"Legendario", icon:"⭐", prob:10, img:"https://tr.rbxcdn.com/ff5c53a1f6300a4e8051a2ebadcb5e11/420/420/Hat/Webp/noFilter"}
     ];
 
     const itemsCracky = [
-      {name:"Cracky Hat", value:250000, rarity:"Legendario", img:"https://tr.rbxcdn.com/746795af1e7cf6842a1d8fb34e66e4ae/420/420/Image/Png", prob:0.001},
-      {name:"Cracky Face", value:10000, rarity:"Raro", img:"https://tr.rbxcdn.com/7d42fef6fdbd25bbf6d8dca9e5078e1a/420/420/Image/Png", prob:50},
-      {name:"Cracky Mods", value:50000, rarity:"Épic", img:"https://tr.rbxcdn.com/8f46e5ac529f7b39b279b1091d651d81/420/420/Image/Png", prob:20}
+      {name:"Cracky Hat", value:250000, rarity:"Legendario", icon:"👑", prob:0.001, img:"https://tr.rbxcdn.com/f22dc14fc6f97152c16f6e3f4935d1c9/420/420/Hat/Webp/noFilter"},
+      {name:"Cracky Face", value:10000, rarity:"Raro", icon:"😀", prob:50, img:"https://tr.rbxcdn.com/4139a92a34d9e226d74e7a487c2fbb4f/420/420/Hat/Webp/noFilter"},
+      {name:"Cracky Mods", value:50000, rarity:"Épic", icon:"🛠", prob:20, img:"https://tr.rbxcdn.com/3a94dd7cf2058b98b5eb2d646f092d32/420/420/Hat/Webp/noFilter"}
     ];
 
     const extraItems = [
-      {name:"Rainbow Dominus", value:2000, rarity:"Legendario", img:"https://tr.rbxcdn.com/746795af1e7cf6842a1d8fb34e66e4ae/420/420/Image/Png", prob:5},
-      {name:"Ban Hammer", value:1800, rarity:"Legendario", img:"https://tr.rbxcdn.com/2df02735e44d3dba2b12a2fc90d1c1fd/420/420/Image/Png", prob:10},
-      {name:"Bloxy Award", value:2200, rarity:"Legendario", img:"https://tr.rbxcdn.com/9089e2b2f18a9784f05ee4d84989e21d/420/420/Image/Png", prob:5}
+      {name:"Rainbow Dominus", value:2000, rarity:"Legendario", icon:"⭐", prob:5},
+      {name:"Ban Hammer", value:1800, rarity:"Legendario", icon:"⭐", prob:10},
+      {name:"Bloxy Award", value:2200, rarity:"Legendario", icon:"⭐", prob:5}
     ];
 
     let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
@@ -135,27 +142,23 @@
       inventory.push(won);
       localStorage.setItem('inventory', JSON.stringify(inventory));
       renderInventory();
-      alert(`¡Ganaste ${won.name}!`);
+      alert(`¡Ganaste ${won.name} (${won.icon} ${won.rarity})!`);
     }
 
     function renderInventory(){
       let div = document.getElementById('inventoryList');
       div.innerHTML = '';
       inventory.forEach((item, idx)=>{
-        div.innerHTML += `
-          <div class="item-card rarity-${item.rarity.toLowerCase()}">
-            <img src="${item.img}" alt="${item.name}">
-            <div>${item.name}</div>
-            <div>${item.rarity}</div>
-            <div>💰 ${item.value}</div>
-            <button class='sell-btn' onclick='sellItem(${idx})'>Vender</button>
-          </div>`;
+        div.innerHTML += `<div class="item rarity-${item.rarity.toLowerCase()}">
+          <img src="${item.img||''}" alt="" width="30" height="30"> 
+          ${item.name} (${item.icon} ${item.rarity}) - Valor: ${item.value}
+          <button class='sell-btn' onclick='sellItem(${idx})'>Vender</button></div>`;
       });
     }
 
     function sellItem(i){
       let item = inventory[i];
-      if(confirm(`¿Vender ${item.name} por ${item.value} monedas?`)){
+      if(confirm(`¿Vender ${item.name} (${item.icon} ${item.rarity}) por ${item.value} monedas?`)){
         coins += item.value;
         inventory.splice(i,1);
         localStorage.setItem('coins', coins);
@@ -166,20 +169,52 @@
     }
 
     function sellAll(){
-      if(inventory.length === 0){ alert("No tienes items en el inventario."); return; }
-      if(confirm("¿Seguro que quieres vender TODOS tus ítems?")){
-        let totalValue = inventory.reduce((sum, item)=> sum + item.value, 0);
-        coins += totalValue;
+      if(inventory.length===0){ alert("No tienes ítems."); return; }
+      if(confirm("¿Vender todos tus ítems?")){
+        let total = inventory.reduce((sum,i)=>sum+i.value,0);
+        coins += total;
         inventory = [];
         localStorage.setItem('coins', coins);
         localStorage.setItem('inventory', JSON.stringify(inventory));
         document.getElementById('coins').innerText = coins;
         renderInventory();
-        alert(`Vendiste todo por ${totalValue} monedas.`);
+        alert(`Vendiste todo por ${total} monedas`);
       }
     }
 
     renderInventory();
+
+    // Modal funciones
+    function showItems(type){
+      let items = [];
+      let title = "";
+      if(type=="basic"){ items=itemsBasic; title="Ítems de Caja Básica"; }
+      if(type=="epic"){ items=itemsEpic; title="Ítems de Caja Épica"; }
+      if(type=="cracky"){ items=itemsCracky; title="Ítems de Caja Cracky"; }
+      document.getElementById('modalTitle').innerText = title;
+      let cont = document.getElementById('modalItems');
+      cont.innerHTML = '';
+      items.forEach(it=>{
+        cont.innerHTML += `<div class="item-card">
+          <img src="${it.img||''}" alt="">
+          <div><b>${it.name}</b></div>
+          <div>${it.icon} ${it.rarity}</div>
+          <div>Valor: ${it.value}</div>
+          <div>Prob: ${it.prob}%</div>
+        </div>`;
+      });
+      document.getElementById('itemsModal').style.display = "block";
+    }
+
+    function closeModal(){
+      document.getElementById('itemsModal').style.display = "none";
+    }
+
+    window.onclick = function(event){
+      if(event.target == document.getElementById('itemsModal')){
+        closeModal();
+      }
+    }
 
     // Timer 20 min
     let nextUpdate = localStorage.getItem('nextItemUpdate');
@@ -197,7 +232,7 @@
         let newItem = weightedRandom(extraItems);
         itemsBasic.push({...newItem, temp:true, expire:Date.now()+60*60*1000});
         itemsEpic.push({...newItem, temp:true, expire:Date.now()+60*60*1000});
-        document.getElementById('ultimoAgregado').innerText = `${newItem.name}`;
+        document.getElementById('ultimoAgregado').innerText = `${newItem.name} (${newItem.icon} ${newItem.rarity})`;
         document.getElementById('soundNew').play();
         nextUpdate = Date.now() + 20*60*1000;
         localStorage.setItem('nextItemUpdate', nextUpdate);
@@ -208,7 +243,7 @@
       document.getElementById('timer').innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     },1000);
 
-    // Expiración
+    // Expiración de ítems
     setInterval(()=>{
       let now = Date.now();
       function check(arr){
@@ -225,30 +260,6 @@
       check(itemsBasic);
       check(itemsEpic);
     },5000);
-
-    // Códigos
-    const usedCodes = JSON.parse(localStorage.getItem('usedCodes')) || [];
-
-    function redeemCode(){
-      const input = document.getElementById('codigoInput').value.trim();
-      const mensaje = document.getElementById('mensajeCodigo');
-
-      if(usedCodes.includes(input)){
-        mensaje.innerText = "❌ Este código ya fue canjeado.";
-        return;
-      }
-
-      if(input === "CRACKYRECOMPENSE"){
-        coins += 50000;
-        usedCodes.push(input);
-        localStorage.setItem('coins', coins);
-        localStorage.setItem('usedCodes', JSON.stringify(usedCodes));
-        document.getElementById('coins').innerText = coins;
-        mensaje.innerText = "✅ Código canjeado: +50,000 monedas.";
-      } else {
-        mensaje.innerText = "❌ Código inválido.";
-      }
-    }
   </script>
 </body>
 </html>
