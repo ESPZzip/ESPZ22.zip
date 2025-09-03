@@ -9,32 +9,22 @@
     .coins { margin:20px; font-size:22px; }
     .container { display:flex; justify-content:center; gap:30px; margin:20px; flex-wrap:wrap; }
     .box { background:#222; padding:20px; border-radius:15px; width:220px; }
-    .box h2 { font-size:18px; margin:10px 0; }
-    .box img { width:120px; height:120px; object-fit:contain; border-radius:12px; }
-    .box button { margin-top:8px; padding:8px 12px; border:none; border-radius:8px; background:#28a745; color:#fff; cursor:pointer; font-size:14px; display:block; margin-left:auto; margin-right:auto; }
+    .box img { width:180px; height:180px; object-fit:contain; margin-bottom:10px; }
+    .box h2 { font-size:20px; margin-bottom:10px; }
+    .box button { margin-top:10px; padding:10px 15px; border:none; border-radius:8px; background:#28a745; color:#fff; cursor:pointer; font-size:16px; display:block; width:100%; }
     .inventory { padding:20px; background:#222; margin:20px; border-radius:15px; }
     .inventory h2 { margin-bottom:10px; }
-    .inventory .item { display:inline-block; margin:8px; padding:6px 10px; background:#333; border-radius:8px; width:160px; vertical-align:top; }
-    .inventory .item img { width:70px; height:70px; object-fit:contain; display:block; margin:0 auto 6px auto; }
+    .inventory-items { display:flex; flex-wrap:wrap; gap:15px; justify-content:center; }
+    .item { background:#333; padding:10px; border-radius:8px; width:120px; }
+    .item img { width:100px; height:100px; object-fit:contain; }
     .rarity-común { color:lightgray; }
     .rarity-raro { color:#4da6ff; }
-    .rarity-épic { color:#b84dff; }
-    .rarity-legendario { color:gold; text-shadow:0 0 8px gold; animation: shine 2s infinite; }
-    @keyframes shine { 50% { text-shadow:0 0 16px gold; } }
+    .rarity-épico { color:#b84dff; }
+    .rarity-legendario { color:gold; text-shadow:0 0 8px gold; }
     .sell-btn { margin-top:5px; padding:4px 8px; font-size:12px; cursor:pointer; background:#c00; border:none; border-radius:5px; color:white; }
-    .sell-all-btn { margin-top:10px; padding:8px 12px; font-size:14px; cursor:pointer; background:#e74c3c; border:none; border-radius:8px; color:white; }
-    #timerBox { position:fixed; top:15px; right:15px; background:#222; padding:10px 15px; border-radius:10px; border:2px solid #555; font-size:16px; display:flex; align-items:center; gap:6px; }
-    #hourglass { animation: spin 2s linear infinite; display:inline-block; }
-    @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
-    .panel-novedades { background:#222; margin:20px auto; padding:15px; border-radius:12px; width:60%; border:1px solid #555; }
-    /* Modal */
-    .modal { display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; overflow:auto; background:rgba(0,0,0,0.7); }
-    .modal-content { background:#222; margin:5% auto; padding:20px; border-radius:15px; width:70%; color:#fff; }
-    .modal h2 { margin-bottom:15px; }
-    .close { float:right; font-size:28px; cursor:pointer; }
-    .items-grid { display:flex; flex-wrap:wrap; gap:15px; justify-content:center; }
-    .item-card { background:#333; border-radius:10px; padding:10px; width:160px; text-align:center; }
-    .item-card img { width:80px; height:80px; object-fit:contain; margin-bottom:8px; }
+    .sell-all-btn { margin-top:15px; padding:10px 15px; font-size:14px; cursor:pointer; background:#e67e22; border:none; border-radius:8px; color:white; }
+    #itemModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); justify-content:center; align-items:center; }
+    #itemModal .modal-content { background:#222; padding:20px; border-radius:10px; max-width:600px; max-height:80%; overflow-y:auto; color:#fff; }
   </style>
 </head>
 <body>
@@ -42,18 +32,23 @@
   <div class="coins">Monedas: <span id="coins">0</span></div>
 
   <div class="container">
+    <!-- Caja Básica -->
     <div class="box">
       <img src="https://media.discordapp.net/attachments/1412227402414821426/1412580654931251301/P7ryoBP.png" alt="Caja Básica">
       <h2>Caja Básica - 150 monedas</h2>
       <button onclick="openBox('basic')">Abrir</button>
       <button onclick="showItems('basic')">Ver ítems</button>
     </div>
+
+    <!-- Caja Épica -->
     <div class="box">
       <img src="https://media.discordapp.net/attachments/1412227402414821426/1412574672939126824/TsnB7J6.png" alt="Caja Épica">
       <h2>Caja Épica - 1200 monedas</h2>
       <button onclick="openBox('epic')">Abrir</button>
       <button onclick="showItems('epic')">Ver ítems</button>
     </div>
+
+    <!-- Caja Cracky -->
     <div class="box">
       <img src="https://media.discordapp.net/attachments/1412227402414821426/1412577203748733038/Ez7wbts.png" alt="Caja Cracky">
       <h2>CAJA CRACKY (Especial) - 100,000 monedas</h2>
@@ -64,204 +59,163 @@
 
   <div class="inventory">
     <h2>Inventario</h2>
-    <button class="sell-all-btn" onclick="sellAll()">Vender Todo</button>
-    <div id="inventoryList"></div>
+    <div class="inventory-items" id="inventory"></div>
+    <button class="sell-all-btn" onclick="sellAll()">Vender todos</button>
   </div>
 
-  <div class="panel-novedades">
-    <h2>Último ítem agregado</h2>
-    <div id="ultimoAgregado">Ninguno aún</div>
+  <div style="margin:20px;">
+    <h2>Canjear Código</h2>
+    <input type="text" id="codeInput" placeholder="Escribe tu código aquí">
+    <button onclick="redeemCode()">Canjear</button>
   </div>
-
-  <div id="timerBox"><span id="hourglass">⏳</span> <span id="timer">Cargando...</span></div>
 
   <!-- Modal -->
-  <div id="itemsModal" class="modal">
+  <div id="itemModal">
     <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
       <h2 id="modalTitle">Ítems</h2>
-      <div id="modalItems" class="items-grid"></div>
+      <div id="modalContent"></div>
+      <button onclick="closeModal()">Cerrar</button>
     </div>
   </div>
 
-  <audio id="soundNew" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
-  <audio id="soundExpire" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3"></audio>
-
   <script>
-    let coins = parseInt(localStorage.getItem('coins')) || 0;
-    document.getElementById('coins').innerText = coins;
-
-    const itemsBasic = [
-      {name:"Robux Coin", value:100, rarity:"Común", icon:"⚪", prob:50, img:"https://tr.rbxcdn.com/180DAY-1/420/420/Hat/Webp/noFilter"},
-      {name:"Noob Character", value:150, rarity:"Común", icon:"⚪", prob:30, img:"https://tr.rbxcdn.com/180DAY-2/420/420/Hat/Webp/noFilter"},
-      {name:"Roblox Shirt", value:200, rarity:"Raro", icon:"🔹", prob:15, img:"https://tr.rbxcdn.com/180DAY-3/420/420/Hat/Webp/noFilter"},
-      {name:"Roblox Hat", value:300, rarity:"Raro", icon:"🔹", prob:5, img:"https://tr.rbxcdn.com/180DAY-4/420/420/Hat/Webp/noFilter"}
-    ];
-
-    const itemsEpic = [
-      {name:"Epic Roblox Sword", value:800, rarity:"Épic", icon:"💎", prob:40, img:"https://tr.rbxcdn.com/180DAY-5/420/420/Hat/Webp/noFilter"},
-      {name:"Golden Robux", value:1000, rarity:"Épic", icon:"💎", prob:30, img:"https://tr.rbxcdn.com/180DAY-6/420/420/Hat/Webp/noFilter"},
-      {name:"Red Valkyrie", value:1200, rarity:"Legendario", icon:"⭐", prob:20, img:"https://tr.rbxcdn.com/180DAY-7/420/420/Hat/Webp/noFilter"},
-      {name:"Dominus", value:1500, rarity:"Legendario", icon:"⭐", prob:10, img:"https://tr.rbxcdn.com/180DAY-8/420/420/Hat/Webp/noFilter"}
-    ];
-
-    const itemsCracky = [
-      {name:"Cracky Hat", value:250000, rarity:"Legendario", icon:"👑", prob:0.001, img:"https://tr.rbxcdn.com/180DAY-9/420/420/Hat/Webp/noFilter"},
-      {name:"Cracky Face", value:10000, rarity:"Raro", icon:"😀", prob:50, img:"https://tr.rbxcdn.com/180DAY-10/420/420/Hat/Webp/noFilter"},
-      {name:"Cracky Mods", value:50000, rarity:"Épic", icon:"🛠", prob:20, img:"https://tr.rbxcdn.com/180DAY-11/420/420/Hat/Webp/noFilter"}
-    ];
-
-    const extraItems = [
-      {name:"Rainbow Dominus", value:2000, rarity:"Legendario", icon:"⭐", prob:5, img:"https://tr.rbxcdn.com/180DAY-12/420/420/Hat/Webp/noFilter"},
-      {name:"Ban Hammer", value:1800, rarity:"Legendario", icon:"⭐", prob:10, img:"https://tr.rbxcdn.com/180DAY-13/420/420/Hat/Webp/noFilter"},
-      {name:"Bloxy Award", value:2200, rarity:"Legendario", icon:"⭐", prob:5, img:"https://tr.rbxcdn.com/180DAY-14/420/420/Hat/Webp/noFilter"}
-    ];
-
+    let coins = parseInt(localStorage.getItem('coins')) || 2500;
     let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+    let codesUsed = JSON.parse(localStorage.getItem('codesUsed')) || {};
 
-    function weightedRandom(items) {
-      let total = items.reduce((sum, i) => sum + i.prob, 0);
-      let r = Math.random() * total;
-      let acum = 0;
-      for (let i of items) {
-        acum += i.prob;
-        if (r <= acum) return i;
+    document.getElementById("coins").innerText = coins;
+
+    const boxes = {
+      basic: {
+        name: "Caja Básica",
+        price: 150,
+        items: [
+          { name:"Classic Fedora", value:200, prob:0.5, rarity:"común", img:"https://tr.rbxcdn.com/30DAY-3a6c7ffb5ec1fbe3c9b514cfa4737860/420/420/Hat/Webp/noFilter" },
+          { name:"Red Roblox Cap", value:500, prob:0.3, rarity:"raro", img:"https://tr.rbxcdn.com/30DAY-6d6a23f7b47e6a2b05682d1830f4a9b1/420/420/Hat/Webp/noFilter" },
+          { name:"Shaggy", value:2000, prob:0.2, rarity:"épico", img:"https://tr.rbxcdn.com/30DAY-8c0a21ad62c26f350c89072c04d79d97/420/420/Hat/Webp/noFilter" }
+        ]
+      },
+      epic: {
+        name: "Caja Épica",
+        price: 1200,
+        items: [
+          { name:"Valkyrie Helm", value:10000, prob:0.5, rarity:"épico", img:"https://tr.rbxcdn.com/30DAY-b730d6e9f65d9eebfdbeed52b21965b8/420/420/Hat/Webp/noFilter" },
+          { name:"Sparkle Time Fedora", value:20000, prob:0.3, rarity:"legendario", img:"https://tr.rbxcdn.com/30DAY-00e55f53d6f8ec65aa2184141f1999c3/420/420/Hat/Webp/noFilter" },
+          { name:"Dominus Aureus", value:50000, prob:0.05, rarity:"legendario", img:"https://tr.rbxcdn.com/30DAY-24a0cfbc7c4b93aeeeb7bc01db57a97c/420/420/Hat/Webp/noFilter" }
+        ]
+      },
+      cracky: {
+        name: "Caja Cracky",
+        price: 100000,
+        items: [
+          { name:"Cracky Hat", value:250000, prob:0.001, rarity:"legendario", img:"https://tr.rbxcdn.com/30DAY-3de1a12a6e72bb6a1e536cb6bff02d9c/420/420/Hat/Webp/noFilter" },
+          { name:"Cracky Face", value:10000, prob:0.5, rarity:"raro", img:"https://tr.rbxcdn.com/30DAY-8708c8e90f7c763ff04bb4eebabb9df0/420/420/Face/Webp/noFilter" },
+          { name:"Cracky Mods", value:50000, prob:0.2, rarity:"épico", img:"https://tr.rbxcdn.com/30DAY-9de6f14d3ef9c601fc7d0c99364a3b5d/420/420/Accessory/Webp/noFilter" }
+        ]
       }
-      return items[0];
-    }
+    };
 
-    function openBox(type){
-      let boxItems, cost;
-      if(type=="basic"){ boxItems=itemsBasic; cost=150; }
-      if(type=="epic"){ boxItems=itemsEpic; cost=1200; }
-      if(type=="cracky"){ boxItems=itemsCracky; cost=100000; }
-      if(coins < cost){ alert("No tienes suficientes monedas"); return; }
-      coins -= cost;
+    function save() {
       localStorage.setItem('coins', coins);
-      document.getElementById('coins').innerText = coins;
-      let won = weightedRandom(boxItems);
-      inventory.push(won);
       localStorage.setItem('inventory', JSON.stringify(inventory));
-      renderInventory();
-      alert(`¡Ganaste ${won.name}!`);
+      localStorage.setItem('codesUsed', JSON.stringify(codesUsed));
     }
 
-    function renderInventory(){
-      let div = document.getElementById('inventoryList');
-      div.innerHTML = '';
-      inventory.forEach((item, idx)=>{
-        div.innerHTML += `<div class="item rarity-${item.rarity.toLowerCase()}">
-          <img src="${item.img}" alt="${item.name}">
-          ${item.name} (${item.icon} ${item.rarity})<br>Valor: ${item.value}
-          <button class='sell-btn' onclick='sellItem(${idx})'>Vender</button>
-        </div>`;
-      });
-    }
+    function openBox(type) {
+      const box = boxes[type];
+      if (coins < box.price) { alert("No tienes suficientes monedas."); return; }
+      coins -= box.price;
+      document.getElementById("coins").innerText = coins;
 
-    function sellItem(i){
-      let item = inventory[i];
-      if(confirm(`¿Vender ${item.name} por ${item.value} monedas?`)){
-        coins += item.value;
-        inventory.splice(i,1);
-        localStorage.setItem('coins', coins);
-        localStorage.setItem('inventory', JSON.stringify(inventory));
-        document.getElementById('coins').innerText = coins;
-        renderInventory();
-      }
-    }
-
-    function sellAll(){
-      if(inventory.length===0){ alert("No tienes ítems."); return; }
-      if(confirm("¿Vender todos tus ítems?")){
-        let total = inventory.reduce((sum,i)=>sum+i.value,0);
-        coins += total;
-        inventory = [];
-        localStorage.setItem('coins', coins);
-        localStorage.setItem('inventory', JSON.stringify(inventory));
-        document.getElementById('coins').innerText = coins;
-        renderInventory();
-        alert(`Vendiste todo por ${total} monedas`);
-      }
-    }
-
-    renderInventory();
-
-    // Modal funciones
-    function showItems(type){
-      let items = [];
-      let title = "";
-      if(type=="basic"){ items=itemsBasic; title="Ítems de Caja Básica"; }
-      if(type=="epic"){ items=itemsEpic; title="Ítems de Caja Épica"; }
-      if(type=="cracky"){ items=itemsCracky; title="Ítems de Caja Cracky"; }
-      document.getElementById('modalTitle').innerText = title;
-      let cont = document.getElementById('modalItems');
-      cont.innerHTML = '';
-      items.forEach(it=>{
-        cont.innerHTML += `<div class="item-card">
-          <img src="${it.img}" alt="${it.name}">
-          <div><b>${it.name}</b></div>
-          <div>${it.icon} ${it.rarity}</div>
-          <div>Valor: ${it.value}</div>
-          <div>Prob: ${it.prob}%</div>
-        </div>`;
-      });
-      document.getElementById('itemsModal').style.display = "block";
-    }
-
-    function closeModal(){
-      document.getElementById('itemsModal').style.display = "none";
-    }
-
-    window.onclick = function(event){
-      if(event.target == document.getElementById('itemsModal')){
-        closeModal();
-      }
-    }
-
-    // Timer 20 min
-    let nextUpdate = localStorage.getItem('nextItemUpdate');
-    if(!nextUpdate){
-      nextUpdate = Date.now() + 20*60*1000;
-      localStorage.setItem('nextItemUpdate', nextUpdate);
-    } else {
-      nextUpdate = parseInt(nextUpdate);
-    }
-
-    setInterval(()=>{
-      let now = Date.now();
-      let diff = nextUpdate - now;
-      if(diff <= 0){
-        let newItem = weightedRandom(extraItems);
-        itemsBasic.push({...newItem, temp:true, expire:Date.now()+60*60*1000});
-        itemsEpic.push({...newItem, temp:true, expire:Date.now()+60*60*1000});
-        document.getElementById('ultimoAgregado').innerText = `${newItem.name}`;
-        document.getElementById('soundNew').play();
-        nextUpdate = Date.now() + 20*60*1000;
-        localStorage.setItem('nextItemUpdate', nextUpdate);
-      }
-      let m = Math.floor(diff/60000);
-      let s = Math.floor((diff%60000)/1000);
-      if(m<0||s<0){m=0;s=0;}
-      document.getElementById('timer').innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    },1000);
-
-    // Expiración de ítems
-    setInterval(()=>{
-      let now = Date.now();
-      function check(arr){
-        for(let i=arr.length-1;i>=0;i--){
-          if(arr[i].temp && arr[i].expire<=now){
-            inventory.push({...arr[i], name: arr[i].name+" [EXCLUSIVO]"});
-            document.getElementById('soundExpire').play();
-            arr.splice(i,1);
-            localStorage.setItem('inventory', JSON.stringify(inventory));
-            renderInventory();
-          }
+      let rand = Math.random();
+      let cumulative = 0;
+      for (let item of box.items) {
+        cumulative += item.prob;
+        if (rand <= cumulative) {
+          inventory.push(item);
+          alert("¡Ganaste: " + item.name + "!");
+          break;
         }
       }
-      check(itemsBasic);
-      check(itemsEpic);
-    },5000);
+      renderInventory();
+      save();
+    }
+
+    function renderInventory() {
+      const inv = document.getElementById("inventory");
+      inv.innerHTML = "";
+      inventory.forEach((it, idx) => {
+        let div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
+          <img src="${it.img}" alt="${it.name}">
+          <div class="rarity-${it.rarity}">${it.name}</div>
+          <small>Valor: ${it.value}</small><br>
+          <button class="sell-btn" onclick="sellItem(${idx})">Vender</button>
+        `;
+        inv.appendChild(div);
+      });
+    }
+    renderInventory();
+
+    function sellItem(i) {
+      let item = inventory[i];
+      coins += item.value;
+      inventory.splice(i, 1);
+      document.getElementById("coins").innerText = coins;
+      renderInventory();
+      save();
+    }
+
+    function sellAll() {
+      let total = inventory.reduce((sum, it) => sum + it.value, 0);
+      if (total === 0) { alert("No tienes ítems."); return; }
+      coins += total;
+      inventory = [];
+      document.getElementById("coins").innerText = coins;
+      renderInventory();
+      save();
+      alert("Vendiste todos tus ítems por " + total + " monedas.");
+    }
+
+    function redeemCode() {
+      const input = document.getElementById("codeInput").value.trim().toUpperCase();
+      if (!input) return;
+      if (codesUsed[input]) { alert("Ya usaste este código."); return; }
+
+      if (input === "CRACKYRECOMPENSE") {
+        coins += 50000;
+        alert("¡Código canjeado! Ganaste 50,000 monedas.");
+        codesUsed[input] = true;
+      } else {
+        alert("Código inválido.");
+        return;
+      }
+
+      document.getElementById("coins").innerText = coins;
+      save();
+    }
+
+    function showItems(type) {
+      const box = boxes[type];
+      document.getElementById("modalTitle").innerText = box.name;
+      let html = "";
+      box.items.forEach(it => {
+        html += `
+          <div style="margin:10px; background:#333; padding:10px; border-radius:8px;">
+            <img src="${it.img}" style="width:80px; height:80px;"><br>
+            <b>${it.name}</b><br>
+            Valor: ${it.value} | Prob: ${(it.prob*100).toFixed(2)}%
+          </div>
+        `;
+      });
+      document.getElementById("modalContent").innerHTML = html;
+      document.getElementById("itemModal").style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("itemModal").style.display = "none";
+    }
   </script>
 </body>
 </html>
